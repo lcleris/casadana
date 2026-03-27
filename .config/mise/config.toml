@@ -1,0 +1,52 @@
+[tools]
+bun = "1"
+go = "1.26"
+
+[tasks.dev-api]
+description = "Run API in development"
+run = "cd apps/api && go run ./cmd/server"
+
+[tasks.dev-web]
+description = "Run web in development"
+run = "bun --cwd apps/web dev"
+
+[tasks.build-api]
+description = "Build API binary"
+run = "cd apps/api && go build -o bin/server ./cmd/server"
+
+[tasks.build-web]
+description = "Build web for production"
+run = "bun --cwd apps/web build"
+
+[tasks.test-api]
+description = "Run Go tests"
+run = "cd apps/api && go test ./..."
+
+[tasks.lint-api]
+description = "Lint Go code"
+run = "cd apps/api && golangci-lint run"
+
+[tasks.migrate-up]
+description = "Run DB migrations"
+run = "cd apps/api && go run ./cmd/migrate up"
+
+[tasks.migrate-down]
+description = "Rollback last migration"
+run = "cd apps/api && go run ./cmd/migrate down"
+
+[tasks.generate]
+description = "Generate sqlc + openapi types"
+run = """
+cd apps/api && sqlc generate
+bun --cwd packages/types generate
+"""
+
+[tasks.docker-dev]
+run = "docker compose -f .docker/docker-compose.yml --env-file .env.dev --profile dev up -d"
+
+[tasks.docker-prod]
+run = "docker compose -f .docker/docker-compose.yml --env-file .env.prod --profile prod up -d"
+
+[tasks.docker-down]
+description = "Stop all containers"
+run = "docker compose -f .docker/docker-compose.yml down"

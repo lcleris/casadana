@@ -1,0 +1,14 @@
+{
+  "name": "@casa-dana/types",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "generate": "openapi-zod-client ../../apps/api/openapi.yaml -o src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "openapi-zod-client": "^1"
+  }
+}

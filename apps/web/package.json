@@ -1,0 +1,20 @@
+{
+  "name": "@casa-dana/web",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@casa-dana/types": "workspace:*",
+    "@tanstack/react-router": "^1",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4",
+    "typescript": "^5",
+    "vite": "^8"
+  }
+}
