@@ -4,8 +4,5 @@
   "workspaces": [
     "apps/web",
     "packages/*"
-  ],
-  "dependencies": {
-    "@tailwindcss/postcss": "^4.2.2"
-  }
+  ]
 }

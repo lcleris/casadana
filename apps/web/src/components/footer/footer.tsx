@@ -1,4 +1,4 @@
-const Footer = () => {
+export default function Footer() {
   const handleNavigate = (href: string) => {
     const element = document.querySelector(href);
     element?.scrollIntoView({ behavior: "smooth" });
@@ -16,26 +16,36 @@ const Footer = () => {
         </p>
 
         <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-          <a className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors" href="#">
+          <a
+            className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors"
+            href="#"
+          >
             Instagram
           </a>
-          <a className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors" href="#">
+          <a
+            className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors"
+            href="#"
+          >
             Facebook
           </a>
-          <a className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors" href="#">
+          <a
+            className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors"
+            href="#"
+          >
             Privacy
           </a>
-          <a className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors" href="#">
+          <a
+            className="text-slate-400 text-xs uppercase tracking-widest hover:text-secondary-fixed transition-colors"
+            href="#"
+          >
             Terms
           </a>
         </div>
 
         <div className="mt-8 pt-8 border-t border-white/10 w-full text-slate-500 text-[10px] uppercase tracking-[0.2em]">
-          © 2024 Casa DaNa. Coastal Editorial Living.
+          © 2026 Casa DaNa. Coastal Editorial Living.
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

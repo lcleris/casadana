@@ -4,59 +4,59 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-primary: okch(23.6% 0.108 253);
-  --color-primary-container: okch(32.8% 0.085 258);
-  --color-on-primary: okch(97.8% 0.002 60);
-  --color-on-primary-container: okch(55.2% 0.062 265);
-  --color-on-primary-fixed: okch(15% 0.055 255);
-  --color-on-primary-fixed-variant: okch(28.4% 0.076 255);
-  --color-primary-fixed: okch(75.2% 0.148 250);
-  --color-primary-fixed-dim: okch(62.1% 0.119 252);
+  --color-primary: oklch(23.6% 0.108 253);
+  --color-primary-container: oklch(32.8% 0.085 258);
+  --color-on-primary: oklch(97.8% 0.002 60);
+  --color-on-primary-container: oklch(55.2% 0.062 265);
+  --color-on-primary-fixed: oklch(15% 0.055 255);
+  --color-on-primary-fixed-variant: oklch(28.4% 0.076 255);
+  --color-primary-fixed: oklch(75.2% 0.148 250);
+  --color-primary-fixed-dim: oklch(62.1% 0.119 252);
 
-  --color-secondary: okch(47.2% 0.123 62);
-  --color-secondary-container: okch(81.2% 0.089 78);
-  --color-on-secondary: okch(97.8% 0.002 60);
-  --color-on-secondary-container: okch(29% 0.085 68);
-  --color-on-secondary-fixed: okch(15% 0.055 65);
-  --color-on-secondary-fixed-variant: okch(35% 0.075 72);
-  --color-secondary-fixed: okch(81.2% 0.089 78);
-  --color-secondary-fixed-dim: okch(72.2% 0.068 75);
+  --color-secondary: oklch(47.2% 0.123 62);
+  --color-secondary-container: oklch(81.2% 0.089 78);
+  --color-on-secondary: oklch(97.8% 0.002 60);
+  --color-on-secondary-container: oklch(29% 0.085 68);
+  --color-on-secondary-fixed: oklch(15% 0.055 65);
+  --color-on-secondary-fixed-variant: oklch(35% 0.075 72);
+  --color-secondary-fixed: oklch(81.2% 0.089 78);
+  --color-secondary-fixed-dim: oklch(72.2% 0.068 75);
 
-  --color-tertiary: okch(12.9% 0.008 0);
-  --color-tertiary-container: okch(21.6% 0.012 45);
-  --color-on-tertiary: okch(97.8% 0.002 60);
-  --color-on-tertiary-container: okch(63.5% 0.008 50);
-  --color-on-tertiary-fixed: okch(15% 0.055 40);
-  --color-on-tertiary-fixed-variant: okch(27.5% 0.010 50);
-  --color-tertiary-fixed: okch(88.8% 0.002 60);
-  --color-tertiary-fixed-dim: okch(77.7% 0.002 60);
+  --color-tertiary: oklch(12.9% 0.008 0);
+  --color-tertiary-container: oklch(21.6% 0.012 45);
+  --color-on-tertiary: oklch(97.8% 0.002 60);
+  --color-on-tertiary-container: oklch(63.5% 0.008 50);
+  --color-on-tertiary-fixed: oklch(15% 0.055 40);
+  --color-on-tertiary-fixed-variant: oklch(27.5% 0.010 50);
+  --color-tertiary-fixed: oklch(88.8% 0.002 60);
+  --color-tertiary-fixed-dim: oklch(77.7% 0.002 60);
 
-  --color-error: okch(40.3% 0.211 29.2);
-  --color-error-container: okch(88.2% 0.082 25);
-  --color-on-error: okch(97.8% 0.002 60);
-  --color-on-error-container: okch(23.5% 0.145 18);
+  --color-error: oklch(40.3% 0.211 29.2);
+  --color-error-container: oklch(88.2% 0.082 25);
+  --color-on-error: oklch(97.8% 0.002 60);
+  --color-on-error-container: oklch(23.5% 0.145 18);
 
-  --color-background: okch(97.8% 0.002 60);
-  --color-surface: okch(97.8% 0.002 60);
-  --color-surface-bright: okch(97.8% 0.002 60);
-  --color-surface-dim: okch(85.7% 0.003 60);
-  --color-surface-container-lowest: okch(97.8% 0.002 60);
-  --color-surface-container-low: okch(96.6% 0.002 60);
-  --color-surface-container: okch(94.6% 0.002 60);
-  --color-surface-container-high: okch(92.6% 0.002 60);
-  --color-surface-container-highest: okch(90.8% 0.002 60);
-  --color-surface-tint: okch(23.6% 0.108 253);
-  --color-surface-variant: okch(90.8% 0.002 60);
-  --color-inverse-surface: okch(19% 0.008 60);
-  --color-inverse-on-surface: okch(96% 0.002 60);
-  --color-inverse-primary: okch(62.1% 0.119 252);
+  --color-background: oklch(97.8% 0.002 60);
+  --color-surface: oklch(97.8% 0.002 60);
+  --color-surface-bright: oklch(97.8% 0.002 60);
+  --color-surface-dim: oklch(85.7% 0.003 60);
+  --color-surface-container-lowest: oklch(97.8% 0.002 60);
+  --color-surface-container-low: oklch(96.6% 0.002 60);
+  --color-surface-container: oklch(94.6% 0.002 60);
+  --color-surface-container-high: oklch(92.6% 0.002 60);
+  --color-surface-container-highest: oklch(90.8% 0.002 60);
+  --color-surface-tint: oklch(23.6% 0.108 253);
+  --color-surface-variant: oklch(90.8% 0.002 60);
+  --color-inverse-surface: oklch(19% 0.008 60);
+  --color-inverse-on-surface: oklch(96% 0.002 60);
+  --color-inverse-primary: oklch(62.1% 0.119 252);
 
-  --color-on-surface: okch(12.1% 0.012 60);
-  --color-on-surface-variant: okch(48.8% 0.022 60);
-  --color-on-background: okch(12.1% 0.012 60);
+  --color-on-surface: oklch(12.1% 0.012 60);
+  --color-on-surface-variant: oklch(48.8% 0.022 60);
+  --color-on-background: oklch(12.1% 0.012 60);
 
-  --color-outline: okch(55.5% 0.030 60);
-  --color-outline-variant: okch(79.5% 0.020 60);
+  --color-outline: oklch(55.5% 0.030 60);
+  --color-outline-variant: oklch(79.5% 0.020 60);
 
   --font-headline: "Noto Serif", serif;
   --font-body: "Inter", sans-serif;
@@ -75,7 +75,7 @@
 
 @layer utilities {
   .editorial-shadow {
-    box-shadow: 0 20px 40px -10px okch(23.6% 0.108 253 / 0.08);
+    box-shadow: 0 20px 40px -10px oklch(23.6% 0.108 253 / 0.08);
   }
 }
 

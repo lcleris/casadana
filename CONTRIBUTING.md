@@ -50,8 +50,8 @@ Monorepo with:
 
 **Styling**
 
-- Use **OKCH color space** instead of hex values
-- Example: `okch(70% 0.15 200)` instead of `#FF5733`
+- Use **OKLCH color space** instead of hex values
+- Example: `oklch(70% 0.15 200)` instead of `#FF5733`
 
 **File**
 
