@@ -47,6 +47,14 @@ run = "docker compose -f .docker/docker-compose.yml --env-file .env.dev --profil
 [tasks.docker-prod]
 run = "docker compose -f .docker/docker-compose.yml --env-file .env.prod --profile prod up -d"
 
-[tasks.docker-down]
+[tasks.docker-stop]
 description = "Stop all containers"
-run = "docker compose -f .docker/docker-compose.yml down"
+run = "docker compose -f .docker/docker-compose.yml --env-file .env.dev --profile dev stop"
+
+[tasks.docker-down]
+description = "Remove all containers"
+run = "docker compose -f .docker/docker-compose.yml --env-file .env.dev --profile dev down"
+
+[tasks.docker-drop]
+description = "Stop and remove all containers, volumes, and images"
+run = "docker compose -f .docker/docker-compose.yml down -v --rmi all"

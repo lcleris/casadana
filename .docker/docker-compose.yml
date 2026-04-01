@@ -1,27 +1,64 @@
+name: casadana
 services:
   web:
     build:
       context: ..
       dockerfile: .docker/web/Dockerfile
+    container_name: casadana-web
     restart: unless-stopped
-    profiles: ["prod", "dev"]
+    profiles: ["prod"]
+    ports:
+      - "3000:80"
     depends_on:
       - api
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:80 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  web-dev:
+    image: oven/bun:1-alpine
+    container_name: casadana-web
+    restart: unless-stopped
+    profiles: ["dev"]
+    ports:
+      - "3000:5173"
+    depends_on:
+      - api
+    volumes:
+      - ../:/app
+    working_dir: /app
+    command: sh -c "bun install && bun --cwd apps/web dev --host 0.0.0.0"
 
   api:
     build:
       context: ..
       dockerfile: .docker/api/Dockerfile
+    container_name: casadana-api
     restart: unless-stopped
     profiles: ["prod", "dev"]
+    ports:
+      - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -q --spider http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   postgres:
     image: postgres:16-alpine
+    container_name: casadana-postgres
     restart: unless-stopped
     profiles: ["prod", "dev"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -32,6 +69,7 @@ services:
 
   caddy:
     image: caddy:2-alpine
+    container_name: casadana-caddy
     restart: unless-stopped
     profiles: ["prod"]
     ports:
