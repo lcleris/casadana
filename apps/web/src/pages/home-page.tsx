@@ -1,24 +1,28 @@
 import PropertyCard from "@/components/sections/property-card";
 import { properties } from "@/constants/collection.const";
+import bgHome from "@/assets/shared/bg-home.jpeg";
 
-export default function CollectionPage() {
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="grow pt-24">
-        <section className="mx-auto max-w-screen-2xl px-8 pt-12 pb-12 text-center">
-          <span className="font-label text-secondary mb-4 block text-xs tracking-[0.3em] uppercase">
-            The Collection
-          </span>
-          <h1 className="font-headline text-primary mb-6 text-5xl leading-tight md:text-7xl">
+    <main className="grow flex min-h-screen flex-col">
+      <section
+        className="relative px-8 pt-24 pb-12 text-center min-h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center"
+        style={{ backgroundImage: `url(${bgHome})` }}
+      >
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative z-10">
+          <h1 className="font-headline text-white mb-6 text-5xl leading-tight md:text-7xl drop-shadow-lg">
             Editorial Living <br />
             <span className="font-normal italic">by the shore.</span>
           </h1>
-          <p className="text-on-surface-variant mx-auto max-w-2xl text-lg font-light">
+          <p className="text-white mx-auto max-w-2xl text-lg font-light drop-shadow">
             Curated coastal escapes designed for the modern aesthete. Explore
             our signature residences.
           </p>
-        </section>
+        </div>
+      </section>
 
+      <section className="flex flex-col">
         {properties.map((property, index) => (
           <div key={property.title}>
             <PropertyCard
@@ -36,7 +40,7 @@ export default function CollectionPage() {
             )}
           </div>
         ))}
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
