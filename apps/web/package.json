@@ -8,7 +8,7 @@
     "preview": "vite preview",
     "paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
     "paraglide:watch": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide --watch",
-    "machine-translate": "inlang machine translate --project project.inlang",
+    "translate": "inlang machine translate --project project.inlang",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "lint": "oxlint",
