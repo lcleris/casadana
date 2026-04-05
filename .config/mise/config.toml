@@ -58,3 +58,19 @@ run = "docker compose -f .docker/docker-compose.yml --env-file .env.dev --profil
 [tasks.docker-drop]
 description = "Stop and remove all containers, volumes, and images"
 run = "docker compose -f .docker/docker-compose.yml down -v --rmi all"
+
+[tasks.format]
+description = "Format with oxfmt web app"
+run = "bun --cwd apps/web fmt"
+
+
+[tasks.shad]
+description = "invoke Shadcn to install new components or update existing ones"
+usage = '''
+arg "<cmd>" help="shadcn subcommand"
+arg "[rest]" {
+  help "extra args to pass to shadcn"
+  var #true
+}
+'''
+run = 'bunx --bun shadcn@latest ${usage_cmd?} ${usage_rest?}'
