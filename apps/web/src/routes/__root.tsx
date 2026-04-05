@@ -1,9 +1,10 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
-import Navbar from "@/components/header/navbar";
-import Footer from "@/components/footer/footer";
+import { createRootRoute, Outlet } from "@tanstack/react-router"
+
+import Footer from "@/components/footer/footer"
+import Navbar from "@/components/header/navbar"
 
 const RootLayout = () => {
-  console.log(import.meta.url);
+  console.log(import.meta.url)
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -12,9 +13,9 @@ const RootLayout = () => {
       </main>
       <Footer />
     </div>
-  );
-};
+  )
+}
 
 export const Route = createRootRoute({
   component: RootLayout,
-});
+})

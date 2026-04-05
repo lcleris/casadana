@@ -1,19 +1,20 @@
-import { useParams } from "@tanstack/react-router";
-import { useEffect } from "react";
-import VillaHero from "@/components/sections/villa-hero";
-import BookingForm from "@/components/forms/booking-form";
-import VillaFeatures from "@/components/sections/villa-features";
-import VillaGallery from "@/components/sections/villa-gallery";
-import ExperienceCards from "@/components/sections/experience-cards";
-import LocalAreaInfo from "@/components/sections/local-area-info";
-import { CASADANA_RAW_DATA } from "@/constants/casadana.const";
+import { useParams } from "@tanstack/react-router"
+import { useEffect } from "react"
+
+import BookingForm from "@/components/forms/booking-form"
+import ExperienceCards from "@/components/sections/experience-cards"
+import LocalAreaInfo from "@/components/sections/local-area-info"
+import VillaFeatures from "@/components/sections/villa-features"
+import VillaGallery from "@/components/sections/villa-gallery"
+import VillaHero from "@/components/sections/villa-hero"
+import { CASADANA_RAW_DATA } from "@/constants/casadana.const"
 
 function VillaDetailPage() {
-  const { villaId } = useParams({ from: "/villa/$villaId" });
+  const { villaId } = useParams({ from: "/villa/$villaId" })
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [villaId]);
+    window.scrollTo(0, 0)
+  }, [villaId])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -60,7 +61,7 @@ function VillaDetailPage() {
         <ExperienceCards experiences={CASADANA_RAW_DATA.experiences} />
       </main>
     </div>
-  );
+  )
 }
 
-export default VillaDetailPage;
+export default VillaDetailPage

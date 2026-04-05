@@ -1,13 +1,13 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 interface Experience {
-  icon: string;
-  title: string;
-  description: string;
+  icon: string
+  title: string
+  description: string
 }
 
 interface ExperienceCardsProps {
-  experiences: Array<Experience>;
+  experiences: Array<Experience>
 }
 
 function ExperienceCards({ experiences }: ExperienceCardsProps) {
@@ -17,7 +17,8 @@ function ExperienceCards({ experiences }: ExperienceCardsProps) {
         <div className="text-center mb-16">
           <h2 className="font-headline text-4xl mb-4">Unforgettable Experiences</h2>
           <p className="text-on-primary-container max-w-xl mx-auto">
-            From high-speed thrills to serene maritime journeys, the Mar Menor offers activities for every soul.
+            From high-speed thrills to serene maritime journeys, the Mar Menor offers activities for
+            every soul.
           </p>
         </div>
 
@@ -26,7 +27,7 @@ function ExperienceCards({ experiences }: ExperienceCardsProps) {
             <div
               key={index}
               className={cn(
-                "bg-primary-container p-6 rounded-lg group hover:bg-secondary transition-colors duration-500"
+                "bg-primary-container p-6 rounded-lg group hover:bg-secondary transition-colors duration-500",
               )}
             >
               <span className="text-4xl text-secondary group-hover:text-white transition-colors">
@@ -41,7 +42,7 @@ function ExperienceCards({ experiences }: ExperienceCardsProps) {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
-export default ExperienceCards;
+export default ExperienceCards

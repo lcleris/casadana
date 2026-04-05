@@ -1,10 +1,10 @@
 interface Feature {
-  icon: string;
-  label: string;
+  icon: string
+  label: string
 }
 
 interface VillaFeaturesProps {
-  features: Array<Feature>;
+  features: Array<Feature>
 }
 
 function VillaFeatures({ features }: VillaFeaturesProps) {
@@ -19,7 +19,7 @@ function VillaFeatures({ features }: VillaFeaturesProps) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-export default VillaFeatures;
+export default VillaFeatures

@@ -52,14 +52,12 @@ export const CASADANA_RAW_DATA = {
     {
       icon: "🏎️",
       title: "Go-Karts",
-      description:
-        "Professional tracks for the ultimate adrenaline rush just minutes away.",
+      description: "Professional tracks for the ultimate adrenaline rush just minutes away.",
     },
     {
       icon: "🏄",
       title: "Windsurfing",
-      description:
-        "Harness the coastal breeze on the calm, safe waters of the inland sea.",
+      description: "Harness the coastal breeze on the calm, safe waters of the inland sea.",
     },
     {
       icon: "🏊",
@@ -69,8 +67,7 @@ export const CASADANA_RAW_DATA = {
     {
       icon: "🚣",
       title: "Kayaking",
-      description:
-        "Explore hidden coves and silent coastlines at your own pace.",
+      description: "Explore hidden coves and silent coastlines at your own pace.",
     },
   ],
   localArea: {
@@ -86,15 +83,13 @@ export const CASADANA_RAW_DATA = {
       {
         icon: "📍",
         title: "Los Alcazares",
-        description:
-          "Walk through Roman ruins and enjoy world-class coastal dining.",
+        description: "Walk through Roman ruins and enjoy world-class coastal dining.",
       },
       {
         icon: "🧖",
         title: "Archena Spa",
-        description:
-          "A 40-minute drive to the famous Balneario de Archena thermal baths.",
+        description: "A 40-minute drive to the famous Balneario de Archena thermal baths.",
       },
     ],
   },
-};
+}

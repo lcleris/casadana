@@ -27,7 +27,7 @@
   --color-on-tertiary: oklch(97.8% 0.002 60);
   --color-on-tertiary-container: oklch(63.5% 0.008 50);
   --color-on-tertiary-fixed: oklch(15% 0.055 40);
-  --color-on-tertiary-fixed-variant: oklch(27.5% 0.010 50);
+  --color-on-tertiary-fixed-variant: oklch(27.5% 0.01 50);
   --color-tertiary-fixed: oklch(88.8% 0.002 60);
   --color-tertiary-fixed-dim: oklch(77.7% 0.002 60);
 
@@ -55,8 +55,8 @@
   --color-on-surface-variant: oklch(48.8% 0.022 60);
   --color-on-background: oklch(12.1% 0.012 60);
 
-  --color-outline: oklch(55.5% 0.030 60);
-  --color-outline-variant: oklch(79.5% 0.020 60);
+  --color-outline: oklch(55.5% 0.03 60);
+  --color-outline-variant: oklch(79.5% 0.02 60);
 
   --font-headline: "Noto Serif", serif;
   --font-body: "Inter", sans-serif;

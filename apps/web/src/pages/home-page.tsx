@@ -1,6 +1,6 @@
-import PropertyCard from "@/components/sections/property-card";
-import { properties } from "@/constants/collection.const";
-import bgHome from "@/assets/shared/bg-home.jpeg";
+import bgHome from "@/assets/shared/bg-home.jpeg"
+import PropertyCard from "@/components/sections/property-card"
+import { properties } from "@/constants/collection.const"
 
 export default function HomePage() {
   return (
@@ -16,8 +16,8 @@ export default function HomePage() {
             <span className="font-normal italic">by the shore.</span>
           </h1>
           <p className="text-white mx-auto max-w-2xl text-lg font-light drop-shadow">
-            Curated coastal escapes designed for the modern aesthete. Explore
-            our signature residences.
+            Curated coastal escapes designed for the modern aesthete. Explore our signature
+            residences.
           </p>
         </div>
       </section>
@@ -42,5 +42,5 @@ export default function HomePage() {
         ))}
       </section>
     </main>
-  );
+  )
 }

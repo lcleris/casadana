@@ -1,20 +1,23 @@
-import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
-import { m } from "@/paraglide/messages";
+import { Link } from "@tanstack/react-router"
+import { useEffect, useState } from "react"
+
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { m } from "@/paraglide/messages"
+
+import { LangSelector } from "../lang-selector"
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+      setIsScrolled(window.scrollY > 50)
+    }
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
     <header
@@ -34,11 +37,8 @@ export default function Navbar() {
         >
           {m.nav_brand()}
         </Link>
-
-        <Button className="bg-primary text-on-primary hover:opacity-80">
-          Book Now
-        </Button>
+        <LangSelector />
       </nav>
     </header>
-  );
+  )
 }

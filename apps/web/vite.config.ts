@@ -1,11 +1,20 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js'
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import path from "path";
+import path, { dirname } from "path"
+import { fileURLToPath } from "url"
+
+import { paraglideVitePlugin } from "@inlang/paraglide-js"
+import { tanstackRouter } from "@tanstack/router-plugin/vite"
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 export default defineConfig({
-  plugins: [paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' }),
+  plugins: [
+    paraglideVitePlugin({
+      project: "./project.inlang",
+      outdir: "./src/paraglide",
+    }),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
@@ -17,4 +26,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+})

@@ -1,21 +1,22 @@
-import { ReactNode } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router"
+import { ChevronRight } from "lucide-react"
+import { ReactNode } from "react"
+
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export interface PropertyCardProps {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  imageUrl: string;
-  imageAlt: string;
+  id: string
+  title: string
+  category: string
+  description: string
+  imageUrl: string
+  imageAlt: string
   features: Array<{
-    icon: string;
-    label: string;
-  }>;
-  layout: "left" | "right";
+    icon: string
+    label: string
+  }>
+  layout: "left" | "right"
 }
 
 export default function PropertyCard({
@@ -28,14 +29,14 @@ export default function PropertyCard({
   features,
   layout = "left",
 }: PropertyCardProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
     <section
       className={cn(
         "relative flex min-h-175 flex-col items-center justify-center overflow-hidden py-20",
         {
           "bg-surface-container-low": layout !== "left",
-        }
+        },
       )}
     >
       <div className="mx-auto grid w-full max-w-screen-2xl items-center gap-12 px-8 md:grid-cols-12">
@@ -90,5 +91,5 @@ export default function PropertyCard({
         </div>
       </div>
     </section>
-  );
+  )
 }

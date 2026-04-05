@@ -1,4 +1,4 @@
-import { PropertyCardProps } from "@/components/sections/property-card";
+import { PropertyCardProps } from "@/components/sections/property-card"
 
 export const properties = [
   {
@@ -32,4 +32,4 @@ export const properties = [
     imageAlt: "Casa DaNa Vue sur la Ville",
     layout: "right",
   },
-] satisfies Array<PropertyCardProps>;
+] satisfies Array<PropertyCardProps>

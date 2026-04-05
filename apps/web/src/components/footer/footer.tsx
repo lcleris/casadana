@@ -1,8 +1,8 @@
 export default function Footer() {
   const handleNavigate = (href: string) => {
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: "smooth" });
-  };
+    const element = document.querySelector(href)
+    element?.scrollIntoView({ behavior: "smooth" })
+  }
 
   return (
     <footer className="bg-primary dark:bg-black w-full pt-20 pb-12 mt-auto">
@@ -47,5 +47,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  );
+  )
 }
