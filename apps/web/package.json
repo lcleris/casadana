@@ -2,9 +2,13 @@
   "name": "@casa-dana/web",
   "private": true,
   "scripts": {
+    "prepare": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
+    "paraglide:watch": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide --watch",
+    "machine-translate": "inlang machine translate --project project.inlang"
   },
   "dependencies": {
     "@casa-dana/types": "workspace:*",
@@ -20,6 +24,10 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@inlang/cli": "^3.0.0",
+    "@inlang/paraglide-js": "^2.15.1",
+    "@inlang/plugin-m-function-matcher": "^2.2.4",
+    "@inlang/plugin-message-format": "^4.4.0",
     "@tanstack/router-plugin": "^1.167.12",
     "@types/react": "^19",
     "@types/react-dom": "^19",

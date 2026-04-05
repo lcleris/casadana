@@ -2,8 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { m } from "@/paraglide/messages";
 
-export default function Navigation() {
+export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Navigation() {
           to="/"
           className="font-headline text-2xl tracking-[0.2em] uppercase text-primary dark:text-slate-50"
         >
-          Casa DaNa & CasAy
+          {m.nav_brand()}
         </Link>
 
         <Button className="bg-primary text-on-primary hover:opacity-80">
