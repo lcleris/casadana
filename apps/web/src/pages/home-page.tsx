@@ -1,6 +1,7 @@
 import bgHome from "@/assets/shared/bg-home.jpeg"
 import PropertyCard from "@/components/sections/property-card"
 import { properties } from "@/constants/collection.const"
+import { m } from "@/paraglide/messages"
 
 export default function HomePage() {
   return (
@@ -11,13 +12,11 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10">
-          <h1 className="font-headline mb-6 text-5xl leading-tight text-white drop-shadow-lg md:text-7xl">
-            Editorial Living <br />
-            <span className="font-normal italic">by the shore.</span>
+          <h1 className="font-headline text-5xl leading-tight text-white drop-shadow-lg md:text-7xl">
+            {m.home_title()}
           </h1>
           <p className="mx-auto max-w-2xl text-lg font-light text-white drop-shadow">
-            Curated coastal escapes designed for the modern aesthete. Explore our signature
-            residences.
+            {m.home_subtitle()}
           </p>
         </div>
       </section>
