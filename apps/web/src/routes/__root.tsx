@@ -6,7 +6,7 @@ import Navbar from "@/components/header/navbar"
 const RootLayout = () => {
   console.log(import.meta.url)
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="grow">
         <Outlet />

@@ -4,18 +4,18 @@ import { properties } from "@/constants/collection.const"
 
 export default function HomePage() {
   return (
-    <main className="grow flex min-h-screen flex-col">
+    <main className="flex min-h-screen grow flex-col">
       <section
-        className="relative px-8 pt-24 pb-12 text-center min-h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center"
+        className="relative flex min-h-screen flex-col justify-center bg-cover bg-center bg-no-repeat px-8 pt-24 pb-12 text-center"
         style={{ backgroundImage: `url(${bgHome})` }}
       >
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10">
-          <h1 className="font-headline text-white mb-6 text-5xl leading-tight md:text-7xl drop-shadow-lg">
+          <h1 className="font-headline mb-6 text-5xl leading-tight text-white drop-shadow-lg md:text-7xl">
             Editorial Living <br />
             <span className="font-normal italic">by the shore.</span>
           </h1>
-          <p className="text-white mx-auto max-w-2xl text-lg font-light drop-shadow">
+          <p className="mx-auto max-w-2xl text-lg font-light text-white drop-shadow">
             Curated coastal escapes designed for the modern aesthete. Explore our signature
             residences.
           </p>

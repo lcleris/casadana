@@ -17,7 +17,7 @@ function VillaDetailPage() {
   }, [villaId])
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <main className="grow">
         <VillaHero
           title={CASADANA_RAW_DATA.title}
@@ -25,13 +25,13 @@ function VillaDetailPage() {
           highlights={CASADANA_RAW_DATA.heroHighlights}
         />
 
-        <section className="py-24 px-8 max-w-screen-2xl mx-auto" id="about">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+        <section className="mx-auto max-w-screen-2xl px-8 py-24" id="about">
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <h2 className="font-headline text-4xl text-primary mb-8">
+              <h2 className="font-headline text-primary mb-8 text-4xl">
                 Refined Living on the Mar Menor
               </h2>
-              <p className="text-lg leading-relaxed text-on-surface-variant mb-12 max-w-2xl">
+              <p className="text-on-surface-variant mb-12 max-w-2xl text-lg leading-relaxed">
                 {CASADANA_RAW_DATA.description}
               </p>
               <VillaFeatures features={CASADANA_RAW_DATA.features} />

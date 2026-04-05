@@ -28,20 +28,16 @@ export function LangSelector() {
 
   return (
     <Select value={language} onValueChange={(lang) => setLocale(lang!)}>
-      <SelectTrigger className="bg-transparent border-none w-fit">
-        <SelectValue
-          placeholder={
-            <>
-              <img src={availableLanguages[language]} alt={language} className="w-8 h-6" />
-            </>
-          }
-        />
+      <SelectTrigger className="w-fit border-none">
+        <SelectValue>
+          <img src={availableLanguages[language]} alt={language} className="h-6 w-8" />
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent align="end" className="border-none bg-white/30 backdrop-blur-2xl">
         <SelectGroup>
           {(Object.keys(availableLanguages) as Array<Locale>).map((lang) => (
             <SelectItem key={lang} className="flex items-center space-x-2" value={lang}>
-              <img src={availableLanguages[lang]} alt={LANGUAGES[lang]} className="w-8 h-6" />
+              <img src={availableLanguages[lang]} alt={LANGUAGES[lang]} className="h-6 w-8" />
               <span>{LANGUAGES[lang]}</span>
             </SelectItem>
           ))}

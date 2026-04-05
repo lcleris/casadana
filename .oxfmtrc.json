@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [],
+  "semi": false,
+  "tabWidth": 2,
+  "sortImports": true,
+  "experimentalTailwindcss": {
+    "preserveWhitespace": false,
+    "preserveDuplicates": false,
+    "functions": ["clsx", "cn", "cva", "tw"]
+  }
+}

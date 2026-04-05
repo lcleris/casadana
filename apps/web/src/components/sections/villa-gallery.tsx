@@ -13,17 +13,17 @@ interface VillaGalleryProps {
 
 function VillaGallery({ images, title, description }: VillaGalleryProps) {
   return (
-    <section className="py-24 bg-surface-container-low overflow-hidden">
-      <div className="max-w-screen-2xl mx-auto px-8">
-        <div className="flex justify-between items-end mb-16">
+    <section className="bg-surface-container-low overflow-hidden py-24">
+      <div className="mx-auto max-w-screen-2xl px-8">
+        <div className="mb-16 flex items-end justify-between">
           <div>
-            <h2 className="font-headline text-4xl text-primary mb-4 italic">{title}</h2>
-            <div className="h-1 w-24 bg-secondary"></div>
+            <h2 className="font-headline text-primary mb-4 text-4xl italic">{title}</h2>
+            <div className="bg-secondary h-1 w-24"></div>
           </div>
-          <p className="hidden md:block text-on-surface-variant max-w-sm">{description}</p>
+          <p className="text-on-surface-variant hidden max-w-sm md:block">{description}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
           {images.map((image, index) => {
             const sizeClasses: Record<string, string> = {
               large: "md:col-span-8 h-[500px]",
@@ -34,14 +34,14 @@ function VillaGallery({ images, title, description }: VillaGalleryProps) {
             const colClass = sizeClasses[image.size || "large"]
 
             return (
-              <div key={index} className={`${colClass} overflow-hidden group relative`}>
+              <div key={index} className={`${colClass} group relative overflow-hidden`}>
                 <img
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   src={image.src}
                   alt={image.alt}
                 />
-                <div className="absolute bottom-6 left-6 text-white z-10">
-                  <span className="text-xs uppercase tracking-widest">{image.label}</span>
+                <div className="absolute bottom-6 left-6 z-10 text-white">
+                  <span className="text-xs tracking-widest uppercase">{image.label}</span>
                 </div>
               </div>
             )

@@ -8,40 +8,40 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as VillaVillaIdRouteImport } from "./routes/villa/$villaId"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as VillaVillaIdRouteImport } from './routes/villa/$villaId'
 
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VillaVillaIdRoute = VillaVillaIdRouteImport.update({
-  id: "/villa/$villaId",
-  path: "/villa/$villaId",
+  id: '/villa/$villaId',
+  path: '/villa/$villaId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
-  "/villa/$villaId": typeof VillaVillaIdRoute
+  '/': typeof IndexRoute
+  '/villa/$villaId': typeof VillaVillaIdRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
-  "/villa/$villaId": typeof VillaVillaIdRoute
+  '/': typeof IndexRoute
+  '/villa/$villaId': typeof VillaVillaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/villa/$villaId": typeof VillaVillaIdRoute
+  '/': typeof IndexRoute
+  '/villa/$villaId': typeof VillaVillaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/villa/$villaId"
+  fullPaths: '/' | '/villa/$villaId'
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/villa/$villaId"
-  id: "__root__" | "/" | "/villa/$villaId"
+  to: '/' | '/villa/$villaId'
+  id: '__root__' | '/' | '/villa/$villaId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -49,19 +49,19 @@ export interface RootRouteChildren {
   VillaVillaIdRoute: typeof VillaVillaIdRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/villa/$villaId": {
-      id: "/villa/$villaId"
-      path: "/villa/$villaId"
-      fullPath: "/villa/$villaId"
+    '/villa/$villaId': {
+      id: '/villa/$villaId'
+      path: '/villa/$villaId'
+      fullPath: '/villa/$villaId'
       preLoaderRoute: typeof VillaVillaIdRouteImport
       parentRoute: typeof rootRouteImport
     }

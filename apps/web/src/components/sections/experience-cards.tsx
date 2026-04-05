@@ -12,29 +12,29 @@ interface ExperienceCardsProps {
 
 function ExperienceCards({ experiences }: ExperienceCardsProps) {
   return (
-    <section className="py-24 bg-primary text-white">
-      <div className="max-w-screen-2xl mx-auto px-8">
-        <div className="text-center mb-16">
-          <h2 className="font-headline text-4xl mb-4">Unforgettable Experiences</h2>
-          <p className="text-on-primary-container max-w-xl mx-auto">
+    <section className="bg-primary py-24 text-white">
+      <div className="mx-auto max-w-screen-2xl px-8">
+        <div className="mb-16 text-center">
+          <h2 className="font-headline mb-4 text-4xl">Unforgettable Experiences</h2>
+          <p className="text-on-primary-container mx-auto max-w-xl">
             From high-speed thrills to serene maritime journeys, the Mar Menor offers activities for
             every soul.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {experiences.map((exp, index) => (
             <div
               key={index}
               className={cn(
-                "bg-primary-container p-6 rounded-lg group hover:bg-secondary transition-colors duration-500",
+                "bg-primary-container group hover:bg-secondary rounded-lg p-6 transition-colors duration-500",
               )}
             >
-              <span className="text-4xl text-secondary group-hover:text-white transition-colors">
+              <span className="text-secondary text-4xl transition-colors group-hover:text-white">
                 {exp.icon}
               </span>
-              <h3 className="font-headline text-xl mt-6 mb-3">{exp.title}</h3>
-              <p className="text-sm text-on-primary-container group-hover:text-white/80 transition-colors">
+              <h3 className="font-headline mt-6 mb-3 text-xl">{exp.title}</h3>
+              <p className="text-on-primary-container text-sm transition-colors group-hover:text-white/80">
                 {exp.description}
               </p>
             </div>
