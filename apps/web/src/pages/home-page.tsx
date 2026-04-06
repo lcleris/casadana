@@ -11,12 +11,12 @@ export default function HomePage() {
         style={{ backgroundImage: `url(${bgHome})` }}
       >
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10">
-          <h1 className="font-headline text-5xl leading-tight text-white drop-shadow-lg md:text-7xl">
+        <div className="relative z-10 space-y-6">
+          <h1 className="font-headline leading-wide text-5xl text-white uppercase drop-shadow-lg text-shadow-2xs md:text-7xl">
             {m.home_title()}
           </h1>
-          <p className="mx-auto max-w-2xl text-lg font-light text-white drop-shadow">
-            {m.home_subtitle()}
+          <p className="mx-auto max-w-2xl text-xl font-light text-white drop-shadow">
+            {m.los_alcazares()}
           </p>
         </div>
       </section>

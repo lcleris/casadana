@@ -1,11 +1,11 @@
 import { PropertyCardProps } from "@/components/sections/property-card"
+import { m } from "@/paraglide/messages"
 
 export const properties = [
   {
     title: "Casa DaNa Los Alcazares",
     category: "Coastal Elite",
-    description:
-      "Experience the ultimate dialogue between architecture and nature. Casa DaNa Los Alcazares is a masterclass in coastal minimalism, featuring floor-to-ceiling glass walls that erase the boundary between life and the Mediterranean.",
+    description: m.casadana_description(),
     imageUrl:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuA706DfuYemgJfYx5wmdI79d4u3Km2gMNH83j8QpS-lqVJMs-wvOMcal8utHsRfL7NwUTQuHRegFb-AbHKDzrpD8TrQBQ1bd418QDpjyKQhtwdFvcLInMXVHJa52CtlmTgO3qikKKmgKQC0UYIBzp_tXADsERb9L4tjKTX_lYims-krtximtA2aHvkabdt08fyA1bDBfOpYlzD90pn0_4xcAJ5XPPcw_JIcw4i51wzeHzZhq-yYOkllSK8GtENgOEsMY1opHSqgFQQ",
     features: [

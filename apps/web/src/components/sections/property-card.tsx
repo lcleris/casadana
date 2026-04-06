@@ -1,6 +1,5 @@
 import { useNavigate } from "@tanstack/react-router"
 import { ChevronRight } from "lucide-react"
-import { ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
