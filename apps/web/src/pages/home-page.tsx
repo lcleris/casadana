@@ -24,16 +24,7 @@ export default function HomePage() {
       <section className="flex flex-col">
         {properties.map((property, index) => (
           <div key={property.title}>
-            <PropertyCard
-              id={property.id}
-              title={property.title}
-              category={property.category}
-              description={property.description}
-              imageUrl={property.imageUrl}
-              imageAlt={property.title}
-              features={property.features}
-              layout={property.layout}
-            />
+            <PropertyCard {...property} />
             {index < properties.length - 1 && (
               <div className="bg-surface-container-high mx-auto h-px max-w-7xl" />
             )}

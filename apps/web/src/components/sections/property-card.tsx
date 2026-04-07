@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router"
 import { ChevronRight } from "lucide-react"
+import { IconName, DynamicIcon } from "lucide-react/dynamic"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -13,7 +14,7 @@ export interface PropertyCardProps {
   imageUrl: string
   imageAlt: string
   features: Array<{
-    icon: string
+    icon: IconName
     label: string
   }>
   layout: "left" | "right"
@@ -71,7 +72,7 @@ export default function PropertyCard({
           <div className="border-outline-variant/30 flex flex-wrap gap-8 border-y py-6">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3">
-                <span>{feature.icon}</span>
+                <DynamicIcon name={feature.icon} />
                 <span className="font-label text-sm tracking-wider uppercase">{feature.label}</span>
               </div>
             ))}

@@ -30,7 +30,6 @@
   "reservation_form_modal_letsgo": "C'est parti 🚀",
   "reservation_form_calendar_add_date": "Ajouter une date",
   "reservation_form_calendar_reservation_confirmed": "Merci {firstName} pour votre réservation !",
-  "reservation_guest": "Personne",
   "reservation_nights": "Nuit(s)",
   "reservation_total": "Total",
   "reservation_toaster_success": "Votre réservation du {startDate} au {endDate} a bien été prise en compte",
@@ -56,7 +55,6 @@
   "casadana_about_title": "Vie Raffinée sur la Mar Menor",
   "casadana_experiences_title": "Expériences Inoubliables",
   "casadana_experiences_description": "Des sensations fortes à haute vitesse aux voyages maritimes sereins, la Mar Menor offre des activités pour chaque âme.",
-  "casadana_local_area_title": "Explorez l'",
   "casadana_local_area_subtitle": "Esprit Murcien",
   "casadana_local_area_description": "Los Alcazares est plus qu'une destination; c'est une expérience sensorielle. Des eaux thérapeutiques de la Mar Menor aux sources thermales cachées d'Archena, découvrez une région où l'histoire et le bien-être convergent.",
   "casadana_amenities_name": "Équipement",
@@ -75,8 +73,14 @@
   "casadana_house_kitchen": "Cuisine",
   "casadana_house_living_room": "Salon",
   "casadana_house_patio": "Patio",
-  "casadana_house_rooftop": "Toit-terrasse",
   "casadana_los_alcazares_button": "Réservez vos vacances",
   "casadana_los_alcazares_description": "Los Alcazares, charmant village niché au cœur de l'Espagne, séduit par son authenticité et son ambiance chaleureuse. Entouré de paysages pittoresques, ce havre de paix offre un mélange parfait de tradition et de modernité. Avec ses ruelles pittoresques, ses marchés locaux et sa proximité avec la plage (mer mineure), Los Alcazares est une destination idéale pour les amateurs de culture, de nature et de détente.",
-  "casacasay_description": "Bienvenue à Casa CasAy, un élégant penthouse de 104 m² pensé pour votre confort et votre détente. Niché dans une urbanisation sécurisée, il vous offre une superbe terrasse avec une vue imprenable sur le golf, idéale pour savourer chaque instant en toute sérénité. \n Parfait pour accueillir jusqu’à 4 personnes, cet écrin de tranquillité se situe à seulement 15 minutes de la Mar Menor et de Los Alcázares, où vous retrouverez également la Casa DaNa. \n Laissez-vous séduire par un lieu où confort, calme et soleil se rencontrent pour créer des souvenirs inoubliables."
+  "casacasay_description": "Bienvenue à Casa CasAy, un élégant penthouse de 104 m² pensé pour votre confort et votre détente. Niché dans une urbanisation sécurisée, il vous offre une superbe terrasse avec une vue imprenable sur le golf, idéale pour savourer chaque instant en toute sérénité. \n Parfait pour accueillir jusqu’à 4 personnes, cet écrin de tranquillité se situe à seulement 15 minutes de la Mar Menor et de Los Alcázares, où vous retrouverez également la Casa DaNa. \n Laissez-vous séduire par un lieu où confort, calme et soleil se rencontrent pour créer des souvenirs inoubliables.",
+  "listing_guests": "{guests} Personnes",
+  "listing_pool": "Piscine",
+  "listing_rooftop": "Rooftop",
+  "listing_car": "Voiture",
+  "listing_exterior": "Terrasse",
+  "category_house": "Maison",
+  "category_flat": "Appartement"
 }
