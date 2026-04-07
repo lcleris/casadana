@@ -1,8 +1,16 @@
+import { useState } from "react"
+
+import { GalleryCategory } from "@/constants/gallery-categories.const"
+
+import BentoGallery from "./bento-gallery"
+import FocusGallery from "./focus-gallery"
+
 interface GalleryImage {
   src: string
   alt: string
   label: string
   size?: "large" | "medium" | "small"
+  category: GalleryCategory
 }
 
 interface VillaGalleryProps {
@@ -12,42 +20,39 @@ interface VillaGalleryProps {
 }
 
 export default function VillaGallery({ images, title, description }: VillaGalleryProps) {
+  const [isFocused, setIsFocused] = useState(false)
+  const [focusedCategory, setFocusedCategory] = useState<GalleryCategory | null>(null)
+
+  const handleImageClick = (category: GalleryCategory) => {
+    setFocusedCategory(category)
+    setIsFocused(true)
+  }
+
+  const handleCloseFocus = () => {
+    setIsFocused(false)
+    setFocusedCategory(null)
+  }
+
   return (
-    <section className="bg-surface-container-low overflow-hidden py-24">
+    <section className="bg-surface-container-low max-h-xl overflow-hidden py-24">
       <div className="mx-auto max-w-screen-2xl px-8">
-        <div className="mb-16 flex items-end justify-between">
-          <div>
-            <h2 className="font-headline text-primary mb-4 text-4xl italic">{title}</h2>
-            <div className="bg-secondary h-1 w-24"></div>
-          </div>
-          <p className="text-on-surface-variant hidden max-w-sm md:block">{description}</p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-          {images.map((image, index) => {
-            const sizeClasses: Record<string, string> = {
-              large: "md:col-span-8 h-[500px]",
-              medium: "md:col-span-6 h-[400px]",
-              small: "md:col-span-4 h-[400px]",
-            }
-
-            const colClass = sizeClasses[image.size || "large"]
-
-            return (
-              <div key={index} className={`${colClass} group relative overflow-hidden`}>
-                <img
-                  className="h-full w-full flex-1 object-cover transition-transform duration-700 group-hover:scale-105"
-                  src={image.src}
-                  alt={image.alt}
-                />
-                <div className="absolute bottom-6 left-6 z-10 text-white">
-                  <span className="text-xs tracking-widest uppercase">{image.label}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        {isFocused && focusedCategory ? (
+          <FocusGallery
+            images={images}
+            initialCategory={focusedCategory}
+            onClose={handleCloseFocus}
+          />
+        ) : (
+          <BentoGallery
+            images={images}
+            title={title}
+            description={description}
+            onImageClick={handleImageClick}
+          />
+        )}
       </div>
     </section>
   )
 }
+
+export type { GalleryImage, VillaGalleryProps }

@@ -83,5 +83,13 @@
   "listing_car": "Car",
   "listing_exterior": "Terrace",
   "category_house": "Home",
-  "category_flat": "Apartment"
+  "category_flat": "Apartment",
+  "casadana_local_area_subtitle": "Murcian Spirit",
+  "casacasay_house_pool_view": "Pool View",
+  "casacasay_house_living_area": "Living Area",
+  "casacasay_house_bedroom": "Bedroom",
+  "casacasay_house_bathroom": "Bathroom",
+  "casacasay_house_kitchen": "Kitchen",
+  "gallery_close": "Close",
+  "gallery_no_images": "No images available for this category."
 }

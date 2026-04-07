@@ -5,6 +5,15 @@ import { IconName, DynamicIcon } from "lucide-react/dynamic"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
+import { GalleryCategory } from "@/constants/gallery-categories.const"
+
+export interface GalleryImage {
+  src: string
+  alt: string
+  label: string
+  size?: "large" | "medium" | "small"
+  category?: GalleryCategory
+}
 
 export interface PropertyCardProps {
   id: string
@@ -18,6 +27,7 @@ export interface PropertyCardProps {
     label: string
   }>
   layout: "left" | "right"
+  galleryImages?: GalleryImage[]
 }
 
 export default function PropertyCard({

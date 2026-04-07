@@ -83,5 +83,12 @@
   "listing_car": "Auto",
   "listing_exterior": "Terraza",
   "category_house": "Hogar",
-  "category_flat": "Departamento"
+  "category_flat": "Departamento",
+  "casacasay_house_pool_view": "Vista a la piscina",
+  "casacasay_house_living_area": "Sala de estar",
+  "casacasay_house_bedroom": "Dormitorio",
+  "casacasay_house_bathroom": "Baño",
+  "casacasay_house_kitchen": "Cocina",
+  "gallery_close": "Cerca",
+  "gallery_no_images": "No hay imágenes disponibles para esta categoría."
 }
