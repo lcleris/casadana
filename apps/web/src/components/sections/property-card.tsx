@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { m } from "@/paraglide/messages"
 
 export interface PropertyCardProps {
   id: string
@@ -39,7 +40,6 @@ export default function PropertyCard({
       )}
     >
       <div className="mx-auto grid w-full max-w-screen-2xl items-center gap-12 px-8 md:grid-cols-12">
-        {/* Image */}
         <div
           className={cn("group relative order-2 md:order-2 md:col-span-7", {
             "order-1": layout === "left",
@@ -54,7 +54,6 @@ export default function PropertyCard({
           </div>
         </div>
 
-        {/* Content */}
         <div
           className={cn("order-1 space-y-8 md:order-1 md:col-span-5 md:pr-8", {
             "order-2 md:order-2 md:pl-8": layout === "left",
@@ -78,13 +77,15 @@ export default function PropertyCard({
             ))}
           </div>
 
-          <p className="text-on-surface-variant leading-relaxed font-light">{description}</p>
+          <p className="text-on-surface-variant text-justify leading-relaxed font-light">
+            {description}
+          </p>
 
           <Button
             onClick={() => navigate({ to: `/villa/${id}` })}
             className="bg-primary text-on-primary flex w-full items-center justify-center gap-2 px-4 py-6 hover:opacity-90 md:w-auto"
           >
-            Découvrir cette propriété
+            {m.casadana_los_alcazares_button()}
             <ChevronRight size={18} />
           </Button>
         </div>

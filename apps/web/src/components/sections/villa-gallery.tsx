@@ -11,7 +11,7 @@ interface VillaGalleryProps {
   description: string
 }
 
-function VillaGallery({ images, title, description }: VillaGalleryProps) {
+export default function VillaGallery({ images, title, description }: VillaGalleryProps) {
   return (
     <section className="bg-surface-container-low overflow-hidden py-24">
       <div className="mx-auto max-w-screen-2xl px-8">
@@ -36,7 +36,7 @@ function VillaGallery({ images, title, description }: VillaGalleryProps) {
             return (
               <div key={index} className={`${colClass} group relative overflow-hidden`}>
                 <img
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="h-full w-full flex-1 object-cover transition-transform duration-700 group-hover:scale-105"
                   src={image.src}
                   alt={image.alt}
                 />
@@ -51,5 +51,3 @@ function VillaGallery({ images, title, description }: VillaGalleryProps) {
     </section>
   )
 }
-
-export default VillaGallery
