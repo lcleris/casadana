@@ -1,11 +1,12 @@
-import CASADANA_BG from "@/assets/casadana/rooftop7.jpeg"
-import CASADANA_LIVING_ROOM from "@/assets/casadana/living_room2.jpeg"
+import CASADANA_BATHROOM from "@/assets/casadana/bathroom.jpeg"
 import CASADANA_BEDROOM from "@/assets/casadana/bedroom1_1.jpeg"
 import CASADANA_KITCHEN from "@/assets/casadana/kitchen1.jpeg"
-import CASADANA_BATHROOM from "@/assets/casadana/bathroom.jpeg"
+import CASADANA_LIVING_ROOM from "@/assets/casadana/living_room2.jpeg"
+import CASADANA_BG from "@/assets/casadana/rooftop7.jpeg"
 import CASACASAY_BG from "@/assets/casadessy/pool1.jpeg"
 import { PropertyCardProps } from "@/components/sections/property-card"
 import { m } from "@/paraglide/messages"
+
 import { GalleryCategory } from "./gallery-categories.const"
 
 export const properties = [

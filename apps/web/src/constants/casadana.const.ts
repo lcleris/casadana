@@ -1,7 +1,10 @@
 import CASADANA_BATHROOM from "@/assets/casadana/bathroom.jpeg"
 import CASADANA_BEDROOM_1 from "@/assets/casadana/bedroom1.jpeg"
-import CASADANA_BEDROOM_2 from "@/assets/casadana/bedroom2.jpeg"
-import CASADANA_BEDROOM_3 from "@/assets/casadana/bedroom3.jpeg"
+import CASADANA_BEDROOM_2 from "@/assets/casadana/bedroom1_1.jpeg"
+import CASADANA_BEDROOM_3 from "@/assets/casadana/bedroom1_2.jpg"
+import CASADANA_BEDROOM_4 from "@/assets/casadana/bedroom1_3.jpg"
+import CASADANA_BEDROOM_5 from "@/assets/casadana/bedroom2.jpeg"
+import CASADANA_BEDROOM_6 from "@/assets/casadana/bedroom3.jpeg"
 import CASADANA_FRONT_1 from "@/assets/casadana/front1.jpeg"
 import CASADANA_FRONT_2 from "@/assets/casadana/front2.jpeg"
 import CASADANA_FRONT_3 from "@/assets/casadana/front3.jpeg"
@@ -24,13 +27,11 @@ import { m } from "@/paraglide/messages"
 
 import { GalleryCategory } from "./gallery-categories.const"
 
-// Helper function to flatten gallery images by category
 function flattenGalleryByCategory(
   grouped: Record<
     string,
     Array<{
       src: string
-      alt: string
       label: string
       size?: "large" | "medium" | "small"
     }>
@@ -45,67 +46,72 @@ const CASADANA_GALLERY_BY_CATEGORY = {
   LIVING_SPACES: [
     {
       src: CASADANA_LIVING_ROOM_1,
-      alt: m.casadana_house_living_room(),
       label: m.casadana_house_living_room(),
       size: "large" as const,
     },
     {
       src: CASADANA_LIVING_ROOM_2,
-      alt: m.casadana_house_living_room(),
       label: m.casadana_house_living_room(),
-      size: "medium" as const,
-    },
-    {
-      src: CASADANA_LIVING_ROOM_3,
-      alt: m.casadana_house_living_room(),
-      label: m.casadana_house_living_room(),
-      size: "medium" as const,
+      size: "small" as const,
     },
     {
       src: CASADANA_LIVING_ROOM_4,
-      alt: m.casadana_house_living_room(),
       label: m.casadana_house_living_room(),
       size: "small" as const,
+    },
+    {
+      src: CASADANA_LIVING_ROOM_3,
+      label: m.casadana_house_living_room(),
+      size: "large" as const,
     },
   ],
   BEDROOMS: [
     {
-      src: CASADANA_BEDROOM_1,
-      alt: m.casadana_house_bedroom_first(),
+      src: CASADANA_BEDROOM_2,
       label: m.casadana_house_bedroom_first(),
       size: "small" as const,
     },
     {
-      src: CASADANA_BEDROOM_2,
-      alt: m.casadana_house_bedroom_second(),
+      src: CASADANA_BEDROOM_3,
+      label: m.casadana_house_bedroom_first(),
+      size: "large" as const,
+    },
+    {
+      src: CASADANA_BEDROOM_4,
+      label: m.casadana_house_bedroom_first(),
+      size: "medium" as const,
+    },
+    {
+      src: CASADANA_BEDROOM_5,
       label: m.casadana_house_bedroom_second(),
       size: "medium" as const,
     },
     {
-      src: CASADANA_BEDROOM_3,
-      alt: m.casadana_house_bedroom_first(),
-      label: m.casadana_house_bedroom_first(),
+      src: CASADANA_BEDROOM_1,
+      label: m.casadana_house_bedroom_second(),
       size: "small" as const,
+    },
+    {
+      src: CASADANA_BEDROOM_6,
+      label: m.casadana_house_bedroom_second(),
+      size: "large" as const,
     },
   ],
   KITCHEN: [
     {
       src: CASADANA_KITCHEN_1,
-      alt: m.casadana_house_kitchen(),
       label: m.casadana_house_kitchen(),
       size: "small" as const,
     },
     {
       src: CASADANA_KITCHEN_2,
-      alt: m.casadana_house_kitchen(),
       label: m.casadana_house_kitchen(),
-      size: "small" as const,
+      size: "medium" as const,
     },
   ],
   BATHROOMS: [
     {
       src: CASADANA_BATHROOM,
-      alt: m.casadana_house_bathroom(),
       label: m.casadana_house_bathroom(),
       size: "large" as const,
     },
@@ -113,73 +119,61 @@ const CASADANA_GALLERY_BY_CATEGORY = {
   OUTDOOR: [
     {
       src: CASADANA_ROOFTOP_1,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
+      label: m.casadana_amenities_solarium(),
       size: "large" as const,
     },
     {
       src: CASADANA_ROOFTOP_2,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
-      size: "medium" as const,
-    },
-    {
-      src: CASADANA_ROOFTOP_3,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
+      label: m.casadana_amenities_solarium(),
       size: "small" as const,
     },
     {
+      src: CASADANA_ROOFTOP_3,
+      label: m.casadana_amenities_solarium(),
+      size: "medium" as const,
+    },
+    {
       src: CASADANA_ROOFTOP_4,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
+      label: m.casadana_amenities_solarium(),
+      size: "medium" as const,
+    },
+    {
+      src: CASADANA_ROOFTOP_6,
+      label: m.casadana_amenities_solarium(),
       size: "small" as const,
     },
     {
       src: CASADANA_ROOFTOP_5,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
-      size: "small" as const,
-    },
-    {
-      src: CASADANA_ROOFTOP_6,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
-      size: "small" as const,
+      label: m.casadana_amenities_solarium(),
+      size: "large" as const,
     },
     {
       src: CASADANA_ROOFTOP_7,
-      alt: m.casadana_house_patio(),
-      label: m.casadana_house_patio(),
-      size: "medium" as const,
-    },
-    {
-      src: CASADANA_JACUZZI_1,
-      alt: m.casadana_house_exterior(),
-      label: m.casadana_house_exterior(),
-      size: "small" as const,
+      label: m.casadana_amenities_solarium(),
+      size: "large" as const,
     },
     {
       src: CASADANA_JACUZZI_2,
-      alt: m.casadana_house_exterior(),
-      label: m.casadana_house_exterior(),
+      label: m.casadana_amenities_jacuzzi(),
       size: "small" as const,
     },
     {
+      src: CASADANA_JACUZZI_1,
+      label: m.casadana_amenities_jacuzzi(),
+      size: "medium" as const,
+    },
+    {
       src: CASADANA_FRONT_1,
-      alt: m.casadana_house_exterior(),
       label: m.casadana_house_exterior(),
       size: "medium" as const,
     },
     {
       src: CASADANA_FRONT_2,
-      alt: m.casadana_house_exterior(),
       label: m.casadana_house_exterior(),
-      size: "small" as const,
+      size: "large" as const,
     },
     {
       src: CASADANA_FRONT_3,
-      alt: m.casadana_house_exterior(),
       label: m.casadana_house_exterior(),
       size: "small" as const,
     },

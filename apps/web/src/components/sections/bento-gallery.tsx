@@ -43,9 +43,9 @@ export default function BentoGallery({
       <div className="grid min-h-125 grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-12">
         {bentoImages.map((image, index) => {
           const sizeClasses: Record<string, string> = {
-            large: "md:col-span-8 h-80",
-            medium: "md:col-span-6 h-80",
-            small: "md:col-span-4 h-80",
+            large: "md:col-span-8 h-96",
+            medium: "md:col-span-6 h-96",
+            small: "md:col-span-4 h-96",
           }
 
           const colClass = sizeClasses[image.size || "large"]
@@ -60,7 +60,7 @@ export default function BentoGallery({
               <img
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 src={image.src}
-                alt={image.alt}
+                alt={image.label}
               />
               <div className="absolute bottom-6 left-6 z-10 text-white">
                 <span className="text-xs tracking-widest uppercase">{image.label}</span>

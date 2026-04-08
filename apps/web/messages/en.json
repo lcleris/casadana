@@ -71,7 +71,6 @@
   "casadana_house_exterior": "Exterior",
   "casadana_house_kitchen": "Kitchen",
   "casadana_house_living_room": "Living Room",
-  "casadana_house_patio": "Patio",
   "casadana_los_alcazares_button": "Book your holiday now!",
   "casadana_los_alcazares_description": "Los Alcázares, a charming village nestled in the heart of Spain, enchants with its authenticity and warm atmosphere. Surrounded by picturesque landscapes, this haven of peace offers a perfect blend of tradition and modernity. With its quaint streets, local markets, and proximity to the beach (Mar Menor), Los Alcázares is an ideal destination for lovers of culture, nature, and relaxation.",
   "home_title": "Casa DaNa & CasAy",
@@ -91,5 +90,6 @@
   "casacasay_house_bathroom": "Bathroom",
   "casacasay_house_kitchen": "Kitchen",
   "gallery_close": "Close",
-  "gallery_no_images": "No images available for this category."
+  "gallery_title": "Gallery",
+  "gallery_description": "Discover our gallery of carefully selected photos, highlighting the unique charms of our properties."
 }

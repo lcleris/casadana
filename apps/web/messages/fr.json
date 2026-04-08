@@ -72,7 +72,6 @@
   "casadana_house_exterior": "Extérieur",
   "casadana_house_kitchen": "Cuisine",
   "casadana_house_living_room": "Salon",
-  "casadana_house_patio": "Patio",
   "casacasay_house_pool_view": "Vue Piscine",
   "casacasay_house_living_area": "Espace Séjour",
   "casacasay_house_bedroom": "Chambre",
@@ -89,5 +88,6 @@
   "category_house": "Maison",
   "category_flat": "Appartement",
   "gallery_close": "Fermer",
-  "gallery_no_images": "Aucune image disponible pour cette catégorie."
+  "gallery_title": "Galerie",
+  "gallery_description": "Découvrez notre galerie de photos soigneusement sélectionnées, mettant en valeur les charmes uniques de nos propriétés."
 }

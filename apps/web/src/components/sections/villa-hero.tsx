@@ -12,7 +12,9 @@ function VillaHero({ title, imageUrl }: VillaHeroProps) {
       </div>
 
       <div className="relative z-10 px-4 text-center text-white">
-        <h1 className="font-headline mb-6 text-5xl tracking-tight md:text-7xl">{title}</h1>
+        <h1 className="font-headline mb-6 text-5xl tracking-wider uppercase md:text-7xl">
+          {title}
+        </h1>
       </div>
 
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">

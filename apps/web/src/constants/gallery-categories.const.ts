@@ -8,14 +8,14 @@ export const GALLERY_CATEGORIES = {
   OUTDOOR: "Outdoor",
   DINING: "Dining",
   UTILITY: "Utility",
-} as const;
+} as const
 
-export type GalleryCategory = keyof typeof GALLERY_CATEGORIES;
+export type GalleryCategory = keyof typeof GALLERY_CATEGORIES
 
 export const getCategoryLabel = (category: GalleryCategory): string => {
-  return GALLERY_CATEGORIES[category];
-};
+  return GALLERY_CATEGORIES[category]
+}
 
-export const getAllCategories = (): GalleryCategory[] => {
-  return Object.keys(GALLERY_CATEGORIES) as GalleryCategory[];
-};
+export const getAllCategories = () => {
+  return Object.keys(GALLERY_CATEGORIES) as Array<GalleryCategory>
+}

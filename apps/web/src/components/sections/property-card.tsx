@@ -3,9 +3,9 @@ import { ChevronRight } from "lucide-react"
 import { IconName, DynamicIcon } from "lucide-react/dynamic"
 
 import { Button } from "@/components/ui/button"
+import { GalleryCategory } from "@/constants/gallery-categories.const"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
-import { GalleryCategory } from "@/constants/gallery-categories.const"
 
 export interface GalleryImage {
   src: string

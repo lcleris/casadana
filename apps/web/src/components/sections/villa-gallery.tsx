@@ -7,7 +7,6 @@ import FocusGallery from "./focus-gallery"
 
 interface GalleryImage {
   src: string
-  alt: string
   label: string
   size?: "large" | "medium" | "small"
   category: GalleryCategory
@@ -34,7 +33,7 @@ export default function VillaGallery({ images, title, description }: VillaGaller
   }
 
   return (
-    <section className="bg-surface-container-low max-h-xl overflow-hidden py-24">
+    <section className="bg-surface-container-low h-full py-24">
       <div className="mx-auto max-w-screen-2xl px-8">
         {isFocused && focusedCategory ? (
           <FocusGallery

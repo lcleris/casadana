@@ -71,7 +71,6 @@
   "casadana_house_exterior": "Exterior",
   "casadana_house_kitchen": "Cocina",
   "casadana_house_living_room": "Salón",
-  "casadana_house_patio": "Patio",
   "casadana_los_alcazares_button": "¡Reserva tus vacaciones!",
   "casadana_los_alcazares_description": "Los Alcázares, un encantador pueblo en el corazón de España, seduce por su autenticidad y su ambiente acogedor. Rodeado de paisajes pintorescos, este remanso de paz ofrece una mezcla perfecta de tradición y modernidad. Con sus callejuelas pintorescas, mercados locales y su proximidad a la playa (Mar Menor), Los Alcázares es un destino ideal para los amantes de la cultura, la naturaleza y la relajación.",
   "home_title": "Casa DaNa y Casay",
@@ -90,5 +89,6 @@
   "casacasay_house_bathroom": "Baño",
   "casacasay_house_kitchen": "Cocina",
   "gallery_close": "Cerca",
-  "gallery_no_images": "No hay imágenes disponibles para esta categoría."
+  "gallery_title": "Galería",
+  "gallery_description": "Descubra nuestra galería de fotos cuidadosamente seleccionadas, que resaltan el encanto único de nuestras propiedades."
 }

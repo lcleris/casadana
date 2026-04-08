@@ -8,6 +8,7 @@ import VillaFeatures from "@/components/sections/villa-features"
 import VillaGallery from "@/components/sections/villa-gallery"
 import VillaHero from "@/components/sections/villa-hero"
 import { CASADANA_RAW_DATA } from "@/constants/casadana.const"
+import { m } from "@/paraglide/messages"
 
 function VillaDetailPage() {
   const { villaId } = useParams({ from: "/villa/$villaId" })
@@ -19,11 +20,7 @@ function VillaDetailPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <main className="grow">
-        <VillaHero
-          title={CASADANA_RAW_DATA.title}
-          imageUrl={CASADANA_RAW_DATA.heroImageUrl}
-          highlights={CASADANA_RAW_DATA.heroHighlights}
-        />
+        <VillaHero title={CASADANA_RAW_DATA.title} imageUrl={CASADANA_RAW_DATA.heroImageUrl} />
 
         <section className="mx-auto max-w-screen-2xl px-8 py-24" id="about">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
@@ -45,8 +42,8 @@ function VillaDetailPage() {
 
         <VillaGallery
           images={CASADANA_RAW_DATA.galleryImages}
-          title="Interior Selection"
-          description="Every room is designed with an editorial eye, blending local textures with modern luxury."
+          title={m.gallery_title()}
+          description={m.gallery_description()}
         />
 
         <LocalAreaInfo
