@@ -1,11 +1,24 @@
 import { ArrowRight, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
 
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import type { VillaData } from "@/constants/villas.const"
 import { cn } from "@/lib/utils"
 
 interface VillaBookingProps {
   booking: VillaData["booking"]
+}
+
+interface BookingFormValues {
+  checkIn: Date
+  checkOut: Date
+  guests: number
+  email: string
+  tel: string
+  description: string
 }
 
 const DAYS_OF_WEEK = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
@@ -36,9 +49,21 @@ function dateOnly(iso: string) {
 }
 
 export default function VillaBooking({ booking }: VillaBookingProps) {
-  const [checkIn, setCheckIn] = useState<Date>(dateOnly(booking.defaultCheckIn))
-  const [checkOut, setCheckOut] = useState<Date>(dateOnly(booking.defaultCheckOut))
-  const [guests, setGuests] = useState<number>(booking.defaultGuests)
+  const { control, register, handleSubmit, watch, setValue } = useForm<BookingFormValues>({
+    defaultValues: {
+      checkIn: dateOnly(booking.defaultCheckIn),
+      checkOut: dateOnly(booking.defaultCheckOut),
+      guests: booking.defaultGuests,
+      email: "",
+      tel: "",
+      description: "",
+    },
+  })
+
+  const checkIn = watch("checkIn")
+  const checkOut = watch("checkOut")
+  const guests = watch("guests")
+
   const [activeField, setActiveField] = useState<"in" | "out" | null>(null)
   const [viewMonth, setViewMonth] = useState<Date>(
     () => new Date(dateOnly(booking.defaultCheckIn).getFullYear(), dateOnly(booking.defaultCheckIn).getMonth(), 1),
@@ -88,13 +113,13 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
 
   const pickDate = (date: Date) => {
     if (activeField === "in" || date < checkIn) {
-      setCheckIn(date)
+      setValue("checkIn", date, { shouldDirty: true })
       if (checkOut <= date) {
-        setCheckOut(new Date(date.getTime() + 7 * 86_400_000))
+        setValue("checkOut", new Date(date.getTime() + 7 * 86_400_000), { shouldDirty: true })
       }
       setActiveField("out")
     } else {
-      setCheckOut(date)
+      setValue("checkOut", date, { shouldDirty: true })
       setActiveField(null)
     }
   }
@@ -104,6 +129,13 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
     const target = field === "in" ? checkIn : checkOut
     setViewMonth(new Date(target.getFullYear(), target.getMonth(), 1))
   }
+
+  const onSubmit = (values: BookingFormValues) => {
+    console.log("booking request", values)
+  }
+
+  const inputClassName =
+    "text-primary placeholder:text-on-surface-variant/50 mt-1 h-auto w-full rounded-none border-0 bg-transparent px-0 py-0 text-[15px] shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-[15px]"
 
   return (
     <aside
@@ -125,152 +157,201 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
         </div>
       </div>
 
-      <div className="border-outline-variant relative grid grid-cols-2 border">
-        <button
-          ref={ciRef}
-          type="button"
-          onClick={() => openCal("in")}
-          className={cn(
-            "border-outline-variant block border-r bg-white px-4 py-3.5 text-left transition-colors hover:bg-surface-container-low",
-            activeField === "in" && "bg-surface-container-low",
-          )}
-        >
-          <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-            Check-in
-          </span>
-          <span className="font-display text-primary mt-1 block text-[17px] italic">
-            {fmt(checkIn)}
-          </span>
-        </button>
-        <button
-          ref={coRef}
-          type="button"
-          onClick={() => openCal("out")}
-          className={cn(
-            "block bg-white px-4 py-3.5 text-left transition-colors hover:bg-surface-container-low",
-            activeField === "out" && "bg-surface-container-low",
-          )}
-        >
-          <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-            Check-out
-          </span>
-          <span className="font-display text-primary mt-1 block text-[17px] italic">
-            {fmt(checkOut)}
-          </span>
-        </button>
-
-        {activeField !== null && (
-          <div
-            ref={popRef}
-            className="border-outline-variant editorial-shadow absolute top-[calc(100%+8px)] right-0 left-0 z-30 border bg-white p-5"
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="border-outline-variant relative grid grid-cols-2 border">
+          <button
+            ref={ciRef}
+            type="button"
+            onClick={() => openCal("in")}
+            className={cn(
+              "border-outline-variant hover:bg-surface-container-low block border-r bg-white px-4 py-3.5 text-left transition-colors",
+              activeField === "in" && "bg-surface-container-low",
+            )}
           >
-            <div className="mb-3 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() =>
-                  setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
-                }
-                aria-label="Previous month"
-                className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
-              >
-                <ChevronLeft size={14} />
-              </button>
-              <h4 className="font-display text-primary text-[17px] italic">{fmtMonth(viewMonth)}</h4>
-              <button
-                type="button"
-                onClick={() =>
-                  setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
-                }
-                aria-label="Next month"
-                className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
-              >
-                <ChevronRight size={14} />
-              </button>
-            </div>
-            <div className="grid grid-cols-7 gap-0.5">
-              {DAYS_OF_WEEK.map((d) => (
-                <div
-                  key={d}
-                  className="text-on-surface-variant py-2 text-center font-mono text-[9.5px] tracking-[0.15em] uppercase"
+            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
+              Check-in
+            </span>
+            <span className="font-display text-primary mt-1 block text-[17px] italic">
+              {fmt(checkIn)}
+            </span>
+          </button>
+          <button
+            ref={coRef}
+            type="button"
+            onClick={() => openCal("out")}
+            className={cn(
+              "hover:bg-surface-container-low block bg-white px-4 py-3.5 text-left transition-colors",
+              activeField === "out" && "bg-surface-container-low",
+            )}
+          >
+            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
+              Check-out
+            </span>
+            <span className="font-display text-primary mt-1 block text-[17px] italic">
+              {fmt(checkOut)}
+            </span>
+          </button>
+
+          {activeField !== null && (
+            <div
+              ref={popRef}
+              className="border-outline-variant editorial-shadow absolute top-[calc(100%+8px)] right-0 left-0 z-30 border bg-white p-5"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
+                  }
+                  aria-label="Previous month"
+                  className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
-                  {d}
-                </div>
-              ))}
-              {cells.map((cell, i) => {
-                if (cell.muted || !cell.date) {
+                  <ChevronLeft size={14} />
+                </button>
+                <h4 className="font-display text-primary text-[17px] italic">{fmtMonth(viewMonth)}</h4>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
+                  }
+                  aria-label="Next month"
+                  className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+              <div className="grid grid-cols-7 gap-0.5">
+                {DAYS_OF_WEEK.map((d) => (
+                  <div
+                    key={d}
+                    className="text-on-surface-variant py-2 text-center font-mono text-[9.5px] tracking-[0.15em] uppercase"
+                  >
+                    {d}
+                  </div>
+                ))}
+                {cells.map((cell, i) => {
+                  if (cell.muted || !cell.date) {
+                    return (
+                      <span
+                        key={i}
+                        className="text-outline-variant flex aspect-square cursor-default items-center justify-center text-[13px]"
+                      >
+                        {cell.d}
+                      </span>
+                    )
+                  }
+                  const isCI = sameDay(cell.date, checkIn)
+                  const isCO = sameDay(cell.date, checkOut)
+                  const inRange = cell.date > checkIn && cell.date < checkOut
                   return (
-                    <span
+                    <button
                       key={i}
-                      className="text-outline-variant flex aspect-square cursor-default items-center justify-center text-[13px]"
+                      type="button"
+                      onClick={() => pickDate(cell.date as Date)}
+                      className={cn(
+                        "text-on-surface flex aspect-square items-center justify-center text-[13px] transition-colors",
+                        inRange && "bg-secondary-container text-on-secondary-container",
+                        (isCI || isCO) && "bg-primary text-on-primary rounded-full",
+                        !inRange && !isCI && !isCO && "hover:bg-surface-container-low",
+                      )}
                     >
                       {cell.d}
-                    </span>
+                    </button>
                   )
-                }
-                const isCI = sameDay(cell.date, checkIn)
-                const isCO = sameDay(cell.date, checkOut)
-                const inRange = cell.date > checkIn && cell.date < checkOut
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => pickDate(cell.date as Date)}
-                    className={cn(
-                      "text-on-surface flex aspect-square items-center justify-center text-[13px] transition-colors",
-                      inRange && "bg-secondary-container text-on-secondary-container",
-                      (isCI || isCO) && "bg-primary text-on-primary rounded-full",
-                      !inRange && !isCI && !isCO && "hover:bg-surface-container-low",
-                    )}
-                  >
-                    {cell.d}
-                  </button>
-                )
-              })}
+                })}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="border-outline-variant flex items-center justify-between border border-t-0 bg-white px-4 py-3.5">
-        <span className="text-on-surface-variant font-mono text-[10px] tracking-[0.22em] uppercase">
-          Guests
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setGuests((g) => Math.max(1, g - 1))}
-            aria-label="Remove guest"
-            className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
-          >
-            <Minus size={12} />
-          </button>
-          <span className="font-display text-primary text-[17px] italic">
-            {guests} {guests === 1 ? "Guest" : "Guests"}
-          </span>
-          <button
-            type="button"
-            onClick={() => setGuests((g) => Math.min(booking.maxGuests, g + 1))}
-            aria-label="Add guest"
-            className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
-          >
-            <Plus size={12} />
-          </button>
-        </span>
-      </div>
+        <Controller
+          control={control}
+          name="guests"
+          render={({ field }) => (
+            <div className="border-outline-variant flex items-center justify-between border border-t-0 bg-white px-4 py-3.5">
+              <span className="text-on-surface-variant font-mono text-[10px] tracking-[0.22em] uppercase">
+                Guests
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => field.onChange(Math.max(1, field.value - 1))}
+                  aria-label="Remove guest"
+                  className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
+                >
+                  <Minus size={12} />
+                </button>
+                <span className="font-display text-primary text-[17px] italic">
+                  {guests} {guests === 1 ? "Guest" : "Guests"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => field.onChange(Math.min(booking.maxGuests, field.value + 1))}
+                  aria-label="Add guest"
+                  className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
+                >
+                  <Plus size={12} />
+                </button>
+              </span>
+            </div>
+          )}
+        />
 
-      <button
-        type="button"
-        className="bg-primary text-on-primary hover:bg-primary-container active:scale-[0.99] mt-4 inline-flex w-full items-center justify-center gap-3 px-6 py-[18px] font-mono text-[11px] tracking-[0.28em] uppercase transition-colors"
-      >
-        Request to Book
-        <ArrowRight size={12} />
-      </button>
-      <button
-        type="button"
-        className="text-primary border-outline-variant hover:bg-surface-container-low mt-2.5 w-full border px-6 py-4 font-mono text-[11px] tracking-[0.28em] uppercase transition-colors"
-      >
-        Contact the Host
-      </button>
+        <div className="border-outline-variant mt-4 grid border border-b-0 bg-white">
+          <label className="border-outline-variant block border-b px-4 py-3">
+            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
+              Email
+            </span>
+            <Input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              className={inputClassName}
+              {...register("email", { required: true })}
+            />
+          </label>
+          <label className="border-outline-variant block border-b px-4 py-3">
+            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
+              Phone
+            </span>
+            <Input
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="+33 6 12 34 56 78"
+              className={inputClassName}
+              {...register("tel", { required: true })}
+            />
+          </label>
+          <label className="border-outline-variant block border-b px-4 py-3">
+            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
+              A few words about your stay
+            </span>
+            <Textarea
+              placeholder="Occasion, arrival time, special requests…"
+              rows={3}
+              className="text-primary placeholder:text-on-surface-variant/50 mt-1 min-h-0 w-full resize-none rounded-none border-0 bg-transparent px-0 py-0 text-[15px] leading-relaxed shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-[15px]"
+              {...register("description")}
+            />
+          </label>
+        </div>
+
+        <Button
+          type="submit"
+          className="bg-primary text-on-primary hover:bg-primary-container mt-4 inline-flex h-auto w-full items-center justify-center gap-3 rounded-none px-6 py-[18px] font-mono text-[11px] tracking-[0.28em] uppercase"
+        >
+          Request to Book
+          <ArrowRight size={12} />
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="text-primary border-outline-variant hover:bg-surface-container-low mt-2.5 h-auto w-full rounded-none border px-6 py-4 font-mono text-[11px] tracking-[0.28em] uppercase"
+        >
+          Contact the Host
+        </Button>
+      </form>
 
       <div className="border-outline-variant mt-6 grid gap-3 border-t pt-5 text-[13.5px]">
         <div className="text-on-surface-variant flex justify-between">
