@@ -25,15 +25,15 @@ function NavBrand() {
 
 function NavLinks({ links }: { links: NavLink[] }) {
   return (
-    <nav className="hidden items-center justify-center gap-8 lg:flex">
+    <nav className="hidden items-center justify-center gap-7 lg:flex">
       {links.map((link) => (
         <a
           key={link.href}
           href={link.href}
-          className="group relative pb-1 text-[11px] tracking-[0.22em] uppercase opacity-90"
+          className="group relative pb-1 font-mono text-[11px] tracking-[0.22em] uppercase opacity-90 transition-opacity hover:opacity-100"
         >
           {link.label}
-          <span className="absolute right-0 -bottom-0.5 left-0 h-px origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100" />
+          <span className="pointer-events-none absolute right-0 -bottom-0.5 left-0 h-px origin-left scale-x-0 bg-current transition-transform duration-300 group-hover:scale-x-100" />
         </a>
       ))}
     </nav>

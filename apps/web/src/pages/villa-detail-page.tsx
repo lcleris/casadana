@@ -1,64 +1,83 @@
 import { useParams } from "@tanstack/react-router"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
-import BookingForm from "@/components/forms/booking-form"
-import ExperienceCards from "@/components/sections/experience-cards"
-import LocalAreaInfo from "@/components/sections/local-area-info"
-import VillaFeatures from "@/components/sections/villa-features"
-import VillaGallery from "@/components/sections/villa-gallery"
+import VillaAbout from "@/components/sections/villa/villa-about"
+import VillaCtaStrip from "@/components/sections/villa/villa-cta-strip"
+import VillaExperiences from "@/components/sections/villa/villa-experiences"
+import VillaFaq from "@/components/sections/villa/villa-faq"
+import VillaGalleryBento from "@/components/sections/villa/villa-gallery-bento"
+import VillaLightbox from "@/components/sections/villa/villa-lightbox"
+import VillaLocalArea from "@/components/sections/villa/villa-local-area"
+import VillaReviews from "@/components/sections/villa/villa-reviews"
+import VillaRibbon from "@/components/sections/villa/villa-ribbon"
+import VillaSister from "@/components/sections/villa/villa-sister"
 import VillaHero from "@/components/sections/villa-hero"
-import { CASADANA_RAW_DATA } from "@/constants/casadana.const"
-import { m } from "@/paraglide/messages"
+import { GalleryCategory } from "@/constants/gallery-categories.const"
+import { getVilla } from "@/constants/villas.const"
 
-function VillaDetailPage() {
+export default function VillaDetailPage() {
   const { villaId } = useParams({ from: "/villa/$villaId" })
+  const villa = getVilla(villaId)
+
+  const [lbOpen, setLbOpen] = useState(false)
+  const [lbCategory, setLbCategory] = useState<GalleryCategory>("LIVING_SPACES")
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    setLbOpen(false)
   }, [villaId])
 
+  if (!villa) {
+    return (
+      <section className="mx-auto max-w-[1440px] px-6 py-32 md:px-10">
+        <span className="text-secondary inline-flex items-center gap-3 font-mono text-[11px] tracking-[0.22em] uppercase before:block before:h-px before:w-6 before:bg-current">
+          Not found
+        </span>
+        <h1 className="font-display text-primary mt-4 text-[clamp(40px,5vw,64px)] font-light italic">
+          We don't have that one.
+        </h1>
+      </section>
+    )
+  }
+
+  const openLb = (c: GalleryCategory) => {
+    const hasImages = villa.gallery.images[c]?.length > 0
+    if (!hasImages) return
+    setLbCategory(c)
+    setLbOpen(true)
+  }
+
+  const openAll = () => {
+    const firstCat = (Object.keys(villa.gallery.images) as GalleryCategory[]).find(
+      (c) => villa.gallery.images[c].length > 0,
+    )
+    if (firstCat) {
+      setLbCategory(firstCat)
+      setLbOpen(true)
+    }
+  }
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="grow">
-        <VillaHero title={CASADANA_RAW_DATA.title} imageUrl={CASADANA_RAW_DATA.heroImageUrl} />
+    <>
+      <VillaHero {...villa.hero} />
+      <VillaRibbon phrases={villa.ribbon} />
+      <VillaAbout about={villa.about} booking={villa.booking} />
+      <VillaGalleryBento data={villa.gallery} onTileClick={openLb} onOpenAll={openAll} />
+      <VillaLocalArea data={villa.localArea} />
+      <VillaExperiences data={villa.experiences} />
+      <VillaReviews data={villa.reviews} />
+      <VillaFaq data={villa.faq} />
+      <VillaCtaStrip data={villa.ctaStrip} />
+      <VillaSister data={villa.sister} />
 
-        <section className="mx-auto max-w-screen-2xl px-8 py-24" id="about">
-          <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <h2 className="font-headline text-primary mb-8 text-4xl">
-                Refined Living on the Mar Menor
-              </h2>
-              <p className="text-on-surface-variant mb-12 max-w-2xl text-lg leading-relaxed">
-                {CASADANA_RAW_DATA.description}
-              </p>
-              <VillaFeatures features={CASADANA_RAW_DATA.features} />
-            </div>
-
-            <div className="lg:col-span-5">
-              <BookingForm />
-            </div>
-          </div>
-        </section>
-
-        <VillaGallery
-          images={CASADANA_RAW_DATA.galleryImages}
-          title={m.gallery_title()}
-          description={m.gallery_description()}
-        />
-
-        <LocalAreaInfo
-          title={CASADANA_RAW_DATA.localArea.title}
-          subtitle={CASADANA_RAW_DATA.localArea.subtitle}
-          description={CASADANA_RAW_DATA.localArea.description}
-          imageUrl={CASADANA_RAW_DATA.localArea.imageUrl}
-          overlapImageUrl={CASADANA_RAW_DATA.localArea.overlapImageUrl}
-          points={CASADANA_RAW_DATA.localArea.points}
-        />
-
-        <ExperienceCards experiences={CASADANA_RAW_DATA.experiences} />
-      </main>
-    </div>
+      <VillaLightbox
+        brand={`Casa ${villa.hero.titleItalic}`}
+        open={lbOpen}
+        category={lbCategory}
+        images={villa.gallery.images}
+        onCategory={setLbCategory}
+        onClose={() => setLbOpen(false)}
+      />
+    </>
   )
 }
-
-export default VillaDetailPage
