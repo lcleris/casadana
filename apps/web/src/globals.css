@@ -58,9 +58,19 @@
   --color-outline: oklch(55.5% 0.03 60);
   --color-outline-variant: oklch(79.5% 0.02 60);
 
-  --font-headline: "Noto Serif", serif;
-  --font-body: "Inter", sans-serif;
-  --font-label: "Inter", sans-serif;
+  --font-display: "Fraunces", "Noto Serif", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-headline: "Fraunces", "Noto Serif", Georgia, serif;
+  --font-label: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --shadow-editorial:
+    0 30px 60px -25px oklch(23.6% 0.108 253 / 0.18),
+    0 8px 24px -12px oklch(23.6% 0.108 253 / 0.1);
+
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-float-bg: float-bg 22s ease-in-out infinite alternate;
+  --animate-scroll-cue: scroll-cue 2.4s ease-in-out infinite;
 }
 
 @layer base {
@@ -69,13 +79,51 @@
   }
 
   body {
-    @apply bg-background text-on-surface font-body;
+    @apply bg-background text-on-surface font-body antialiased;
   }
 }
 
 @layer utilities {
   .editorial-shadow {
-    box-shadow: 0 20px 40px -10px oklch(23.6% 0.108 253 / 0.08);
+    box-shadow: var(--shadow-editorial);
+  }
+
+  .italic-display {
+    font-style: italic;
+    font-variation-settings: "SOFT" 60, "WONK" 0;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float-bg {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes scroll-cue {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.01% {
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
   }
 }
 

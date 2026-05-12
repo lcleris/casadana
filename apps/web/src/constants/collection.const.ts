@@ -1,28 +1,33 @@
 import CASADANA_BATHROOM from "@/assets/casadana/bathroom.jpeg"
 import CASADANA_BEDROOM from "@/assets/casadana/bedroom1_1.jpeg"
 import CASADANA_KITCHEN from "@/assets/casadana/kitchen1.jpeg"
-import CASADANA_LIVING_ROOM from "@/assets/casadana/living_room2.jpeg"
 import CASADANA_BG from "@/assets/casadana/rooftop7.jpeg"
 import CASACASAY_BG from "@/assets/casadessy/pool1.jpeg"
-import { PropertyCardProps } from "@/components/sections/property-card"
+import type { PropertyCardProps } from "@/components/sections/property-card"
 import { m } from "@/paraglide/messages"
 
 import { GalleryCategory } from "./gallery-categories.const"
 
 export const properties = [
   {
-    title: m.casadana_full_name(),
+    id: "casadana",
+    badge: m.prop_badge_villa(),
     category: m.category_house(),
-    description: m.casadana_description(),
+    titlePrefix: m.home_hero_title_prefix(),
+    titleName: m.home_hero_title_dana(),
+    subtitle: m.prop_casadana_subtitle(),
+    description: m.prop_casadana_short_description(),
+    exploreLabel: m.prop_explore_dana(),
+    price: { amount: 185, currency: "€" },
+    rating: { score: 4.96, count: 87 },
     imageUrl: CASADANA_BG,
+    imageAlt: "Casa DaNa rooftop solarium",
+    layout: "left",
     features: [
       { icon: "users", label: m.listing_guests({ guests: 6 }) },
       { icon: "sun", label: m.listing_rooftop() },
       { icon: "car", label: m.listing_car() },
     ],
-    layout: "left",
-    imageAlt: "Casa DaNa Los Alcazares",
-    id: "casadana",
     galleryImages: [
       {
         src: CASADANA_BG,
@@ -56,17 +61,23 @@ export const properties = [
   },
   {
     id: "casacasay",
-    title: "Casa CasAy",
+    badge: m.prop_badge_penthouse(),
     category: m.category_flat(),
-    description: m.casacasay_description(),
+    titlePrefix: m.home_hero_title_prefix(),
+    titleName: m.home_hero_title_casay(),
+    subtitle: m.prop_casacasay_subtitle(),
+    description: m.prop_casacasay_short_description(),
+    exploreLabel: m.prop_explore_casay(),
+    price: { amount: 145, currency: "€" },
+    rating: { score: 4.92, count: 41 },
     imageUrl: CASACASAY_BG,
+    imageAlt: "Casa CasAy pool",
+    layout: "right",
     features: [
       { icon: "users", label: m.listing_guests({ guests: 4 }) },
-      { icon: "sun", label: m.listing_exterior() },
       { icon: "waves-ladder", label: m.listing_pool() },
+      { icon: "armchair", label: m.listing_exterior() },
     ],
-    imageAlt: "Casa DaNa Vue sur la Ville",
-    layout: "right",
     galleryImages: [
       {
         src: CASACASAY_BG,

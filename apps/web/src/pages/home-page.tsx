@@ -1,36 +1,22 @@
-import bgHome from "@/assets/shared/bg-home.jpeg"
+import CtaStrip from "@/components/sections/home/cta-strip"
+import HomeHero from "@/components/sections/home/home-hero"
+import IntroCollection from "@/components/sections/home/intro-collection"
+import MarqueeRibbon from "@/components/sections/home/marquee-ribbon"
+import StoryStrip from "@/components/sections/home/story-strip"
 import PropertyCard from "@/components/sections/property-card"
 import { properties } from "@/constants/collection.const"
-import { m } from "@/paraglide/messages"
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen grow flex-col">
-      <section
-        className="relative flex min-h-screen flex-col justify-center bg-cover bg-center bg-no-repeat px-8 pt-24 pb-12 text-center"
-        style={{ backgroundImage: `url(${bgHome})` }}
-      >
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 space-y-6">
-          <h1 className="font-headline leading-wide text-5xl text-white uppercase drop-shadow-lg text-shadow-2xs md:text-7xl">
-            {m.home_title()}
-          </h1>
-          <p className="mx-auto max-w-2xl text-xl font-light text-white drop-shadow">
-            {m.los_alcazares()}
-          </p>
-        </div>
-      </section>
-
-      <section className="flex flex-col">
-        {properties.map((property, index) => (
-          <div key={property.title}>
-            <PropertyCard {...property} />
-            {index < properties.length - 1 && (
-              <div className="bg-surface-container-high mx-auto h-px max-w-7xl" />
-            )}
-          </div>
-        ))}
-      </section>
-    </main>
+    <>
+      <HomeHero />
+      <IntroCollection />
+      {properties.map((property) => (
+        <PropertyCard key={property.id} {...property} />
+      ))}
+      <MarqueeRibbon />
+      <StoryStrip />
+      <CtaStrip />
+    </>
   )
 }
