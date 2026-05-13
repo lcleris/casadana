@@ -496,5 +496,13 @@
   "villa_casacasay_sister_button": "Discover Casa DaNa",
   "home_hero_image_alt": "The Alcázares",
   "home_story_image_alt_facade": "Facade of Casa DaNa",
-  "home_story_image_alt_pool": "Casa CasAy Swimming Pool"
+  "home_story_image_alt_pool": "Casa CasAy Swimming Pool",
+  "villa_booking_name_label": "Full name",
+  "villa_booking_name_placeholder": "Your full name",
+  "villa_booking_error_dates_conflict": "Those dates were just taken. Please pick others.",
+  "villa_booking_error_unknown_villa": "We could not find this villa. Please refresh.",
+  "villa_booking_error_generic": "Something went wrong. Please try again.",
+  "villa_booking_success_title": "Thank you",
+  "villa_booking_success_body": "We received your request and will be in touch shortly.",
+  "villa_booking_request_sending": "Sending..."
 }

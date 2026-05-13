@@ -494,5 +494,13 @@
   "villa_casacasay_sister_title_lead": "Plutôt en bord de mer,",
   "villa_casacasay_sister_title_italic": "la casa familiale ?",
   "villa_casacasay_sister_description": "Casa DaNa est notre casa familiale de six personnes à Los Alcázares même — solarium sur le toit, jacuzzi, et 1,6 km de la Mar Menor. Mêmes hôtes, même soin.",
-  "villa_casacasay_sister_button": "Découvrir Casa DaNa"
+  "villa_casacasay_sister_button": "Découvrir Casa DaNa",
+  "villa_booking_name_label": "Nom complet",
+  "villa_booking_name_placeholder": "Votre nom complet",
+  "villa_booking_error_dates_conflict": "Ces dates viennent d'être prises. Veuillez en choisir d'autres.",
+  "villa_booking_error_unknown_villa": "Villa introuvable. Veuillez actualiser la page.",
+  "villa_booking_error_generic": "Une erreur est survenue. Veuillez réessayer.",
+  "villa_booking_success_title": "Merci",
+  "villa_booking_success_body": "Nous avons bien reçu votre demande et reviendrons vers vous très bientôt.",
+  "villa_booking_request_sending": "Envoi..."
 }

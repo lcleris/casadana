@@ -495,5 +495,13 @@
   "villa_casacasay_sister_button": "Descubre Casa DaNa",
   "home_hero_image_alt": "Los Alcázares",
   "home_story_image_alt_facade": "Fachada de Casa DaNa",
-  "home_story_image_alt_pool": "Piscina Casa Casa"
+  "home_story_image_alt_pool": "Piscina Casa Casa",
+  "villa_booking_name_label": "Nombre completo",
+  "villa_booking_name_placeholder": "Tu nombre completo",
+  "villa_booking_error_dates_conflict": "Estas fechas acaban de reservarse. Elige otras, por favor.",
+  "villa_booking_error_unknown_villa": "No encontramos esta villa. Actualiza la página.",
+  "villa_booking_error_generic": "Algo salió mal. Inténtalo de nuevo.",
+  "villa_booking_success_title": "Gracias",
+  "villa_booking_success_body": "Recibimos tu solicitud y te contactaremos en breve.",
+  "villa_booking_request_sending": "Enviando..."
 }

@@ -1,3 +1,6 @@
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query"
+import { ApiError, useCreateBooking, useGetVillaAvailability } from "@casa-dana/api"
+import { addDays, addMonths, endOfMonth, format, parseISO, startOfMonth } from "date-fns"
 import { ArrowRight, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -10,10 +13,12 @@ import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
 
 interface VillaBookingProps {
+  villaSlug: string
   booking: VillaData["booking"]
 }
 
 interface BookingFormValues {
+  name: string
   checkIn: Date
   checkOut: Date
   guests: number
@@ -57,9 +62,10 @@ function dateOnly(iso: string) {
   return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1)
 }
 
-export default function VillaBooking({ booking }: VillaBookingProps) {
-  const { control, register, handleSubmit, watch, setValue } = useForm<BookingFormValues>({
+export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) {
+  const { control, register, handleSubmit, watch, setValue, setError } = useForm<BookingFormValues>({
     defaultValues: {
+      name: "",
       checkIn: dateOnly(booking.defaultCheckIn),
       checkOut: dateOnly(booking.defaultCheckOut),
       guests: booking.defaultGuests,
@@ -80,6 +86,79 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
   const popRef = useRef<HTMLDivElement | null>(null)
   const ciRef = useRef<HTMLButtonElement | null>(null)
   const coRef = useRef<HTMLButtonElement | null>(null)
+
+  const [submitted, setSubmitted] = useState(false)
+  const [topLevelError, setTopLevelError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+
+  const { mutate: createBooking, isPending } = useCreateBooking({
+    mutation: {
+      onSuccess: () => {
+        setSubmitted(true)
+        setTopLevelError(null)
+        queryClient.invalidateQueries({ queryKey: ["/api/villas", villaSlug, "availability"] })
+      },
+      onError: (err) => {
+        if (err instanceof ApiError) {
+          if (err.code === "VALIDATION") {
+            const fieldMap: Record<string, keyof BookingFormValues> = {
+              GuestName: "name",
+              GuestEmail: "email",
+              GuestPhone: "tel",
+              CheckIn: "checkIn",
+              CheckOut: "checkOut",
+              Adults: "guests",
+            }
+            for (const part of err.message.split(";")) {
+              const [rawField, tag] = part.split(":").map((s) => s.trim())
+              const field = fieldMap[rawField ?? ""]
+              if (field) setError(field, { type: tag || "invalid", message: tag })
+            }
+            setTopLevelError(null)
+          } else if (err.code === "DATES_CONFLICT") {
+            setTopLevelError(m.villa_booking_error_dates_conflict())
+          } else if (err.code === "UNKNOWN_VILLA") {
+            setTopLevelError(m.villa_booking_error_unknown_villa())
+          } else {
+            setTopLevelError(m.villa_booking_error_generic())
+          }
+        } else {
+          setTopLevelError(m.villa_booking_error_generic())
+        }
+      },
+    },
+  })
+
+  const queryWindow = useMemo(() => {
+    const from = startOfMonth(viewMonth)
+    const to = endOfMonth(addMonths(viewMonth, 1))
+    return { from: format(from, "yyyy-MM-dd"), to: format(to, "yyyy-MM-dd") }
+  }, [viewMonth])
+
+  const { data: availability } = useGetVillaAvailability(
+    villaSlug,
+    { from: queryWindow.from, to: queryWindow.to },
+    {
+      query: {
+        enabled: activeField !== null,
+        placeholderData: keepPreviousData,
+      },
+    },
+  )
+
+  const blockedNights = useMemo(() => {
+    const set = new Set<string>()
+    for (const r of availability?.booked_ranges ?? []) {
+      const start = parseISO(r.check_in)
+      const end = parseISO(r.check_out)
+      for (let d = start; d < end; d = addDays(d, 1)) {
+        set.add(format(d, "yyyy-MM-dd"))
+      }
+    }
+    return set
+  }, [availability])
+
+  const isBlocked = (date: Date) => blockedNights.has(format(date, "yyyy-MM-dd"))
 
   const nights = nightsBetween(checkIn, checkOut)
   const subtotal = nights * booking.nightly
@@ -104,23 +183,24 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
 
   const cells = useMemo(() => {
     const y = viewMonth.getFullYear()
-    const m = viewMonth.getMonth()
-    const first = new Date(y, m, 1)
+    const mo = viewMonth.getMonth()
+    const first = new Date(y, mo, 1)
     const startDow = (first.getDay() + 6) % 7
-    const daysInMonth = new Date(y, m + 1, 0).getDate()
-    const prevDays = new Date(y, m, 0).getDate()
+    const daysInMonth = new Date(y, mo + 1, 0).getDate()
+    const prevDays = new Date(y, mo, 0).getDate()
 
     const out: Array<{ d: number; muted: boolean; date?: Date }> = []
     for (let i = startDow; i > 0; i--) {
       out.push({ d: prevDays - i + 1, muted: true })
     }
     for (let d = 1; d <= daysInMonth; d++) {
-      out.push({ d, muted: false, date: new Date(y, m, d) })
+      out.push({ d, muted: false, date: new Date(y, mo, d) })
     }
     return out
   }, [viewMonth])
 
   const pickDate = (date: Date) => {
+    if (isBlocked(date)) return
     if (activeField === "in" || date < checkIn) {
       setValue("checkIn", date, { shouldDirty: true })
       if (checkOut <= date) {
@@ -140,11 +220,41 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
   }
 
   const onSubmit = (values: BookingFormValues) => {
-    console.log("booking request", values)
+    createBooking({
+      data: {
+        villa_slug: villaSlug,
+        guest_name: values.name,
+        guest_email: values.email,
+        guest_phone: values.tel,
+        check_in: format(values.checkIn, "yyyy-MM-dd"),
+        check_out: format(values.checkOut, "yyyy-MM-dd"),
+        adults: values.guests,
+        children: 0,
+        message: values.description,
+      },
+    })
   }
 
   const inputClassName =
     "text-primary placeholder:text-on-surface-variant/50 mt-1 h-auto w-full rounded-none border-0 bg-transparent px-0 py-0 text-[15px] shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-[15px]"
+
+  if (submitted) {
+    return (
+      <aside
+        id="book"
+        className="bg-background border-outline-variant editorial-shadow border p-6 md:sticky md:top-28 md:p-8"
+      >
+        <div className="text-center">
+          <h3 className="font-display text-primary text-[28px] italic">
+            {m.villa_booking_success_title()}
+          </h3>
+          <p className="text-on-surface-variant mt-3 text-[15px]">
+            {m.villa_booking_success_body()}
+          </p>
+        </div>
+      </aside>
+    )
+  }
 
   return (
     <aside
@@ -249,6 +359,18 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
                       </span>
                     )
                   }
+                  const blocked = isBlocked(cell.date)
+                  if (blocked) {
+                    return (
+                      <span
+                        key={i}
+                        aria-disabled="true"
+                        className="text-on-surface-variant/40 flex aspect-square cursor-not-allowed items-center justify-center text-[13px] line-through"
+                      >
+                        {cell.d}
+                      </span>
+                    )
+                  }
                   const isCI = sameDay(cell.date, checkIn)
                   const isCO = sameDay(cell.date, checkOut)
                   const inRange = cell.date > checkIn && cell.date < checkOut
@@ -309,6 +431,18 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
         <div className="border-outline-variant mt-4 grid border border-b-0 bg-white">
           <label className="border-outline-variant block border-b px-4 py-3">
             <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
+              {m.villa_booking_name_label()}
+            </span>
+            <Input
+              type="text"
+              autoComplete="name"
+              placeholder={m.villa_booking_name_placeholder()}
+              className={inputClassName}
+              {...register("name", { required: true })}
+            />
+          </label>
+          <label className="border-outline-variant block border-b px-4 py-3">
+            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
               {m.villa_booking_email_label()}
             </span>
             <Input
@@ -346,12 +480,19 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
           </label>
         </div>
 
+        {topLevelError && (
+          <p className="border-error/30 bg-error-container/20 text-error mt-3 border px-3 py-2 text-[13px]">
+            {topLevelError}
+          </p>
+        )}
+
         <Button
           type="submit"
-          className="bg-primary text-on-primary hover:bg-primary-container mt-4 inline-flex h-auto w-full items-center justify-center gap-3 rounded-none px-6 py-[18px] font-mono text-[11px] tracking-[0.28em] uppercase"
+          disabled={isPending}
+          className="bg-primary text-on-primary hover:bg-primary-container disabled:opacity-60 mt-4 inline-flex h-auto w-full items-center justify-center gap-3 rounded-none px-6 py-[18px] font-mono text-[11px] tracking-[0.28em] uppercase"
         >
-          {m.villa_booking_request_book()}
-          <ArrowRight size={12} />
+          {isPending ? m.villa_booking_request_sending() : m.villa_booking_request_book()}
+          {!isPending && <ArrowRight size={12} />}
         </Button>
         <Button
           type="button"

@@ -5,6 +5,7 @@ import type { VillaData } from "@/constants/villas.const"
 import VillaBooking from "./villa-booking"
 
 interface VillaAboutProps {
+  villaSlug: string
   about: VillaData["about"]
   booking: VillaData["booking"]
 }
@@ -23,7 +24,7 @@ function FeatureCell({ feature }: { feature: { icon: IconName; label: string } }
   )
 }
 
-export default function VillaAbout({ about, booking }: VillaAboutProps) {
+export default function VillaAbout({ villaSlug, about, booking }: VillaAboutProps) {
   return (
     <section id="about" className="mx-auto max-w-[1440px] px-6 py-20 md:px-10 md:py-[140px]">
       <div className="grid items-start gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-24">
@@ -61,7 +62,7 @@ export default function VillaAbout({ about, booking }: VillaAboutProps) {
           </div>
         </div>
 
-        <VillaBooking booking={booking} />
+        <VillaBooking villaSlug={villaSlug} booking={booking} />
       </div>
     </section>
   )
