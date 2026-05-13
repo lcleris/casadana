@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: Casa Dana API
+  version: 0.1.0
+  description: |
+    Casa Dana villa rental API. Public endpoints for booking submission and
+    availability lookup. Villa content (names, photos, descriptions) is static
+    in the frontend and not exposed by this API.
+
+servers:
+  - url: http://localhost:8080
+    description: local dev
+  - url: https://casa-dana.com
+    description: production
+
+tags:
+  - name: health
+    description: Liveness
+  - name: bookings
+    description: Booking submission and availability
+
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      tags: [health]
+      summary: Liveness probe
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /api/bookings:
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Submit a booking request
+      description: |
+        Creates a `pending` booking and triggers a confirmation email to the
+        guest plus a notification email to the admin.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingRequest"
+      responses:
+        "201":
+          description: Booking accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingResponse"
+        "404":
+          description: Villa slug not in allowlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Dates conflict with an existing booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/villas/{slug}/availability:
+    get:
+      operationId: getVillaAvailability
+      tags: [bookings]
+      summary: Get booked date ranges for a villa
+      description: |
+        Returns date ranges where the villa is already booked (approved or
+        paid) within the [from, to) window. Pending bookings are NOT returned.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+          example: casadana
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          description: Window start (inclusive). YYYY-MM-DD.
+          example: "2026-07-01"
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          description: Window end (exclusive). YYYY-MM-DD.
+          example: "2026-08-01"
+      responses:
+        "200":
+          description: Availability
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvailabilityResponse"
+        "404":
+          description: Villa slug not in allowlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid query params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+          example: ok
+
+    BookingStatus:
+      type: string
+      enum: [pending, approved, rejected, cancelled, paid]
+
+    CreateBookingRequest:
+      type: object
+      required:
+        - villa_slug
+        - guest_name
+        - guest_email
+        - guest_phone
+        - check_in
+        - check_out
+        - adults
+      properties:
+        villa_slug: { type: string, minLength: 1, maxLength: 64, example: casadana }
+        guest_name: { type: string, minLength: 1, maxLength: 120, example: Jane Doe }
+        guest_email: { type: string, format: email, maxLength: 255, example: jane@example.com }
+        guest_phone: { type: string, minLength: 2, maxLength: 40, example: "+33123456789" }
+        check_in:
+          type: string
+          format: date
+          description: ISO date, YYYY-MM-DD
+          example: "2026-07-04"
+        check_out:
+          type: string
+          format: date
+          description: ISO date, YYYY-MM-DD. Must be strictly after check_in.
+          example: "2026-07-11"
+        adults: { type: integer, minimum: 1, maximum: 20, example: 2 }
+        children: { type: integer, minimum: 0, maximum: 20, default: 0, example: 0 }
+        message: { type: string, maxLength: 2000, default: "", example: "" }
+
+    BookingResponse:
+      type: object
+      required:
+        - id
+        - villa_slug
+        - status
+        - check_in
+        - check_out
+        - guest_name
+        - guest_email
+        - created_at
+      properties:
+        id: { type: string, format: uuid }
+        villa_slug: { type: string }
+        status: { $ref: "#/components/schemas/BookingStatus" }
+        check_in: { type: string, format: date }
+        check_out: { type: string, format: date }
+        guest_name: { type: string }
+        guest_email: { type: string, format: email }
+        created_at: { type: string, format: date-time }
+
+    BookedRange:
+      type: object
+      required: [check_in, check_out]
+      properties:
+        check_in: { type: string, format: date }
+        check_out: { type: string, format: date }
+
+    AvailabilityResponse:
+      type: object
+      required: [booked_ranges]
+      properties:
+        booked_ranges:
+          type: array
+          items: { $ref: "#/components/schemas/BookedRange" }
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: |
+                Machine-readable error code. Known codes:
+                `DATES_CONFLICT`, `UNKNOWN_VILLA`, `VALIDATION`,
+                `INTERNAL`, `INVALID_STATUS`.
+              example: DATES_CONFLICT
+            message:
+              type: string
+              example: those dates are not available

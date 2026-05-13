@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/TheHikuro/casadana/internal/booking"
+	"github.com/TheHikuro/casadana/internal/db"
+	"github.com/TheHikuro/casadana/internal/openapi"
 	"github.com/TheHikuro/casadana/internal/platform/config"
 	"github.com/TheHikuro/casadana/internal/platform/email"
 	"github.com/TheHikuro/casadana/internal/platform/httpserver"
@@ -42,7 +44,7 @@ func main() {
 	defer pool.Close()
 
 	if cfg.MigrateOnBoot {
-		if err := postgres.MigrateUp(pool, "file://internal/db/migrations"); err != nil {
+		if err := postgres.MigrateUp(pool, db.Migrations, "migrations"); err != nil {
 			log.Error("migrate failed", "err", err.Error())
 			os.Exit(1)
 		}
@@ -57,7 +59,8 @@ func main() {
 		realClock{},
 	)
 
-	r := httpserver.NewRouter(log)
+	r := httpserver.NewRouter(log, cfg.WebOrigin)
+	openapi.Mount(r)
 	booking.Mount(r, bookingSvc)
 
 	if err := httpserver.Run(r, cfg.Port, log); err != nil {

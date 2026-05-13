@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/caarlos0/env/v11"
 )
@@ -15,8 +16,14 @@ type DBConfig struct {
 }
 
 func (d DBConfig) DSN() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		d.User, d.Password, d.Host, d.Port, d.Name)
+	u := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(d.User, d.Password),
+		Host:     fmt.Sprintf("%s:%d", d.Host, d.Port),
+		Path:     d.Name,
+		RawQuery: "sslmode=disable",
+	}
+	return u.String()
 }
 
 type Config struct {
