@@ -1,36 +1,67 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"context"
+	"log/slog"
 	"os"
+	"time"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/TheHikuro/casadana/internal/booking"
+	"github.com/TheHikuro/casadana/internal/platform/config"
+	"github.com/TheHikuro/casadana/internal/platform/email"
+	"github.com/TheHikuro/casadana/internal/platform/httpserver"
+	"github.com/TheHikuro/casadana/internal/platform/logger"
+	"github.com/TheHikuro/casadana/internal/platform/postgres"
+	"github.com/TheHikuro/casadana/internal/villaslug"
 )
 
+type realClock struct{}
+
+func (realClock) Now() time.Time { return time.Now().UTC() }
+
+type slugAllowlist struct{}
+
+func (slugAllowlist) IsKnown(slug string) bool { return villaslug.IsKnown(slug) }
+
 func main() {
-	r := chi.NewRouter()
-
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write([]byte(`{"status":"ok"}`)); err != nil {
-			log.Printf("failed to write response: %v", err)
-		}
-	})
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	cfg, err := config.Load()
+	if err != nil {
+		slog.Error("config load failed", "err", err.Error())
+		os.Exit(1)
 	}
 
-	log.Printf("Starting server on :%s", port)
+	log := logger.New(cfg.LogLevel)
+	slog.SetDefault(log)
 
-	if err := http.ListenAndServe(":"+port, r); err != nil {
-		log.Fatal(err)
+	ctx := context.Background()
+	pool, err := postgres.Open(ctx, cfg.DB.DSN())
+	if err != nil {
+		log.Error("postgres open failed", "err", err.Error())
+		os.Exit(1)
+	}
+	defer pool.Close()
+
+	if cfg.MigrateOnBoot {
+		if err := postgres.MigrateUp(pool, "file://internal/db/migrations"); err != nil {
+			log.Error("migrate failed", "err", err.Error())
+			os.Exit(1)
+		}
+		log.Info("migrations applied")
+	}
+
+	mailer := email.NewMailer(cfg.ResendKey, cfg.MailFrom, cfg.AdminNotifyEmail)
+	bookingSvc := booking.NewService(
+		booking.NewPgRepo(pool),
+		booking.NewResendMailer(mailer),
+		slugAllowlist{},
+		realClock{},
+	)
+
+	r := httpserver.NewRouter(log)
+	booking.Mount(r, bookingSvc)
+
+	if err := httpserver.Run(r, cfg.Port, log); err != nil {
+		log.Error("server crashed", "err", err.Error())
+		os.Exit(1)
 	}
 }
