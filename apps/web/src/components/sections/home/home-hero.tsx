@@ -39,7 +39,7 @@ export default function HomeHero() {
       <div className="absolute inset-0">
         <img
           src={bgHome}
-          alt="Los Alcázares"
+          alt={m.home_hero_image_alt()}
           className="animate-float-bg h-full w-full object-cover"
           style={{ animation: "float-bg 22s ease-in-out infinite alternate" }}
         />

@@ -1,3 +1,5 @@
+import { m } from "@/paraglide/messages"
+
 interface Stat {
   label: string
   value: string
@@ -97,14 +99,14 @@ export default function VillaHero({
             href="#about"
             className="inline-flex items-center gap-3 font-mono text-[11px] tracking-[0.22em] uppercase"
           >
-            <span>Scroll</span>
+            <span>{m.villa_hero_scroll()}</span>
             <span className="relative h-px w-16 overflow-hidden bg-white/40">
               <span
                 className="absolute inset-0 origin-left bg-white"
                 style={{ animation: "scroll-cue 2.4s ease-in-out infinite" }}
               />
             </span>
-            <span>Discover</span>
+            <span>{m.villa_hero_discover()}</span>
           </a>
         </div>
       </div>

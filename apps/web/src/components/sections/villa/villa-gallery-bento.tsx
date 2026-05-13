@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react"
 import type { BentoTile, VillaData } from "@/constants/villas.const"
 import { GalleryCategory } from "@/constants/gallery-categories.const"
 import { cn } from "@/lib/utils"
+import { m } from "@/paraglide/messages"
 
 interface VillaGalleryBentoProps {
   data: VillaData["gallery"]
@@ -34,7 +35,7 @@ function PlaceholderArt({ label }: { label: string }) {
       <div className="font-display flex flex-col items-center italic" style={{ color: "oklch(35% 0.07 230)" }}>
         <span className="text-[32px] leading-none">{label}</span>
         <span className="mt-2 font-mono text-[10px] tracking-[0.22em] uppercase not-italic opacity-70">
-          Photo coming soon
+          {m.villa_gallery_photo_coming_soon()}
         </span>
       </div>
     </div>

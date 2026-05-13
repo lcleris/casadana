@@ -1,4 +1,5 @@
 import type { VillaData } from "@/constants/villas.const"
+import { m } from "@/paraglide/messages"
 
 interface VillaLocalAreaProps {
   data: VillaData["localArea"]
@@ -23,7 +24,7 @@ export default function VillaLocalArea({ data }: VillaLocalAreaProps) {
             <div className="border-background editorial-shadow absolute right-0 bottom-0 hidden h-48 w-48 overflow-hidden border-[10px] md:block md:h-60 md:w-60">
               <img
                 src={data.overlapImage}
-                alt="Detail"
+                alt={m.villa_local_area_overlap_alt()}
                 className="h-full w-full object-cover"
               />
             </div>

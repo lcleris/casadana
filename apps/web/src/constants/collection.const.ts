@@ -21,7 +21,7 @@ export const properties = [
     price: { amount: 185, currency: "€" },
     rating: { score: 4.96, count: 87 },
     imageUrl: CASADANA_BG,
-    imageAlt: "Casa DaNa rooftop solarium",
+    imageAlt: m.prop_casadana_image_alt(),
     layout: "left",
     features: [
       { icon: "users", label: m.listing_guests({ guests: 6 }) },
@@ -71,7 +71,7 @@ export const properties = [
     price: { amount: 145, currency: "€" },
     rating: { score: 4.92, count: 41 },
     imageUrl: CASACASAY_BG,
-    imageAlt: "Casa CasAy pool",
+    imageAlt: m.prop_casacasay_image_alt(),
     layout: "right",
     features: [
       { icon: "users", label: m.listing_guests({ guests: 4 }) },

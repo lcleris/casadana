@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { VillaData } from "@/constants/villas.const"
 import { cn } from "@/lib/utils"
+import { m } from "@/paraglide/messages"
 
 interface VillaBookingProps {
   booking: VillaData["booking"]
@@ -21,7 +22,15 @@ interface BookingFormValues {
   description: string
 }
 
-const DAYS_OF_WEEK = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+const getDaysOfWeek = () => [
+  m.villa_booking_day_mo(),
+  m.villa_booking_day_tu(),
+  m.villa_booking_day_we(),
+  m.villa_booking_day_th(),
+  m.villa_booking_day_fr(),
+  m.villa_booking_day_sa(),
+  m.villa_booking_day_su(),
+]
 
 function fmt(date: Date) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
@@ -146,13 +155,13 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
         <div className="font-display text-primary text-[34px] leading-none font-light italic md:text-[38px]">
           €{booking.nightly}
           <small className="text-on-surface-variant ml-1 font-sans text-[13px] not-italic">
-            / night
+            {m.villa_booking_per_night()}
           </small>
         </div>
         <div className="flex flex-col items-end gap-1 font-mono text-[11px] tracking-[0.1em]">
           <span className="text-secondary text-[13px] tracking-[2px]">★★★★★</span>
           <span className="text-on-surface-variant">
-            {booking.rating.toFixed(2)} · {booking.reviewCount} reviews
+            {booking.rating.toFixed(2)} · {m.villa_booking_review_count({ count: booking.reviewCount })}
           </span>
         </div>
       </div>
@@ -169,7 +178,7 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
             )}
           >
             <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              Check-in
+              {m.villa_booking_check_in()}
             </span>
             <span className="font-display text-primary mt-1 block text-[17px] italic">
               {fmt(checkIn)}
@@ -185,7 +194,7 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
             )}
           >
             <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              Check-out
+              {m.villa_booking_check_out()}
             </span>
             <span className="font-display text-primary mt-1 block text-[17px] italic">
               {fmt(checkOut)}
@@ -203,7 +212,7 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
                   onClick={() =>
                     setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
                   }
-                  aria-label="Previous month"
+                  aria-label={m.villa_booking_prev_month()}
                   className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
                   <ChevronLeft size={14} />
@@ -214,14 +223,14 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
                   onClick={() =>
                     setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
                   }
-                  aria-label="Next month"
+                  aria-label={m.villa_booking_next_month()}
                   className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
                   <ChevronRight size={14} />
                 </button>
               </div>
               <div className="grid grid-cols-7 gap-0.5">
-                {DAYS_OF_WEEK.map((d) => (
+                {getDaysOfWeek().map((d) => (
                   <div
                     key={d}
                     className="text-on-surface-variant py-2 text-center font-mono text-[9.5px] tracking-[0.15em] uppercase"
@@ -270,24 +279,24 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
           render={({ field }) => (
             <div className="border-outline-variant flex items-center justify-between border border-t-0 bg-white px-4 py-3.5">
               <span className="text-on-surface-variant font-mono text-[10px] tracking-[0.22em] uppercase">
-                Guests
+                {m.villa_booking_guests_label()}
               </span>
               <span className="inline-flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => field.onChange(Math.max(1, field.value - 1))}
-                  aria-label="Remove guest"
+                  aria-label={m.villa_booking_aria_remove_guest()}
                   className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
                   <Minus size={12} />
                 </button>
                 <span className="font-display text-primary text-[17px] italic">
-                  {guests} {guests === 1 ? "Guest" : "Guests"}
+                  {guests} {guests === 1 ? m.villa_booking_guest_singular() : m.villa_booking_guest_plural()}
                 </span>
                 <button
                   type="button"
                   onClick={() => field.onChange(Math.min(booking.maxGuests, field.value + 1))}
-                  aria-label="Add guest"
+                  aria-label={m.villa_booking_aria_add_guest()}
                   className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
                   <Plus size={12} />
@@ -300,36 +309,36 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
         <div className="border-outline-variant mt-4 grid border border-b-0 bg-white">
           <label className="border-outline-variant block border-b px-4 py-3">
             <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              Email
+              {m.villa_booking_email_label()}
             </span>
             <Input
               type="email"
               inputMode="email"
               autoComplete="email"
-              placeholder="you@example.com"
+              placeholder={m.villa_booking_email_placeholder()}
               className={inputClassName}
               {...register("email", { required: true })}
             />
           </label>
           <label className="border-outline-variant block border-b px-4 py-3">
             <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              Phone
+              {m.villa_booking_phone_label()}
             </span>
             <Input
               type="tel"
               inputMode="tel"
               autoComplete="tel"
-              placeholder="+33 6 12 34 56 78"
+              placeholder={m.villa_booking_phone_placeholder()}
               className={inputClassName}
               {...register("tel", { required: true })}
             />
           </label>
           <label className="border-outline-variant block border-b px-4 py-3">
             <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              A few words about your stay
+              {m.villa_booking_stay_about_label()}
             </span>
             <Textarea
-              placeholder="Occasion, arrival time, special requests…"
+              placeholder={m.villa_booking_stay_about_placeholder()}
               rows={3}
               className="text-primary placeholder:text-on-surface-variant/50 mt-1 min-h-0 w-full resize-none rounded-none border-0 bg-transparent px-0 py-0 text-[15px] leading-relaxed shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-[15px]"
               {...register("description")}
@@ -341,7 +350,7 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
           type="submit"
           className="bg-primary text-on-primary hover:bg-primary-container mt-4 inline-flex h-auto w-full items-center justify-center gap-3 rounded-none px-6 py-[18px] font-mono text-[11px] tracking-[0.28em] uppercase"
         >
-          Request to Book
+          {m.villa_booking_request_book()}
           <ArrowRight size={12} />
         </Button>
         <Button
@@ -349,32 +358,32 @@ export default function VillaBooking({ booking }: VillaBookingProps) {
           variant="outline"
           className="text-primary border-outline-variant hover:bg-surface-container-low mt-2.5 h-auto w-full rounded-none border px-6 py-4 font-mono text-[11px] tracking-[0.28em] uppercase"
         >
-          Contact the Host
+          {m.villa_booking_contact_host()}
         </Button>
       </form>
 
       <div className="border-outline-variant mt-6 grid gap-3 border-t pt-5 text-[13.5px]">
         <div className="text-on-surface-variant flex justify-between">
           <span>
-            {nights} night{nights === 1 ? "" : "s"} × €{booking.nightly}
+            {nights} {nights === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural()} × €{booking.nightly}
           </span>
           <span>€{subtotal.toLocaleString()}</span>
         </div>
         <div className="text-on-surface-variant flex justify-between">
-          <span>Cleaning fee</span>
+          <span>{m.villa_booking_cleaning_fee()}</span>
           <span>€{booking.cleaning}</span>
         </div>
         <div className="text-on-surface-variant flex justify-between">
-          <span>Concierge &amp; welcome</span>
+          <span>{m.villa_booking_concierge_welcome()}</span>
           <span>€{booking.concierge}</span>
         </div>
         <div className="font-display text-primary border-outline-variant mt-1 flex justify-between border-t pt-3.5 text-[22px] italic">
-          <span>Total</span>
+          <span>{m.villa_booking_total()}</span>
           <span>€{total.toLocaleString()}</span>
         </div>
       </div>
       <p className="text-on-surface-variant mt-4 text-center text-xs italic">
-        No charge will be made yet · 48-hour confirmation
+        {m.villa_booking_no_charge_note()}
       </p>
     </aside>
   )

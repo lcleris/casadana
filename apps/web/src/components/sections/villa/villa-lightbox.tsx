@@ -7,6 +7,7 @@ import {
 } from "@/constants/gallery-categories.const"
 import type { GalleryEntry } from "@/constants/villas.const"
 import { cn } from "@/lib/utils"
+import { m } from "@/paraglide/messages"
 
 interface VillaLightboxProps {
   brand: string
@@ -80,7 +81,7 @@ export default function VillaLightbox({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close gallery"
+          aria-label={m.villa_lightbox_close()}
           className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-white/40 text-white transition-colors hover:bg-white/10"
         >
           <X size={18} />

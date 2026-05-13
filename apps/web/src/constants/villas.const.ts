@@ -23,6 +23,7 @@ import ROOFTOP_3 from "@/assets/casadana/rooftop3.jpeg"
 import ROOFTOP_5 from "@/assets/casadana/rooftop5.jpeg"
 import ROOFTOP_7 from "@/assets/casadana/rooftop7.jpeg"
 import POOL_1 from "@/assets/casadessy/pool1.jpeg"
+import { m } from "@/paraglide/messages"
 
 import { GalleryCategory } from "./gallery-categories.const"
 
@@ -181,585 +182,553 @@ export interface VillaData {
   }
 }
 
-const CASADANA: VillaData = {
-  id: "casadana",
-  index: "Villa № 01",
-  badge: "Villa № 01",
-  brandSub: "Los Alcázares · Est. 2021",
-  hero: {
-    image: ROOFTOP_7,
-    eyebrow: ["Villa № 01", "37°44'N · 0°50'W", "Mar Menor · Murcia"],
-    titlePrefix: "Casa ",
-    titleItalic: "DaNa",
-    titleSuffix: "à Los Alcázares",
-    stats: [
-      { label: "Sleeps", value: "Up to 6" },
-      { label: "Bedrooms", value: "Three" },
-      { label: "Beach", value: "1.6 km" },
-      { label: "Solarium", value: "+ Jacuzzi" },
-      { label: "Rating", value: "4.96 ★" },
-    ],
-    price: 185,
-    priceLabel: "/ night · low season from",
-  },
-  ribbon: [
-    "Mediterranean sun",
-    "Roman ruins steps away",
-    "Private rooftop solarium",
-    "Thermal springs of Archena",
-    "Calm waters of Mar Menor",
-    "Slow mornings, local markets",
-  ],
-  about: {
-    chapter: "Chapter 01 — The Villa",
-    titleLead: "Refined living",
-    titleItalic: "on the Mar Menor",
-    lead: "A six-person Spanish casa built for slow mornings, long lunches on the rooftop, and quiet returns from the sea.",
-    body: "Casa DaNa sits in a calm residential pocket of Los Alcázares, just 1.6 km from the Mediterranean's only inland sea. Three bedrooms, two terraces, a jacuzzi and a private solarium — designed for families and small groups who want the rhythm of the south without the crowds of the Costa.",
-    features: [
-      { icon: "bath", label: "Jacuzzi" },
-      { icon: "sun", label: "Solarium" },
-      { icon: "snowflake", label: "Central AC" },
-      { icon: "wifi", label: "High-speed Wifi" },
-      { icon: "flame", label: "Summer BBQ" },
-      { icon: "car", label: "Private Parking" },
-      { icon: "waves", label: "Beach Front" },
-      { icon: "bed", label: "Premium Linens" },
-    ],
-    meta: [
-      { label: "Property", value: "Detached casa" },
-      { label: "Surface", value: "142 m²" },
-      { label: "Stay", value: "3-night min." },
-    ],
-  },
-  booking: {
-    nightly: 185,
-    cleaning: 80,
-    concierge: 45,
-    rating: 4.96,
-    reviewCount: 87,
-    maxGuests: 6,
-    defaultGuests: 4,
-    defaultCheckIn: "2026-07-18",
-    defaultCheckOut: "2026-07-25",
-  },
-  gallery: {
-    chapter: "Chapter 02 — Interiors",
-    titleItalic: "Interior",
-    titleTail: " selection",
-    description:
-      "Every room is designed with an editorial eye, blending local textures with quiet, modern luxury. Tap a room to explore its full gallery.",
-    totalLabel: "Open the full gallery — 28 photos",
-    tiles: [
-      {
-        category: "LIVING_SPACES",
-        src: LIVING_1,
-        index: "01 · Living",
-        label: "01 · Living",
-        caption: "The Salon",
-        span: "wide",
-      },
-      {
-        category: "BEDROOMS",
-        src: BEDROOM_3,
-        index: "02 · Bedrooms",
-        label: "02 · Bedrooms",
-        caption: "Suites & Linens",
-        span: "half",
-      },
-      {
-        category: "KITCHEN",
-        src: KITCHEN_1,
-        index: "03 · Kitchen",
-        label: "03 · Kitchen",
-        caption: "The Gourmet",
-        span: "half",
-      },
-      {
-        category: "BATHROOMS",
-        src: BATHROOM,
-        index: "04 · Bath",
-        label: "04 · Bath",
-        caption: "Spa Bathroom",
-        span: "third",
-      },
-      {
-        category: "OUTDOOR",
-        src: ROOFTOP_1,
-        index: "05 · Outside",
-        label: "05 · Outside",
-        caption: "Solarium & Jacuzzi",
-        span: "wide",
-      },
-    ],
-    images: {
-      LIVING_SPACES: [
-        { src: LIVING_1, label: "The Salon", category: "LIVING_SPACES", size: "large" },
-        { src: LIVING_2, label: "Reading nook", category: "LIVING_SPACES", size: "small" },
-        { src: LIVING_4, label: "Open plan", category: "LIVING_SPACES", size: "medium" },
-        { src: LIVING_3, label: "Dining", category: "LIVING_SPACES", size: "medium" },
+function buildCasadana(): VillaData {
+  return {
+    id: "casadana",
+    index: m.villa_casadana_index(),
+    badge: m.villa_casadana_badge(),
+    brandSub: m.villa_casadana_brand_sub(),
+    hero: {
+      image: ROOFTOP_7,
+      eyebrow: [
+        m.villa_casadana_hero_eyebrow_1(),
+        m.villa_casadana_hero_eyebrow_2(),
+        m.villa_casadana_hero_eyebrow_3(),
       ],
-      BEDROOMS: [
-        { src: BEDROOM_3, label: "Master suite", category: "BEDROOMS", size: "large" },
-        { src: BEDROOM_2, label: "Master detail", category: "BEDROOMS", size: "small" },
-        { src: BEDROOM_5, label: "Bedroom 2", category: "BEDROOMS", size: "small" },
-        { src: BEDROOM_6, label: "Bedroom 3", category: "BEDROOMS", size: "medium" },
-        { src: BEDROOM_1, label: "Linens", category: "BEDROOMS", size: "medium" },
-        { src: BEDROOM_4, label: "Detail", category: "BEDROOMS", size: "small" },
+      titlePrefix: m.villa_casadana_hero_title_prefix(),
+      titleItalic: m.villa_casadana_hero_title_italic(),
+      titleSuffix: m.villa_casadana_hero_title_suffix(),
+      stats: [
+        { label: m.villa_casadana_hero_stat_1_label(), value: m.villa_casadana_hero_stat_1_value() },
+        { label: m.villa_casadana_hero_stat_2_label(), value: m.villa_casadana_hero_stat_2_value() },
+        { label: m.villa_casadana_hero_stat_3_label(), value: m.villa_casadana_hero_stat_3_value() },
+        { label: m.villa_casadana_hero_stat_4_label(), value: m.villa_casadana_hero_stat_4_value() },
+        { label: m.villa_casadana_hero_stat_5_label(), value: m.villa_casadana_hero_stat_5_value() },
       ],
-      KITCHEN: [
-        { src: KITCHEN_1, label: "The Gourmet", category: "KITCHEN", size: "large" },
-        { src: KITCHEN_2, label: "Coffee corner", category: "KITCHEN", size: "medium" },
-      ],
-      BATHROOMS: [
-        { src: BATHROOM, label: "Spa bathroom", category: "BATHROOMS", size: "large" },
-      ],
-      OUTDOOR: [
-        { src: ROOFTOP_7, label: "Solarium at dusk", category: "OUTDOOR", size: "large" },
-        { src: ROOFTOP_1, label: "Rooftop lounge", category: "OUTDOOR", size: "small" },
-        { src: ROOFTOP_3, label: "Solarium", category: "OUTDOOR", size: "medium" },
-        { src: ROOFTOP_5, label: "Pergola", category: "OUTDOOR", size: "medium" },
-        { src: JACUZZI_1, label: "Jacuzzi", category: "OUTDOOR", size: "small" },
-        { src: JACUZZI_2, label: "Jacuzzi sunset", category: "OUTDOOR", size: "medium" },
-        { src: FRONT_2, label: "Front entrance", category: "OUTDOOR", size: "large" },
-        { src: FRONT_1, label: "Facade", category: "OUTDOOR", size: "small" },
-        { src: FRONT_3, label: "Street", category: "OUTDOOR", size: "medium" },
-      ],
-      DINING: [],
-      UTILITY: [],
+      price: 185,
+      priceLabel: m.villa_casadana_hero_price_label(),
     },
-  },
-  localArea: {
-    chapter: "Chapter 03 — The Region",
-    titleLead: "Explore the",
-    titleItalic: "Murcian spirit",
-    description:
-      "Los Alcázares is more than a destination; it's a sensory experience. From the therapeutic waters of the Mar Menor to the hidden thermal springs of Archena, this is a region where history and wellness still set the pace of the day.",
-    mainImage: FRONT_2,
-    overlapImage: JACUZZI_1,
-    stampBig: "1.6",
-    stampSmall: "km to\nMar Menor",
-    points: [
-      {
-        number: "№ 01",
-        title: "Los Alcázares old town",
-        description:
-          "Walk through Roman thermal ruins and the seafront promenade. Tapas bars, the Tuesday market, and salt-air mornings.",
-        distance: "5 min walk · 0.4 km",
-      },
-      {
-        number: "№ 02",
-        title: "Balneario de Archena",
-        description:
-          "A 40-minute drive inland to the famous Roman thermal spa nestled in the Ricote Valley.",
-        distance: "40 min drive · 48 km",
-      },
-      {
-        number: "№ 03",
-        title: "Cabo de Palos & La Manga",
-        description:
-          "Sail to the lighthouse, dive the marine reserve, dinner on the narrow strip between two seas.",
-        distance: "25 min drive · 22 km",
-      },
-      {
-        number: "№ 04",
-        title: "Murcia City",
-        description:
-          "Baroque cathedral, the casino, late-night terraces in Plaza de las Flores.",
-        distance: "30 min drive · 37 km",
-      },
-      {
-        number: "№ 05",
-        title: "Corvera Airport (RMU)",
-        description: "Direct flights from London, Manchester, Paris and Brussels.",
-        distance: "30 min drive · 35 km",
-      },
+    ribbon: [
+      m.villa_casadana_ribbon_1(),
+      m.villa_casadana_ribbon_2(),
+      m.villa_casadana_ribbon_3(),
+      m.villa_casadana_ribbon_4(),
+      m.villa_casadana_ribbon_5(),
+      m.villa_casadana_ribbon_6(),
     ],
-  },
-  experiences: {
-    chapter: "Chapter 04 — Things to do",
-    titleLead: "Unforgettable",
-    titleItalic: "experiences",
-    description:
-      "From high-speed thrills to serene maritime journeys, the Mar Menor offers something for every soul. Our concierge will help you book any of these.",
-    entries: [
-      {
-        number: "№ 01",
-        tag: "High-octane",
-        title: "Go-Karts",
-        description:
-          "Professional tracks for the ultimate adrenaline rush, just minutes from the villa.",
-        location: "Karting Cartagena · 8 km",
-        icon: "kart",
+    about: {
+      chapter: m.villa_casadana_about_chapter(),
+      titleLead: m.villa_casadana_about_title_lead(),
+      titleItalic: m.villa_casadana_about_title_italic(),
+      lead: m.villa_casadana_about_lead(),
+      body: m.villa_casadana_about_body(),
+      features: [
+        { icon: "bath", label: m.villa_casadana_about_feature_jacuzzi() },
+        { icon: "sun", label: m.villa_casadana_about_feature_solarium() },
+        { icon: "snowflake", label: m.villa_casadana_about_feature_ac() },
+        { icon: "wifi", label: m.villa_casadana_about_feature_wifi() },
+        { icon: "flame", label: m.villa_casadana_about_feature_bbq() },
+        { icon: "car", label: m.villa_casadana_about_feature_parking() },
+        { icon: "waves", label: m.villa_casadana_about_feature_beach() },
+        { icon: "bed", label: m.villa_casadana_about_feature_linens() },
+      ],
+      meta: [
+        { label: m.villa_casadana_about_meta_1_label(), value: m.villa_casadana_about_meta_1_value() },
+        { label: m.villa_casadana_about_meta_2_label(), value: m.villa_casadana_about_meta_2_value() },
+        { label: m.villa_casadana_about_meta_3_label(), value: m.villa_casadana_about_meta_3_value() },
+      ],
+    },
+    booking: {
+      nightly: 185,
+      cleaning: 80,
+      concierge: 45,
+      rating: 4.96,
+      reviewCount: 87,
+      maxGuests: 6,
+      defaultGuests: 4,
+      defaultCheckIn: "2026-07-18",
+      defaultCheckOut: "2026-07-25",
+    },
+    gallery: {
+      chapter: m.villa_casadana_gallery_chapter(),
+      titleItalic: m.villa_casadana_gallery_title_italic(),
+      titleTail: m.villa_casadana_gallery_title_tail(),
+      description: m.villa_casadana_gallery_description(),
+      totalLabel: m.villa_casadana_gallery_total_label(),
+      tiles: [
+        {
+          category: "LIVING_SPACES",
+          src: LIVING_1,
+          index: m.villa_casadana_gallery_tile_1_index(),
+          label: m.villa_casadana_gallery_tile_1_index(),
+          caption: m.villa_casadana_gallery_tile_1_caption(),
+          span: "wide",
+        },
+        {
+          category: "BEDROOMS",
+          src: BEDROOM_3,
+          index: m.villa_casadana_gallery_tile_2_index(),
+          label: m.villa_casadana_gallery_tile_2_index(),
+          caption: m.villa_casadana_gallery_tile_2_caption(),
+          span: "half",
+        },
+        {
+          category: "KITCHEN",
+          src: KITCHEN_1,
+          index: m.villa_casadana_gallery_tile_3_index(),
+          label: m.villa_casadana_gallery_tile_3_index(),
+          caption: m.villa_casadana_gallery_tile_3_caption(),
+          span: "half",
+        },
+        {
+          category: "BATHROOMS",
+          src: BATHROOM,
+          index: m.villa_casadana_gallery_tile_4_index(),
+          label: m.villa_casadana_gallery_tile_4_index(),
+          caption: m.villa_casadana_gallery_tile_4_caption(),
+          span: "third",
+        },
+        {
+          category: "OUTDOOR",
+          src: ROOFTOP_1,
+          index: m.villa_casadana_gallery_tile_5_index(),
+          label: m.villa_casadana_gallery_tile_5_index(),
+          caption: m.villa_casadana_gallery_tile_5_caption(),
+          span: "wide",
+        },
+      ],
+      images: {
+        LIVING_SPACES: [
+          { src: LIVING_1, label: m.villa_casadana_gallery_img_living_1(), category: "LIVING_SPACES", size: "large" },
+          { src: LIVING_2, label: m.villa_casadana_gallery_img_living_2(), category: "LIVING_SPACES", size: "small" },
+          { src: LIVING_4, label: m.villa_casadana_gallery_img_living_3(), category: "LIVING_SPACES", size: "medium" },
+          { src: LIVING_3, label: m.villa_casadana_gallery_img_living_4(), category: "LIVING_SPACES", size: "medium" },
+        ],
+        BEDROOMS: [
+          { src: BEDROOM_3, label: m.villa_casadana_gallery_img_bedroom_1(), category: "BEDROOMS", size: "large" },
+          { src: BEDROOM_2, label: m.villa_casadana_gallery_img_bedroom_2(), category: "BEDROOMS", size: "small" },
+          { src: BEDROOM_5, label: m.villa_casadana_gallery_img_bedroom_3(), category: "BEDROOMS", size: "small" },
+          { src: BEDROOM_6, label: m.villa_casadana_gallery_img_bedroom_4(), category: "BEDROOMS", size: "medium" },
+          { src: BEDROOM_1, label: m.villa_casadana_gallery_img_bedroom_5(), category: "BEDROOMS", size: "medium" },
+          { src: BEDROOM_4, label: m.villa_casadana_gallery_img_bedroom_6(), category: "BEDROOMS", size: "small" },
+        ],
+        KITCHEN: [
+          { src: KITCHEN_1, label: m.villa_casadana_gallery_img_kitchen_1(), category: "KITCHEN", size: "large" },
+          { src: KITCHEN_2, label: m.villa_casadana_gallery_img_kitchen_2(), category: "KITCHEN", size: "medium" },
+        ],
+        BATHROOMS: [
+          { src: BATHROOM, label: m.villa_casadana_gallery_img_bathroom_1(), category: "BATHROOMS", size: "large" },
+        ],
+        OUTDOOR: [
+          { src: ROOFTOP_7, label: m.villa_casadana_gallery_img_outdoor_1(), category: "OUTDOOR", size: "large" },
+          { src: ROOFTOP_1, label: m.villa_casadana_gallery_img_outdoor_2(), category: "OUTDOOR", size: "small" },
+          { src: ROOFTOP_3, label: m.villa_casadana_gallery_img_outdoor_3(), category: "OUTDOOR", size: "medium" },
+          { src: ROOFTOP_5, label: m.villa_casadana_gallery_img_outdoor_4(), category: "OUTDOOR", size: "medium" },
+          { src: JACUZZI_1, label: m.villa_casadana_gallery_img_outdoor_5(), category: "OUTDOOR", size: "small" },
+          { src: JACUZZI_2, label: m.villa_casadana_gallery_img_outdoor_6(), category: "OUTDOOR", size: "medium" },
+          { src: FRONT_2, label: m.villa_casadana_gallery_img_outdoor_7(), category: "OUTDOOR", size: "large" },
+          { src: FRONT_1, label: m.villa_casadana_gallery_img_outdoor_8(), category: "OUTDOOR", size: "small" },
+          { src: FRONT_3, label: m.villa_casadana_gallery_img_outdoor_9(), category: "OUTDOOR", size: "medium" },
+        ],
+        DINING: [],
+        UTILITY: [],
       },
-      {
-        number: "№ 02",
-        tag: "On the water",
-        title: "Windsurf",
-        description:
-          "Harness the coastal breeze on the calm, shallow, sailor-friendly waters of the inland sea.",
-        location: "Club Náutico · 2.1 km",
-        icon: "wind",
-      },
-      {
-        number: "№ 03",
-        tag: "For the family",
-        title: "Water Park",
-        description:
-          "Slides, lazy rivers and wave pools — a perfect family day out, all under the Murcian sun.",
-        location: "Aquopolis · 24 km",
-        icon: "splash",
-      },
-      {
-        number: "№ 04",
-        tag: "Slow travel",
-        title: "Kayaking",
-        description:
-          "Paddle through hidden coves and silent coastlines around the Mar Menor at your own pace.",
-        location: "Playa Honda · 6 km",
-        icon: "kayak",
-      },
-    ],
-  },
-  reviews: {
-    chapter: "Chapter 05 — Guest stories",
-    titleLead: "What guests",
-    titleItalic: "remember",
-    description:
-      "Eighty-seven reviews across Airbnb, Booking and direct stays. We keep them all — the rooftop sunrise comes up a lot.",
-    score: 4.96,
-    count: 87,
-    bars: [
-      { label: "Cleanliness", pct: 99, value: "5.0" },
-      { label: "Comfort", pct: 98, value: "4.9" },
-      { label: "Location", pct: 96, value: "4.9" },
-      { label: "Host", pct: 100, value: "5.0" },
-      { label: "Value", pct: 94, value: "4.8" },
-    ],
-    entries: [
-      {
-        initial: "C",
-        name: "Camille & Théo",
-        meta: "Lyon, France · Stayed July 2025",
-        quote:
-          "The rooftop at sunrise alone is worth the trip — coffee, the call of the gulls, the Mar Menor turning pink. Loan thought of everything, down to the linens.",
-        source: "via Airbnb · Family of 4",
-        stars: 5,
-      },
-      {
-        initial: "M",
-        name: "Marta Ruiz",
-        meta: "Madrid, Spain · Stayed September 2025",
-        quote:
-          "A real Spanish casa, not a rental box. Quiet street, perfect kitchen, and the jacuzzi was the highlight after long beach days. We'll be back off-season.",
-        source: "via Booking · Couple",
-        stars: 5,
-      },
-      {
-        initial: "J",
-        name: "James & Eloise",
-        meta: "Bristol, UK · Stayed June 2025",
-        quote:
-          "Six of us, three generations. Felt like a home, not an Airbnb. The BBQ and the solarium turned every evening into something to remember.",
-        source: "Direct booking · Group of 6",
-        stars: 5,
-      },
-    ],
-  },
-  faq: {
-    chapter: "Chapter 06 — Practical",
-    titleLead: "Before",
-    titleItalic: "you arrive",
-    intro:
-      "A few quick answers — anything else, message us directly and we'll get back within a few hours.",
-    entries: [
-      {
-        question: "What is the minimum stay?",
-        answer:
-          "Three nights in low season (Oct–May) and five nights in high season (Jun–Sep). For full weeks Saturday-to-Saturday, we offer 10% off the nightly rate.",
-      },
-      {
-        question: "How do we check in?",
-        answer:
-          "Self check-in from 4pm via a smart lock — we send the code 24 hours before arrival. The host or a local contact is always reachable in under 30 minutes if you need anything.",
-      },
-      {
-        question: "Is the villa good for families with small children?",
-        answer:
-          "Yes — a travel cot, high chair and stair gate are provided on request at no extra cost. The Mar Menor itself is a shallow, calm inland sea, ideal for small swimmers.",
-      },
-      {
-        question: "Can we host an event or party?",
-        answer:
-          "The villa is in a quiet residential street and we ask guests to keep things at speaking level after 11pm. Small gatherings (up to 8) are absolutely welcome.",
-      },
-      {
-        question: "Do you offer airport transfers?",
-        answer:
-          "Yes — we work with a local driver from Corvera (RMU, 30 min) and Alicante (ALC, 1h). One-way from €45 / €95 respectively. Book through the concierge after confirmation.",
-      },
-      {
-        question: "What is the cancellation policy?",
-        answer:
-          "Full refund up to 30 days before arrival. 50% refund 15–30 days before. Within 14 days, the stay is non-refundable but fully reschedulable inside the next 12 months.",
-      },
-    ],
-  },
-  ctaStrip: {
-    lead: "Eight days of",
-    italic: "quiet sun",
-    tail: " are waiting at Casa DaNa.",
-    button: "Check Availability",
-  },
-  sister: {
-    chapter: "Sister property",
-    titleLead: "Or a quieter penthouse",
-    titleItalic: "over the green",
-    description:
-      "Casa CasAy is our two-bedroom penthouse inside a gated community fifteen minutes inland — wide southern terrace, shared pool, uninterrupted views of the golf course. Same hosts, same care.",
-    button: "Visit Casa CasAy",
-    targetId: "casacasay",
-    image: POOL_1,
-  },
+    },
+    localArea: {
+      chapter: m.villa_casadana_local_area_chapter(),
+      titleLead: m.villa_casadana_local_area_title_lead(),
+      titleItalic: m.villa_casadana_local_area_title_italic(),
+      description: m.villa_casadana_local_area_description(),
+      mainImage: FRONT_2,
+      overlapImage: JACUZZI_1,
+      stampBig: m.villa_casadana_local_area_stamp_big(),
+      stampSmall: m.villa_casadana_local_area_stamp_small(),
+      points: [
+        {
+          number: "№ 01",
+          title: m.villa_casadana_local_area_point_1_title(),
+          description: m.villa_casadana_local_area_point_1_description(),
+          distance: m.villa_casadana_local_area_point_1_distance(),
+        },
+        {
+          number: "№ 02",
+          title: m.villa_casadana_local_area_point_2_title(),
+          description: m.villa_casadana_local_area_point_2_description(),
+          distance: m.villa_casadana_local_area_point_2_distance(),
+        },
+        {
+          number: "№ 03",
+          title: m.villa_casadana_local_area_point_3_title(),
+          description: m.villa_casadana_local_area_point_3_description(),
+          distance: m.villa_casadana_local_area_point_3_distance(),
+        },
+        {
+          number: "№ 04",
+          title: m.villa_casadana_local_area_point_4_title(),
+          description: m.villa_casadana_local_area_point_4_description(),
+          distance: m.villa_casadana_local_area_point_4_distance(),
+        },
+        {
+          number: "№ 05",
+          title: m.villa_casadana_local_area_point_5_title(),
+          description: m.villa_casadana_local_area_point_5_description(),
+          distance: m.villa_casadana_local_area_point_5_distance(),
+        },
+      ],
+    },
+    experiences: {
+      chapter: m.villa_casadana_experiences_chapter(),
+      titleLead: m.villa_casadana_experiences_title_lead(),
+      titleItalic: m.villa_casadana_experiences_title_italic(),
+      description: m.villa_casadana_experiences_description(),
+      entries: [
+        {
+          number: "№ 01",
+          tag: m.villa_casadana_experiences_1_tag(),
+          title: m.villa_casadana_experiences_1_title(),
+          description: m.villa_casadana_experiences_1_description(),
+          location: m.villa_casadana_experiences_1_location(),
+          icon: "kart",
+        },
+        {
+          number: "№ 02",
+          tag: m.villa_casadana_experiences_2_tag(),
+          title: m.villa_casadana_experiences_2_title(),
+          description: m.villa_casadana_experiences_2_description(),
+          location: m.villa_casadana_experiences_2_location(),
+          icon: "wind",
+        },
+        {
+          number: "№ 03",
+          tag: m.villa_casadana_experiences_3_tag(),
+          title: m.villa_casadana_experiences_3_title(),
+          description: m.villa_casadana_experiences_3_description(),
+          location: m.villa_casadana_experiences_3_location(),
+          icon: "splash",
+        },
+        {
+          number: "№ 04",
+          tag: m.villa_casadana_experiences_4_tag(),
+          title: m.villa_casadana_experiences_4_title(),
+          description: m.villa_casadana_experiences_4_description(),
+          location: m.villa_casadana_experiences_4_location(),
+          icon: "kayak",
+        },
+      ],
+    },
+    reviews: {
+      chapter: m.villa_casadana_reviews_chapter(),
+      titleLead: m.villa_casadana_reviews_title_lead(),
+      titleItalic: m.villa_casadana_reviews_title_italic(),
+      description: m.villa_casadana_reviews_description(),
+      score: 4.96,
+      count: 87,
+      bars: [
+        { label: m.villa_casadana_reviews_bar_1_label(), pct: 99, value: "5.0" },
+        { label: m.villa_casadana_reviews_bar_2_label(), pct: 98, value: "4.9" },
+        { label: m.villa_casadana_reviews_bar_3_label(), pct: 96, value: "4.9" },
+        { label: m.villa_casadana_reviews_bar_4_label(), pct: 100, value: "5.0" },
+        { label: m.villa_casadana_reviews_bar_5_label(), pct: 94, value: "4.8" },
+      ],
+      entries: [
+        {
+          initial: "C",
+          name: m.villa_casadana_reviews_1_name(),
+          meta: m.villa_casadana_reviews_1_meta(),
+          quote: m.villa_casadana_reviews_1_quote(),
+          source: m.villa_casadana_reviews_1_source(),
+          stars: 5,
+        },
+        {
+          initial: "M",
+          name: m.villa_casadana_reviews_2_name(),
+          meta: m.villa_casadana_reviews_2_meta(),
+          quote: m.villa_casadana_reviews_2_quote(),
+          source: m.villa_casadana_reviews_2_source(),
+          stars: 5,
+        },
+        {
+          initial: "J",
+          name: m.villa_casadana_reviews_3_name(),
+          meta: m.villa_casadana_reviews_3_meta(),
+          quote: m.villa_casadana_reviews_3_quote(),
+          source: m.villa_casadana_reviews_3_source(),
+          stars: 5,
+        },
+      ],
+    },
+    faq: {
+      chapter: m.villa_casadana_faq_chapter(),
+      titleLead: m.villa_casadana_faq_title_lead(),
+      titleItalic: m.villa_casadana_faq_title_italic(),
+      intro: m.villa_casadana_faq_intro(),
+      entries: [
+        { question: m.villa_casadana_faq_1_question(), answer: m.villa_casadana_faq_1_answer() },
+        { question: m.villa_casadana_faq_2_question(), answer: m.villa_casadana_faq_2_answer() },
+        { question: m.villa_casadana_faq_3_question(), answer: m.villa_casadana_faq_3_answer() },
+        { question: m.villa_casadana_faq_4_question(), answer: m.villa_casadana_faq_4_answer() },
+        { question: m.villa_casadana_faq_5_question(), answer: m.villa_casadana_faq_5_answer() },
+        { question: m.villa_casadana_faq_6_question(), answer: m.villa_casadana_faq_6_answer() },
+      ],
+    },
+    ctaStrip: {
+      lead: m.villa_casadana_cta_strip_lead(),
+      italic: m.villa_casadana_cta_strip_italic(),
+      tail: m.villa_casadana_cta_strip_tail(),
+      button: m.villa_casadana_cta_strip_button(),
+    },
+    sister: {
+      chapter: m.villa_casadana_sister_chapter(),
+      titleLead: m.villa_casadana_sister_title_lead(),
+      titleItalic: m.villa_casadana_sister_title_italic(),
+      description: m.villa_casadana_sister_description(),
+      button: m.villa_casadana_sister_button(),
+      targetId: "casacasay",
+      image: POOL_1,
+    },
+  }
 }
 
-const CASACASAY: VillaData = {
-  id: "casacasay",
-  index: "Villa № 02",
-  badge: "Villa № 02",
-  brandSub: "Los Alcázares · No. 02",
-  hero: {
-    image: POOL_1,
-    eyebrow: ["Villa № 02", "Murcia · Inland", "15 min to Mar Menor"],
-    titlePrefix: "Casa ",
-    titleItalic: "CasAy",
-    titleSuffix: "au-dessus du green",
-    stats: [
-      { label: "Sleeps", value: "Up to 4" },
-      { label: "Bedrooms", value: "Two" },
-      { label: "Surface", value: "104 m²" },
-      { label: "View", value: "Golf course" },
-      { label: "Rating", value: "4.92 ★" },
-    ],
-    price: 145,
-    priceLabel: "/ night · low season from",
-  },
-  ribbon: [
-    "Quiet residential community",
-    "Wide southern terrace",
-    "Shared pool, no crowds",
-    "15 min to Los Alcázares",
-    "30 min to Murcia city",
-    "Slow afternoons over the green",
-  ],
-  about: {
-    chapter: "Chapter 01 — The Penthouse",
-    titleLead: "A quieter",
-    titleItalic: "kind of stay",
-    lead: "A 104 m² penthouse with a southern terrace, designed for slow mornings, late lunches over the fairway, and full nights of sleep.",
-    body: "Casa CasAy sits inside a small gated community fifteen minutes inland from Los Alcázares. Two bedrooms, a wide terrace, and an uninterrupted view of the golf course — the kind of place that suits couples, friends, and small families looking for a calmer base than the seafront.",
-    features: [
-      { icon: "waves-ladder", label: "Shared pool" },
-      { icon: "armchair", label: "Terrace" },
-      { icon: "snowflake", label: "Central AC" },
-      { icon: "wifi", label: "High-speed Wifi" },
-      { icon: "shield-check", label: "Gated community" },
-      { icon: "car", label: "Private parking" },
-      { icon: "bed", label: "Premium linens" },
-      { icon: "flag", label: "Golf course view" },
-    ],
-    meta: [
-      { label: "Property", value: "Penthouse" },
-      { label: "Surface", value: "104 m²" },
-      { label: "Stay", value: "3-night min." },
-    ],
-  },
-  booking: {
-    nightly: 145,
-    cleaning: 60,
-    concierge: 35,
-    rating: 4.92,
-    reviewCount: 41,
-    maxGuests: 4,
-    defaultGuests: 2,
-    defaultCheckIn: "2026-09-12",
-    defaultCheckOut: "2026-09-19",
-  },
-  gallery: {
-    chapter: "Chapter 02 — The Rooms",
-    titleItalic: "Light & space",
-    titleTail: " over the green",
-    description:
-      "The full photoshoot is coming soon — for now, a glimpse of the terrace and the pool. Drop us a line and we'll send the rest.",
-    totalLabel: "Open the full gallery",
-    tiles: [
-      {
-        category: "OUTDOOR",
-        src: POOL_1,
-        index: "01 · The Pool",
-        label: "01 · The Pool",
-        caption: "Shared community pool",
-        span: "wide",
-      },
-      {
-        category: "OUTDOOR",
-        src: "",
-        index: "02 · Terrace",
-        label: "02 · Terrace",
-        caption: "South-facing",
-        span: "third",
-        placeholder: true,
-        placeholderLabel: "Terrace",
-      },
-      {
-        category: "LIVING_SPACES",
-        src: "",
-        index: "03 · Living",
-        label: "03 · Living",
-        caption: "Open-plan",
-        span: "third",
-        placeholder: true,
-        placeholderLabel: "Living Area",
-      },
-      {
-        category: "BEDROOMS",
-        src: "",
-        index: "04 · Master",
-        label: "04 · Master",
-        caption: "Suite",
-        span: "third",
-        placeholder: true,
-        placeholderLabel: "Bedroom",
-      },
-      {
-        category: "KITCHEN",
-        src: "",
-        index: "05 · Kitchen",
-        label: "05 · Kitchen",
-        caption: "Fully equipped",
-        span: "third",
-        placeholder: true,
-        placeholderLabel: "Kitchen",
-      },
-    ],
-    images: {
-      LIVING_SPACES: [],
-      BEDROOMS: [],
-      KITCHEN: [],
-      BATHROOMS: [],
-      OUTDOOR: [{ src: POOL_1, label: "Shared community pool", category: "OUTDOOR", size: "large" }],
-      DINING: [],
-      UTILITY: [],
+function buildCasacasay(): VillaData {
+  return {
+    id: "casacasay",
+    index: m.villa_casacasay_index(),
+    badge: m.villa_casacasay_badge(),
+    brandSub: m.villa_casacasay_brand_sub(),
+    hero: {
+      image: POOL_1,
+      eyebrow: [
+        m.villa_casacasay_hero_eyebrow_1(),
+        m.villa_casacasay_hero_eyebrow_2(),
+        m.villa_casacasay_hero_eyebrow_3(),
+      ],
+      titlePrefix: m.villa_casacasay_hero_title_prefix(),
+      titleItalic: m.villa_casacasay_hero_title_italic(),
+      titleSuffix: m.villa_casacasay_hero_title_suffix(),
+      stats: [
+        { label: m.villa_casacasay_hero_stat_1_label(), value: m.villa_casacasay_hero_stat_1_value() },
+        { label: m.villa_casacasay_hero_stat_2_label(), value: m.villa_casacasay_hero_stat_2_value() },
+        { label: m.villa_casacasay_hero_stat_3_label(), value: m.villa_casacasay_hero_stat_3_value() },
+        { label: m.villa_casacasay_hero_stat_4_label(), value: m.villa_casacasay_hero_stat_4_value() },
+        { label: m.villa_casacasay_hero_stat_5_label(), value: m.villa_casacasay_hero_stat_5_value() },
+      ],
+      price: 145,
+      priceLabel: m.villa_casacasay_hero_price_label(),
     },
-  },
-  localArea: {
-    chapter: "Chapter 03 — The Region",
-    titleLead: "Inland Murcia,",
-    titleItalic: "at your pace",
-    description:
-      "A short drive from the salt, the village and the sea — but with the quiet of the inland valleys. Spend mornings on the terrace, drive to the Mar Menor for lunch, return for sunset over the green.",
-    mainImage: POOL_1,
-    stampBig: "15",
-    stampSmall: "min to\nMar Menor",
-    points: [
-      {
-        number: "№ 01",
-        title: "Los Alcázares & Mar Menor",
-        description:
-          "The seafront village, the inland sea, our sister property Casa DaNa.",
-        distance: "15 min drive · 14 km",
-      },
-      {
-        number: "№ 02",
-        title: "Murcia city",
-        description:
-          "Baroque cathedral, casino, late terraces in Plaza de las Flores.",
-        distance: "30 min drive · 30 km",
-      },
-      {
-        number: "№ 03",
-        title: "Balneario de Archena",
-        description:
-          "Famous Roman thermal spa nestled in the Ricote Valley.",
-        distance: "35 min drive · 40 km",
-      },
-      {
-        number: "№ 04",
-        title: "Corvera Airport (RMU)",
-        description: "Direct flights from London, Manchester, Paris and Brussels.",
-        distance: "20 min drive · 18 km",
-      },
+    ribbon: [
+      m.villa_casacasay_ribbon_1(),
+      m.villa_casacasay_ribbon_2(),
+      m.villa_casacasay_ribbon_3(),
+      m.villa_casacasay_ribbon_4(),
+      m.villa_casacasay_ribbon_5(),
+      m.villa_casacasay_ribbon_6(),
     ],
-  },
-  reviews: {
-    chapter: "Chapter 04 — Guest stories",
-    titleLead: "What guests",
-    titleItalic: "remember",
-    description:
-      "Forty-one verified stays so far. The terrace at golden hour and the quiet keep coming up.",
-    score: 4.92,
-    count: 41,
-    bars: [
-      { label: "Cleanliness", pct: 98, value: "4.9" },
-      { label: "Comfort", pct: 96, value: "4.8" },
-      { label: "Location", pct: 94, value: "4.7" },
-      { label: "Host", pct: 100, value: "5.0" },
-      { label: "Value", pct: 96, value: "4.8" },
-    ],
-    entries: [
-      {
-        initial: "S",
-        name: "Sophie & Marc",
-        meta: "Brussels · Stayed May 2025",
-        quote:
-          "A real find. The terrace faces straight onto the green — coffee at sunrise, wine at sunset, no one in sight. Beautifully kept, every detail thought through.",
-        source: "via Booking · Couple",
-        stars: 5,
+    about: {
+      chapter: m.villa_casacasay_about_chapter(),
+      titleLead: m.villa_casacasay_about_title_lead(),
+      titleItalic: m.villa_casacasay_about_title_italic(),
+      lead: m.villa_casacasay_about_lead(),
+      body: m.villa_casacasay_about_body(),
+      features: [
+        { icon: "waves-ladder", label: m.villa_casacasay_about_feature_pool() },
+        { icon: "armchair", label: m.villa_casacasay_about_feature_terrace() },
+        { icon: "snowflake", label: m.villa_casacasay_about_feature_ac() },
+        { icon: "wifi", label: m.villa_casacasay_about_feature_wifi() },
+        { icon: "shield-check", label: m.villa_casacasay_about_feature_gated() },
+        { icon: "car", label: m.villa_casacasay_about_feature_parking() },
+        { icon: "bed", label: m.villa_casacasay_about_feature_linens() },
+        { icon: "flag", label: m.villa_casacasay_about_feature_golf() },
+      ],
+      meta: [
+        { label: m.villa_casacasay_about_meta_1_label(), value: m.villa_casacasay_about_meta_1_value() },
+        { label: m.villa_casacasay_about_meta_2_label(), value: m.villa_casacasay_about_meta_2_value() },
+        { label: m.villa_casacasay_about_meta_3_label(), value: m.villa_casacasay_about_meta_3_value() },
+      ],
+    },
+    booking: {
+      nightly: 145,
+      cleaning: 60,
+      concierge: 35,
+      rating: 4.92,
+      reviewCount: 41,
+      maxGuests: 4,
+      defaultGuests: 2,
+      defaultCheckIn: "2026-09-12",
+      defaultCheckOut: "2026-09-19",
+    },
+    gallery: {
+      chapter: m.villa_casacasay_gallery_chapter(),
+      titleItalic: m.villa_casacasay_gallery_title_italic(),
+      titleTail: m.villa_casacasay_gallery_title_tail(),
+      description: m.villa_casacasay_gallery_description(),
+      totalLabel: m.villa_casacasay_gallery_total_label(),
+      tiles: [
+        {
+          category: "OUTDOOR",
+          src: POOL_1,
+          index: m.villa_casacasay_gallery_tile_1_index(),
+          label: m.villa_casacasay_gallery_tile_1_index(),
+          caption: m.villa_casacasay_gallery_tile_1_caption(),
+          span: "wide",
+        },
+        {
+          category: "OUTDOOR",
+          src: "",
+          index: m.villa_casacasay_gallery_tile_2_index(),
+          label: m.villa_casacasay_gallery_tile_2_index(),
+          caption: m.villa_casacasay_gallery_tile_2_caption(),
+          span: "third",
+          placeholder: true,
+          placeholderLabel: m.villa_casacasay_gallery_tile_2_placeholder(),
+        },
+        {
+          category: "LIVING_SPACES",
+          src: "",
+          index: m.villa_casacasay_gallery_tile_3_index(),
+          label: m.villa_casacasay_gallery_tile_3_index(),
+          caption: m.villa_casacasay_gallery_tile_3_caption(),
+          span: "third",
+          placeholder: true,
+          placeholderLabel: m.villa_casacasay_gallery_tile_3_placeholder(),
+        },
+        {
+          category: "BEDROOMS",
+          src: "",
+          index: m.villa_casacasay_gallery_tile_4_index(),
+          label: m.villa_casacasay_gallery_tile_4_index(),
+          caption: m.villa_casacasay_gallery_tile_4_caption(),
+          span: "third",
+          placeholder: true,
+          placeholderLabel: m.villa_casacasay_gallery_tile_4_placeholder(),
+        },
+        {
+          category: "KITCHEN",
+          src: "",
+          index: m.villa_casacasay_gallery_tile_5_index(),
+          label: m.villa_casacasay_gallery_tile_5_index(),
+          caption: m.villa_casacasay_gallery_tile_5_caption(),
+          span: "third",
+          placeholder: true,
+          placeholderLabel: m.villa_casacasay_gallery_tile_5_placeholder(),
+        },
+      ],
+      images: {
+        LIVING_SPACES: [],
+        BEDROOMS: [],
+        KITCHEN: [],
+        BATHROOMS: [],
+        OUTDOOR: [
+          { src: POOL_1, label: m.villa_casacasay_gallery_img_outdoor_1(), category: "OUTDOOR", size: "large" },
+        ],
+        DINING: [],
+        UTILITY: [],
       },
-      {
-        initial: "H",
-        name: "Hannah K.",
-        meta: "London · Stayed October 2025",
-        quote:
-          "Quieter than we expected and exactly what we needed. Pool is calm, the community is gated, and Loan answered every question within minutes.",
-        source: "via Airbnb · Family of 3",
-        stars: 5,
-      },
-      {
-        initial: "A",
-        name: "Alejandro Pons",
-        meta: "Valencia · Stayed July 2025",
-        quote:
-          "Perfect base for a golf week. Airy interiors, fast wifi, and a 15-minute drive to the Mar Menor for lunch. Already rebooked for spring.",
-        source: "Direct booking · Friends",
-        stars: 5,
-      },
-    ],
-  },
-  ctaStrip: {
-    lead: "Slow mornings over",
-    italic: "the green",
-    tail: " — your week starts at Casa CasAy.",
-    button: "Check Availability",
-  },
-  sister: {
-    chapter: "Sister property",
-    titleLead: "Looking for the beachfront",
-    titleItalic: "casa?",
-    description:
-      "Casa DaNa is our six-person family casa in Los Alcázares itself — rooftop solarium, jacuzzi, and 1.6 km from the Mar Menor. Same hosts, same care.",
-    button: "Visit Casa DaNa",
-    targetId: "casadana",
-    image: ROOFTOP_7,
-  },
-}
-
-export const VILLAS: Record<"casadana" | "casacasay", VillaData> = {
-  casadana: CASADANA,
-  casacasay: CASACASAY,
+    },
+    localArea: {
+      chapter: m.villa_casacasay_local_area_chapter(),
+      titleLead: m.villa_casacasay_local_area_title_lead(),
+      titleItalic: m.villa_casacasay_local_area_title_italic(),
+      description: m.villa_casacasay_local_area_description(),
+      mainImage: POOL_1,
+      stampBig: m.villa_casacasay_local_area_stamp_big(),
+      stampSmall: m.villa_casacasay_local_area_stamp_small(),
+      points: [
+        {
+          number: "№ 01",
+          title: m.villa_casacasay_local_area_point_1_title(),
+          description: m.villa_casacasay_local_area_point_1_description(),
+          distance: m.villa_casacasay_local_area_point_1_distance(),
+        },
+        {
+          number: "№ 02",
+          title: m.villa_casacasay_local_area_point_2_title(),
+          description: m.villa_casacasay_local_area_point_2_description(),
+          distance: m.villa_casacasay_local_area_point_2_distance(),
+        },
+        {
+          number: "№ 03",
+          title: m.villa_casacasay_local_area_point_3_title(),
+          description: m.villa_casacasay_local_area_point_3_description(),
+          distance: m.villa_casacasay_local_area_point_3_distance(),
+        },
+        {
+          number: "№ 04",
+          title: m.villa_casacasay_local_area_point_4_title(),
+          description: m.villa_casacasay_local_area_point_4_description(),
+          distance: m.villa_casacasay_local_area_point_4_distance(),
+        },
+      ],
+    },
+    reviews: {
+      chapter: m.villa_casacasay_reviews_chapter(),
+      titleLead: m.villa_casacasay_reviews_title_lead(),
+      titleItalic: m.villa_casacasay_reviews_title_italic(),
+      description: m.villa_casacasay_reviews_description(),
+      score: 4.92,
+      count: 41,
+      bars: [
+        { label: m.villa_casacasay_reviews_bar_1_label(), pct: 98, value: "4.9" },
+        { label: m.villa_casacasay_reviews_bar_2_label(), pct: 96, value: "4.8" },
+        { label: m.villa_casacasay_reviews_bar_3_label(), pct: 94, value: "4.7" },
+        { label: m.villa_casacasay_reviews_bar_4_label(), pct: 100, value: "5.0" },
+        { label: m.villa_casacasay_reviews_bar_5_label(), pct: 96, value: "4.8" },
+      ],
+      entries: [
+        {
+          initial: "S",
+          name: m.villa_casacasay_reviews_1_name(),
+          meta: m.villa_casacasay_reviews_1_meta(),
+          quote: m.villa_casacasay_reviews_1_quote(),
+          source: m.villa_casacasay_reviews_1_source(),
+          stars: 5,
+        },
+        {
+          initial: "H",
+          name: m.villa_casacasay_reviews_2_name(),
+          meta: m.villa_casacasay_reviews_2_meta(),
+          quote: m.villa_casacasay_reviews_2_quote(),
+          source: m.villa_casacasay_reviews_2_source(),
+          stars: 5,
+        },
+        {
+          initial: "A",
+          name: m.villa_casacasay_reviews_3_name(),
+          meta: m.villa_casacasay_reviews_3_meta(),
+          quote: m.villa_casacasay_reviews_3_quote(),
+          source: m.villa_casacasay_reviews_3_source(),
+          stars: 5,
+        },
+      ],
+    },
+    ctaStrip: {
+      lead: m.villa_casacasay_cta_strip_lead(),
+      italic: m.villa_casacasay_cta_strip_italic(),
+      tail: m.villa_casacasay_cta_strip_tail(),
+      button: m.villa_casacasay_cta_strip_button(),
+    },
+    sister: {
+      chapter: m.villa_casacasay_sister_chapter(),
+      titleLead: m.villa_casacasay_sister_title_lead(),
+      titleItalic: m.villa_casacasay_sister_title_italic(),
+      description: m.villa_casacasay_sister_description(),
+      button: m.villa_casacasay_sister_button(),
+      targetId: "casadana",
+      image: ROOFTOP_7,
+    },
+  }
 }
 
 export function getVilla(id: string): VillaData | null {
-  if (id === "casadana" || id === "casacasay") return VILLAS[id]
+  if (id === "casadana") return buildCasadana()
+  if (id === "casacasay") return buildCasacasay()
   return null
 }
+
+export const VILLAS = {
+  get casadana() {
+    return buildCasadana()
+  },
+  get casacasay() {
+    return buildCasacasay()
+  },
+} as const

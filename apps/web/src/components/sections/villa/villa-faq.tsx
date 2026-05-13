@@ -1,6 +1,7 @@
 import { ArrowRight, Plus } from "lucide-react"
 
 import type { VillaData } from "@/constants/villas.const"
+import { m } from "@/paraglide/messages"
 
 interface VillaFaqProps {
   data: VillaData["faq"]
@@ -26,7 +27,7 @@ export default function VillaFaq({ data }: VillaFaqProps) {
             href="mailto:hello@casa-dana.com"
             className="text-primary border-outline-variant hover:bg-surface-container-low inline-flex items-center gap-3 border px-6 py-4 font-mono text-[11px] tracking-[0.28em] uppercase transition-colors"
           >
-            Email the host
+            {m.villa_faq_email_host()}
             <ArrowRight size={12} />
           </a>
         </div>

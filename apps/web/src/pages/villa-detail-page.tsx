@@ -14,6 +14,7 @@ import VillaSister from "@/components/sections/villa/villa-sister"
 import VillaHero from "@/components/sections/villa-hero"
 import { GalleryCategory } from "@/constants/gallery-categories.const"
 import { getVilla } from "@/constants/villas.const"
+import { m } from "@/paraglide/messages"
 
 export default function VillaDetailPage() {
   const { villaId } = useParams({ from: "/villa/$villaId" })
@@ -31,10 +32,10 @@ export default function VillaDetailPage() {
     return (
       <section className="mx-auto max-w-[1440px] px-6 py-32 md:px-10">
         <span className="text-secondary inline-flex items-center gap-3 font-mono text-[11px] tracking-[0.22em] uppercase before:block before:h-px before:w-6 before:bg-current">
-          Not found
+          {m.villa_not_found_index()}
         </span>
         <h1 className="font-display text-primary mt-4 text-[clamp(40px,5vw,64px)] font-light italic">
-          We don't have that one.
+          {m.villa_not_found_title()}
         </h1>
       </section>
     )

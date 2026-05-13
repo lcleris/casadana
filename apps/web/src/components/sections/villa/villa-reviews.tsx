@@ -1,4 +1,5 @@
 import type { VillaData } from "@/constants/villas.const"
+import { m } from "@/paraglide/messages"
 
 interface VillaReviewsProps {
   data: VillaData["reviews"]
@@ -47,7 +48,7 @@ export default function VillaReviews({ data }: VillaReviewsProps) {
               ★★★★★
             </div>
             <div className="text-on-surface-variant mb-7 font-mono text-[11px] tracking-[0.18em] uppercase">
-              Based on {data.count} verified stays
+              {m.villa_reviews_based_on({ count: data.count })}
             </div>
             <div className="grid max-w-[320px] gap-3.5">
               {data.bars.map((b) => (

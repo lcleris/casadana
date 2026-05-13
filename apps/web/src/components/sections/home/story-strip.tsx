@@ -12,12 +12,12 @@ export default function StoryStrip() {
         <div className="relative grid grid-cols-2 gap-3 md:pr-16">
           <img
             src={FRONT_IMG}
-            alt="Casa DaNa façade"
+            alt={m.home_story_image_alt_facade()}
             className="aspect-[3/4] w-full object-cover"
           />
           <img
             src={POOL_IMG}
-            alt="Casa CasAy pool"
+            alt={m.home_story_image_alt_pool()}
             className="mt-16 aspect-[3/4] w-full object-cover"
           />
           <div
