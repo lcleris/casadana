@@ -112,14 +112,10 @@ export interface VillaData {
   }
   booking: {
     nightly: number
-    cleaning: number
-    concierge: number
     rating: number
     reviewCount: number
     maxGuests: number
     defaultGuests: number
-    defaultCheckIn: string
-    defaultCheckOut: string
   }
   gallery: {
     chapter: string
@@ -239,15 +235,11 @@ function buildCasadana(): VillaData {
       ],
     },
     booking: {
-      nightly: 185,
-      cleaning: 80,
-      concierge: 45,
+      nightly: 95,
       rating: 4.96,
       reviewCount: 87,
       maxGuests: 6,
       defaultGuests: 4,
-      defaultCheckIn: "2026-07-18",
-      defaultCheckOut: "2026-07-25",
     },
     gallery: {
       chapter: m.villa_casadana_gallery_chapter(),
@@ -546,15 +538,11 @@ function buildCasacasay(): VillaData {
       ],
     },
     booking: {
-      nightly: 145,
-      cleaning: 60,
-      concierge: 35,
+      nightly: 58,
       rating: 4.92,
       reviewCount: 41,
       maxGuests: 4,
       defaultGuests: 2,
-      defaultCheckIn: "2026-09-12",
-      defaultCheckOut: "2026-09-19",
     },
     gallery: {
       chapter: m.villa_casacasay_gallery_chapter(),

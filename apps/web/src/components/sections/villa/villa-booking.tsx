@@ -1,5 +1,5 @@
 import { keepPreviousData, useQueryClient } from "@tanstack/react-query"
-import { ApiError, useCreateBooking, useGetVillaAvailability } from "@casa-dana/api"
+import { ApiError, useCreateBooking, useGetVillaAvailability, useGetVillaPricing } from "@casa-dana/api"
 import { addDays, addMonths, endOfMonth, format, parseISO, startOfMonth } from "date-fns"
 import { ArrowRight, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -57,17 +57,29 @@ function sameDay(a: Date, b: Date) {
   )
 }
 
-function dateOnly(iso: string) {
-  const [y, m, d] = iso.split("-").map(Number)
-  return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1)
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+// Default arrival = tomorrow (gives the guest at least one day of buffer);
+// default departure = +7 nights from arrival.
+function defaultDates(): { checkIn: Date; checkOut: Date } {
+  const today = startOfDay(new Date())
+  const checkIn = addDays(today, 1)
+  const checkOut = addDays(checkIn, 7)
+  return { checkIn, checkOut }
 }
 
 export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) {
+  // Computed once at mount — dates won't shift if the user keeps the page open
+  // across midnight, which is fine for a booking flow.
+  const defaults = useMemo(defaultDates, [])
+
   const { control, register, handleSubmit, watch, setValue, setError } = useForm<BookingFormValues>({
     defaultValues: {
       name: "",
-      checkIn: dateOnly(booking.defaultCheckIn),
-      checkOut: dateOnly(booking.defaultCheckOut),
+      checkIn: defaults.checkIn,
+      checkOut: defaults.checkOut,
       guests: booking.defaultGuests,
       email: "",
       tel: "",
@@ -81,7 +93,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
   const [activeField, setActiveField] = useState<"in" | "out" | null>(null)
   const [viewMonth, setViewMonth] = useState<Date>(
-    () => new Date(dateOnly(booking.defaultCheckIn).getFullYear(), dateOnly(booking.defaultCheckIn).getMonth(), 1),
+    () => new Date(defaults.checkIn.getFullYear(), defaults.checkIn.getMonth(), 1),
   )
   const popRef = useRef<HTMLDivElement | null>(null)
   const ciRef = useRef<HTMLButtonElement | null>(null)
@@ -129,11 +141,16 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     },
   })
 
+  // Window covers both the visible calendar months AND the selected stay range
+  // (so the displayed total stays accurate even when checkout is outside the
+  // currently-viewed month).
   const queryWindow = useMemo(() => {
-    const from = startOfMonth(viewMonth)
-    const to = endOfMonth(addMonths(viewMonth, 1))
+    const calFrom = startOfMonth(viewMonth)
+    const calTo = endOfMonth(addMonths(viewMonth, 1))
+    const from = checkIn < calFrom ? checkIn : calFrom
+    const to = checkOut > calTo ? checkOut : calTo
     return { from: format(from, "yyyy-MM-dd"), to: format(to, "yyyy-MM-dd") }
-  }, [viewMonth])
+  }, [viewMonth, checkIn, checkOut])
 
   const { data: availability } = useGetVillaAvailability(
     villaSlug,
@@ -141,6 +158,18 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     {
       query: {
         enabled: activeField !== null,
+        placeholderData: keepPreviousData,
+      },
+    },
+  )
+
+  // Pricing is always enabled (not gated on calendar visibility) so the sidebar
+  // total reflects real overrides on first paint, before the user opens the calendar.
+  const { data: pricing } = useGetVillaPricing(
+    villaSlug,
+    { from: queryWindow.from, to: queryWindow.to },
+    {
+      query: {
         placeholderData: keepPreviousData,
       },
     },
@@ -160,9 +189,32 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
   const isBlocked = (date: Date) => blockedNights.has(format(date, "yyyy-MM-dd"))
 
+  const priceOverridesByDate = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const o of pricing?.overrides ?? []) {
+      map.set(o.date, o.price_cents)
+    }
+    return map
+  }, [pricing])
+
+  const priceCentsFor = (date: Date): number => {
+    const key = format(date, "yyyy-MM-dd")
+    const override = priceOverridesByDate.get(key)
+    return override ?? booking.nightly * 100
+  }
+
   const nights = nightsBetween(checkIn, checkOut)
-  const subtotal = nights * booking.nightly
-  const total = subtotal + booking.cleaning + booking.concierge
+  // Inline the override lookup to keep the dep array honest (priceCentsFor is a
+  // plain function reference that React can't track).
+  const totalCents = useMemo(() => {
+    let sum = 0
+    for (let day = new Date(checkIn); day < checkOut; day = addDays(day, 1)) {
+      const key = format(day, "yyyy-MM-dd")
+      sum += priceOverridesByDate.get(key) ?? booking.nightly * 100
+    }
+    return sum
+  }, [checkIn, checkOut, priceOverridesByDate, booking.nightly])
+  const total = totalCents / 100
 
   useEffect(() => {
     if (!activeField) return
@@ -353,7 +405,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                     return (
                       <span
                         key={i}
-                        className="text-outline-variant flex aspect-square cursor-default items-center justify-center text-[13px]"
+                        className="text-outline-variant flex min-h-[42px] cursor-default items-center justify-center text-[13px]"
                       >
                         {cell.d}
                       </span>
@@ -365,7 +417,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                       <span
                         key={i}
                         aria-disabled="true"
-                        className="text-on-surface-variant/40 flex aspect-square cursor-not-allowed items-center justify-center text-[13px] line-through"
+                        className="text-on-surface-variant/40 flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px] line-through"
                       >
                         {cell.d}
                       </span>
@@ -374,19 +426,26 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                   const isCI = sameDay(cell.date, checkIn)
                   const isCO = sameDay(cell.date, checkOut)
                   const inRange = cell.date > checkIn && cell.date < checkOut
+                  const showPrice = !(isCI || isCO)
+                  const priceCents = priceCentsFor(cell.date)
                   return (
                     <button
                       key={i}
                       type="button"
                       onClick={() => pickDate(cell.date as Date)}
                       className={cn(
-                        "text-on-surface flex aspect-square items-center justify-center text-[13px] transition-colors",
+                        "text-on-surface flex min-h-[42px] flex-col items-center justify-center gap-0.5 text-[13px] transition-colors",
                         inRange && "bg-secondary-container text-on-secondary-container",
-                        (isCI || isCO) && "bg-primary text-on-primary rounded-full",
+                        (isCI || isCO) && "bg-primary text-on-primary mx-auto size-[42px] rounded-full",
                         !inRange && !isCI && !isCO && "hover:bg-surface-container-low",
                       )}
                     >
-                      {cell.d}
+                      <span>{cell.d}</span>
+                      {showPrice && (
+                        <span className="text-on-surface-variant font-mono text-[9px] leading-none">
+                          €{Math.round(priceCents / 100)}
+                        </span>
+                      )}
                     </button>
                   )
                 })}
@@ -506,17 +565,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       <div className="border-outline-variant mt-6 grid gap-3 border-t pt-5 text-[13.5px]">
         <div className="text-on-surface-variant flex justify-between">
           <span>
-            {nights} {nights === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural()} × €{booking.nightly}
+            {nights} {nights === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural()}
           </span>
-          <span>€{subtotal.toLocaleString()}</span>
-        </div>
-        <div className="text-on-surface-variant flex justify-between">
-          <span>{m.villa_booking_cleaning_fee()}</span>
-          <span>€{booking.cleaning}</span>
-        </div>
-        <div className="text-on-surface-variant flex justify-between">
-          <span>{m.villa_booking_concierge_welcome()}</span>
-          <span>€{booking.concierge}</span>
+          <span>€{total.toLocaleString()}</span>
         </div>
         <div className="font-display text-primary border-outline-variant mt-1 flex justify-between border-t pt-3.5 text-[22px] italic">
           <span>{m.villa_booking_total()}</span>
