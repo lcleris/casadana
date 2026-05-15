@@ -32,7 +32,8 @@ import type {
   BookingResponse,
   CreateBookingRequest,
   ErrorResponse,
-  GetVillaAvailabilityParams
+  GetVillaAvailabilityParams,
+  PatchBookingRequest
 } from '.././schemas';
 
 import { customAxios } from '../../client';
@@ -104,6 +105,76 @@ export const useCreateBooking = <TError = ErrorResponse,
       > => {
 
       const mutationOptions = getCreateBookingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Moves a booking through its lifecycle: `pending → approved | rejected |
+cancelled`, `approved → paid | cancelled`, `paid → cancelled`. The
+backend enforces the state machine and rejects invalid transitions
+with 409 `INVALID_STATUS`. Currently unauthenticated; auth gate is
+added in Plan 2 (admin auth).
+
+ * @summary Transition a booking's status
+ */
+export const patchBooking = (
+    id: string,
+    patchBookingRequest: PatchBookingRequest,
+ ) => {
+      
+      
+      return customAxios<BookingResponse>(
+      {url: `/api/bookings/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: patchBookingRequest
+    },
+      );
+    }
+  
+
+
+export const getPatchBookingMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchBooking>>, TError,{id: string;data: PatchBookingRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof patchBooking>>, TError,{id: string;data: PatchBookingRequest}, TContext> => {
+
+const mutationKey = ['patchBooking'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchBooking>>, {id: string;data: PatchBookingRequest}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  patchBooking(id,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchBookingMutationResult = NonNullable<Awaited<ReturnType<typeof patchBooking>>>
+    export type PatchBookingMutationBody = PatchBookingRequest
+    export type PatchBookingMutationError = ErrorResponse
+
+    /**
+ * @summary Transition a booking's status
+ */
+export const usePatchBooking = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchBooking>>, TError,{id: string;data: PatchBookingRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchBooking>>,
+        TError,
+        {id: string;data: PatchBookingRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getPatchBookingMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
