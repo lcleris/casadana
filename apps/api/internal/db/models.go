@@ -71,3 +71,11 @@ type Booking struct {
 	CreatedAt  pgtype.Timestamptz
 	UpdatedAt  pgtype.Timestamptz
 }
+
+type PriceOverride struct {
+	VillaSlug  string
+	Date       pgtype.Date
+	PriceCents int32
+	CreatedAt  pgtype.Timestamptz
+	UpdatedAt  pgtype.Timestamptz
+}

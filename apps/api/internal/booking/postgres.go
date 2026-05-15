@@ -94,7 +94,7 @@ func (r *pgRepo) Get(ctx context.Context, id string) (*Booking, error) {
 	row, err := r.q().GetBookingByID(ctx, pgtype.UUID{Bytes: [16]byte(uid), Valid: true})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("booking: not found")
+			return nil, ErrNotFound
 		}
 		return nil, err
 	}

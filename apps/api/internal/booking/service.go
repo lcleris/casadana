@@ -83,3 +83,21 @@ func (s *Service) Availability(ctx context.Context, villaSlug string, from, to t
 	}
 	return s.repo.BookedRanges(ctx, villaSlug, from, to)
 }
+
+// TransitionStatus moves a booking through its lifecycle (pending → approved /
+// rejected / cancelled / paid). The state machine is enforced by the domain
+// helper Booking.Transition; the service handles persistence.
+func (s *Service) TransitionStatus(ctx context.Context, id string, next Status) (*Booking, error) {
+	current, err := s.repo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	transitioned, err := current.Transition(next, s.clock.Now())
+	if err != nil {
+		return nil, err
+	}
+	if err := s.repo.UpdateStatus(ctx, id, transitioned.Status, transitioned.UpdatedAt); err != nil {
+		return nil, fmt.Errorf("booking: update status: %w", err)
+	}
+	return &transitioned, nil
+}

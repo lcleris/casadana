@@ -16,6 +16,7 @@ type Querier interface {
 	InsertBooking(ctx context.Context, arg InsertBookingParams) (Booking, error)
 	ListBookedRanges(ctx context.Context, arg ListBookedRangesParams) ([]ListBookedRangesRow, error)
 	ListBookingsByStatus(ctx context.Context, status BookingStatus) ([]Booking, error)
+	ListPriceOverrides(ctx context.Context, arg ListPriceOverridesParams) ([]ListPriceOverridesRow, error)
 	UpdateBookingStatus(ctx context.Context, arg UpdateBookingStatusParams) error
 }
 

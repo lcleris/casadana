@@ -51,6 +51,7 @@ var (
 	ErrDatesConflict = errors.New("those dates are not available")
 	ErrUnknownVilla  = errors.New("unknown villa")
 	ErrInvalidStatus = errors.New("invalid booking status transition")
+	ErrNotFound      = errors.New("booking not found")
 )
 
 func NewBooking(in NewBookingInput) (*Booking, error) {

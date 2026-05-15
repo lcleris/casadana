@@ -18,6 +18,8 @@ tags:
     description: Liveness
   - name: bookings
     description: Booking submission and availability
+  - name: pricing
+    description: Per-date price overrides
 
 paths:
   /api/health:
@@ -62,6 +64,60 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "409":
           description: Dates conflict with an existing booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/bookings/{id}:
+    patch:
+      operationId: patchBooking
+      tags: [bookings]
+      summary: Transition a booking's status
+      description: |
+        Moves a booking through its lifecycle: `pending → approved | rejected |
+        cancelled`, `approved → paid | cancelled`, `paid → cancelled`. The
+        backend enforces the state machine and rejects invalid transitions
+        with 409 `INVALID_STATUS`. Currently unauthenticated; auth gate is
+        added in Plan 2 (admin auth).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchBookingRequest"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingResponse"
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid status transition
           content:
             application/json:
               schema:
@@ -131,6 +187,59 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/villas/{slug}/pricing:
+    get:
+      operationId: getVillaPricing
+      tags: [pricing]
+      summary: Get price overrides for a villa within a date window
+      description: |
+        Returns the sparse list of per-date price overrides for a villa within
+        the [from, to) window. Dates without an override fall back to the villa's
+        frontend-defined default (`booking.nightly` in villas.const.ts).
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+          example: casadana
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          description: Window start (inclusive). YYYY-MM-DD.
+          example: "2026-07-01"
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          description: Window end (exclusive). YYYY-MM-DD.
+          example: "2026-08-01"
+      responses:
+        "200":
+          description: Price overrides
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PricingResponse"
+        "404":
+          description: Villa slug not in allowlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid query params or invalid range
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthResponse:
@@ -145,6 +254,15 @@ components:
     BookingStatus:
       type: string
       enum: [pending, approved, rejected, cancelled, paid]
+
+    PatchBookingRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected, cancelled, paid]
+          description: Target status for the transition.
 
     CreateBookingRequest:
       type: object
@@ -210,6 +328,25 @@ components:
         booked_ranges:
           type: array
           items: { $ref: "#/components/schemas/BookedRange" }
+
+    PriceOverride:
+      type: object
+      required: [date, price_cents]
+      properties:
+        date: { type: string, format: date }
+        price_cents:
+          type: integer
+          minimum: 0
+          description: Price in EUR cents (e.g. 9500 = 95.00€).
+          example: 9500
+
+    PricingResponse:
+      type: object
+      required: [overrides]
+      properties:
+        overrides:
+          type: array
+          items: { $ref: "#/components/schemas/PriceOverride" }
 
     ErrorResponse:
       type: object

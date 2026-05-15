@@ -14,6 +14,7 @@ import (
 	"github.com/TheHikuro/casadana/internal/platform/httpserver"
 	"github.com/TheHikuro/casadana/internal/platform/logger"
 	"github.com/TheHikuro/casadana/internal/platform/postgres"
+	"github.com/TheHikuro/casadana/internal/pricing"
 	"github.com/TheHikuro/casadana/internal/villaslug"
 )
 
@@ -58,10 +59,12 @@ func main() {
 		slugAllowlist{},
 		realClock{},
 	)
+	pricingSvc := pricing.NewService(pricing.NewPgRepo(pool), slugAllowlist{})
 
 	r := httpserver.NewRouter(log, cfg.WebOrigin)
 	openapi.Mount(r)
 	booking.Mount(r, bookingSvc)
+	pricing.Mount(r, pricingSvc)
 
 	if err := httpserver.Run(r, cfg.Port, log); err != nil {
 		log.Error("server crashed", "err", err.Error())

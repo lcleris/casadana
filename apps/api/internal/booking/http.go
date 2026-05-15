@@ -15,11 +15,17 @@ func init() {
 	httpserver.Register(ErrDatesConflict, http.StatusConflict, "DATES_CONFLICT")
 	httpserver.Register(ErrUnknownVilla, http.StatusNotFound, "UNKNOWN_VILLA")
 	httpserver.Register(ErrInvalidStatus, http.StatusConflict, "INVALID_STATUS")
+	httpserver.Register(ErrNotFound, http.StatusNotFound, "BOOKING_NOT_FOUND")
 }
 
 func Mount(r chi.Router, svc *Service) {
 	r.Post("/api/bookings", createHandler(svc))
+	r.Patch("/api/bookings/{id}", patchBookingHandler(svc))
 	r.Get("/api/villas/{slug}/availability", availabilityHandler(svc))
+}
+
+type patchBookingRequest struct {
+	Status string `json:"status" validate:"required,oneof=approved rejected cancelled paid"`
 }
 
 type createBookingRequest struct {
@@ -97,6 +103,28 @@ func createHandler(svc *Service) http.HandlerFunc {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(toResponse(b))
+	}
+}
+
+func patchBookingHandler(svc *Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := chi.URLParam(r, "id")
+		var req patchBookingRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			httpserver.WriteError(w, r, &httpserver.ValidationError{Message: "invalid json: " + err.Error()})
+			return
+		}
+		if err := validator.Struct(&req); err != nil {
+			httpserver.WriteError(w, r, &httpserver.ValidationError{Message: err.Error()})
+			return
+		}
+		b, err := svc.TransitionStatus(r.Context(), id, Status(req.Status))
+		if err != nil {
+			httpserver.WriteError(w, r, err)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(toResponse(b))
 	}
 }
