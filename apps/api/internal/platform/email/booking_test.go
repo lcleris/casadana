@@ -99,7 +99,7 @@ func TestBuildMessage_AddressingAndIdempotency(t *testing.T) {
 	d := sample(LocaleFR)
 	const owner = "hosts@casa-dana.com"
 
-	guest, err := buildMessage(d.GuestEmail, owner, "approved", d.ID, d.approvedContent())
+	guest, err := buildMessage(d.GuestEmail, owner, mailKey("booking", d.ID, "approved"), d.approvedContent())
 	if err != nil {
 		t.Fatalf("buildMessage: %v", err)
 	}
@@ -111,7 +111,7 @@ func TestBuildMessage_AddressingAndIdempotency(t *testing.T) {
 		t.Errorf("idempotency key = %q", guest.IdempotencyKey)
 	}
 
-	notice, err := buildMessage(owner, d.GuestEmail, "owner-request", d.ID, d.ownerContent())
+	notice, err := buildMessage(owner, d.GuestEmail, mailKey("booking", d.ID, "owner-request"), d.ownerContent())
 	if err != nil {
 		t.Fatalf("buildMessage: %v", err)
 	}
@@ -130,7 +130,7 @@ func TestBuildMessage_RendersBothPartsAndEscapes(t *testing.T) {
 	d := sample(LocaleFR)
 	d.GuestName = `Jane <script>alert("x")</script>`
 
-	msg, err := buildMessage(d.GuestEmail, "hosts@casa-dana.com", "received", d.ID, d.receivedContent())
+	msg, err := buildMessage(d.GuestEmail, "hosts@casa-dana.com", mailKey("booking", d.ID, "received"), d.receivedContent())
 	if err != nil {
 		t.Fatalf("buildMessage: %v", err)
 	}

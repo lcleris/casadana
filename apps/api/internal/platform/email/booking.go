@@ -62,23 +62,13 @@ func (d BookingData) stayDetails(loc Locale) []detail {
 	}
 }
 
-func (d BookingData) base(loc Locale) content {
-	return content{
-		Locale:     loc,
-		Tagline:    t(loc, "brand.tagline"),
-		SignedName: t(loc, "footer.signed"),
-		SignedRole: t(loc, "footer.role"),
-		ReplyHint:  t(loc, "footer.reply"),
-	}
-}
-
 // The content builders below are pure: they turn a booking into the copy of one
 // email and touch nothing else, which is what makes every email in this package
 // assertable without a network round-trip.
 
 func (d BookingData) receivedContent() content {
 	loc := d.locale()
-	c := d.base(loc)
+	c := newContent(loc)
 	c.Subject = tf(loc, "received.subject", d.VillaName)
 	c.Heading = t(loc, "received.heading")
 	c.Greeting = tf(loc, "greeting", d.GuestName)
@@ -90,7 +80,7 @@ func (d BookingData) receivedContent() content {
 
 func (d BookingData) approvedContent() content {
 	loc := d.locale()
-	c := d.base(loc)
+	c := newContent(loc)
 	c.Subject = tf(loc, "approved.subject", d.VillaName)
 	c.Heading = t(loc, "approved.heading")
 	c.Greeting = tf(loc, "greeting", d.GuestName)
@@ -105,7 +95,7 @@ func (d BookingData) approvedContent() content {
 
 func (d BookingData) rejectedContent() content {
 	loc := d.locale()
-	c := d.base(loc)
+	c := newContent(loc)
 	c.Subject = tf(loc, "rejected.subject", d.VillaName)
 	c.Heading = t(loc, "rejected.heading")
 	c.Greeting = tf(loc, "greeting", d.GuestName)
@@ -118,7 +108,7 @@ func (d BookingData) rejectedContent() content {
 
 func (d BookingData) cancelledContent() content {
 	loc := d.locale()
-	c := d.base(loc)
+	c := newContent(loc)
 	c.Subject = tf(loc, "cancelled.subject", d.VillaName)
 	c.Heading = t(loc, "cancelled.heading")
 	c.Greeting = tf(loc, "greeting", d.GuestName)
@@ -135,7 +125,7 @@ func (d BookingData) cancelledContent() content {
 // can act on the request straight from their inbox.
 func (d BookingData) ownerContent() content {
 	loc := DefaultLocale
-	c := d.base(loc)
+	c := newContent(loc)
 	c.Subject = tf(loc, "owner.subject", d.VillaName, formatDate(d.CheckIn, loc), formatDate(d.CheckOut, loc))
 	c.Heading = t(loc, "owner.heading")
 	c.Paragraphs = []string{t(loc, "owner.p1"), t(loc, "owner.p2")}
@@ -177,7 +167,7 @@ func (m *Mailer) SendGuestCancelled(ctx context.Context, d BookingData) error {
 // SendOwnerNewRequest notifies the owners that a request is waiting.
 func (m *Mailer) SendOwnerNewRequest(ctx context.Context, d BookingData) error {
 	// Reply-To is the guest, so answering the notification answers the guest.
-	msg, err := buildMessage(m.adminNotify, d.GuestEmail, "owner-request", d.ID, d.ownerContent())
+	msg, err := buildMessage(m.adminNotify, d.GuestEmail, mailKey("booking", d.ID, "owner-request"), d.ownerContent())
 	if err != nil {
 		return err
 	}
@@ -187,17 +177,17 @@ func (m *Mailer) SendOwnerNewRequest(ctx context.Context, d BookingData) error {
 // sendGuest addresses the guest and points Reply-To at the owners, so a guest
 // replying to any of these emails reaches a human.
 func (m *Mailer) sendGuest(ctx context.Context, d BookingData, kind string, c content) error {
-	msg, err := buildMessage(d.GuestEmail, m.adminNotify, kind, d.ID, c)
+	msg, err := buildMessage(d.GuestEmail, m.adminNotify, mailKey("booking", d.ID, kind), c)
 	if err != nil {
 		return err
 	}
 	return m.Send(ctx, msg)
 }
 
-// buildMessage renders the layout into a sendable message. The idempotency key
-// is derived from the booking and the kind of email, so retrying the same
-// notification can never deliver it twice.
-func buildMessage(to, replyTo, kind, bookingID string, c content) (Message, error) {
+// buildMessage renders the layout into a sendable message. Callers pass an
+// idempotency key built with mailKey, so retrying the same notification can
+// never deliver it twice.
+func buildMessage(to, replyTo, idempotencyKey string, c content) (Message, error) {
 	if len(c.Paragraphs) > 0 {
 		c.Preheader = c.Paragraphs[0]
 	}
@@ -211,6 +201,12 @@ func buildMessage(to, replyTo, kind, bookingID string, c content) (Message, erro
 		Subject:        c.Subject,
 		HTML:           html,
 		Text:           text,
-		IdempotencyKey: fmt.Sprintf("booking/%s/%s", bookingID, kind),
+		IdempotencyKey: idempotencyKey,
 	}, nil
+}
+
+// mailKey identifies one notification: the thing it is about, and which of that
+// thing's emails it is. Two different scopes can share an id without colliding.
+func mailKey(scope, id, kind string) string {
+	return fmt.Sprintf("%s/%s/%s", scope, id, kind)
 }

@@ -54,3 +54,15 @@ func (c content) render() (html, text string, err error) {
 	}
 	return hb.String(), tb.String(), nil
 }
+
+// newContent seeds an email with the parts every message shares: the brand
+// line and the signature block. Each builder fills in the rest.
+func newContent(loc Locale) content {
+	return content{
+		Locale:     loc,
+		Tagline:    t(loc, "brand.tagline"),
+		SignedName: t(loc, "footer.signed"),
+		SignedRole: t(loc, "footer.role"),
+		ReplyHint:  t(loc, "footer.reply"),
+	}
+}

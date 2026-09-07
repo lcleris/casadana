@@ -61,6 +61,23 @@ var catalog = map[Locale]map[string]string{
 		"owner.p1":        "Une nouvelle demande vient d'arriver depuis le site. Elle est en attente de votre réponse dans le back-office.",
 		"owner.p2":        "Répondez à cet e-mail pour écrire directement au voyageur.",
 		"owner.nomessage": "(aucun message)",
+
+		"label.author": "Auteur",
+		"label.rating": "Note",
+		"label.review": "Avis",
+		"label.source": "Provenance",
+
+		// %s = villa name, %d = rating out of 5
+		"review.owner.subject": "Nouvel avis — %s · %d/5",
+		"review.owner.heading": "Nouvel avis à modérer",
+		// %s = villa name
+		"review.owner.p1":     "Un nouvel avis vient d'être déposé sur %s. Il n'est pas encore visible sur le site : il attend votre modération dans le back-office.",
+		"review.owner.p2":     "Approuvez-le pour qu'il apparaisse sur la page du logement et compte dans la note publiée.",
+		"review.owner.footer": "Approuvez ou refusez cet avis depuis le back-office.",
+		"review.owner.nobody": "(aucun commentaire)",
+
+		"review.source.website": "Formulaire du site",
+		"review.source.direct":  "Depuis une réservation",
 	},
 	LocaleEN: {
 		"brand.tagline":  "Two family homes, Los Alcázares",
@@ -111,6 +128,21 @@ var catalog = map[Locale]map[string]string{
 		"owner.p1":        "A new request just came in from the website. It's waiting for your answer in the back-office.",
 		"owner.p2":        "Reply to this email to write to the guest directly.",
 		"owner.nomessage": "(no message)",
+
+		"label.author": "Author",
+		"label.rating": "Rating",
+		"label.review": "Review",
+		"label.source": "Source",
+
+		"review.owner.subject": "New review — %s · %d/5",
+		"review.owner.heading": "New review to moderate",
+		"review.owner.p1":      "A new review has just been left for %s. It isn't visible on the site yet: it's waiting for your moderation in the back-office.",
+		"review.owner.p2":      "Approve it for it to appear on the property page and count towards the published rating.",
+		"review.owner.footer":  "Approve or reject this review from the back-office.",
+		"review.owner.nobody":  "(no comment)",
+
+		"review.source.website": "Website form",
+		"review.source.direct":  "From a booking",
 	},
 	LocaleES: {
 		"brand.tagline":  "Dos casas familiares, Los Alcázares",
@@ -161,6 +193,21 @@ var catalog = map[Locale]map[string]string{
 		"owner.p1":        "Acaba de llegar una nueva solicitud desde el sitio web. Está esperando su respuesta en el back-office.",
 		"owner.p2":        "Responda a este correo para escribir directamente al huésped.",
 		"owner.nomessage": "(sin mensaje)",
+
+		"label.author": "Autor",
+		"label.rating": "Valoración",
+		"label.review": "Opinión",
+		"label.source": "Procedencia",
+
+		"review.owner.subject": "Nueva opinión — %s · %d/5",
+		"review.owner.heading": "Nueva opinión por moderar",
+		"review.owner.p1":      "Acaba de llegar una nueva opinión sobre %s. Todavía no es visible en el sitio: está esperando su moderación en el back-office.",
+		"review.owner.p2":      "Apruébela para que aparezca en la página del alojamiento y cuente en la valoración publicada.",
+		"review.owner.footer":  "Apruebe o rechace esta opinión desde el back-office.",
+		"review.owner.nobody":  "(sin comentario)",
+
+		"review.source.website": "Formulario del sitio",
+		"review.source.direct":  "Desde una reserva",
 	},
 }
 
