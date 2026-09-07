@@ -451,12 +451,6 @@ function buildCasadana(): VillaData {
           description: m.villa_casadana_local_area_point_4_description(),
           distance: m.villa_casadana_local_area_point_4_distance(),
         },
-        {
-          number: "№ 05",
-          title: m.villa_casadana_local_area_point_5_title(),
-          description: m.villa_casadana_local_area_point_5_description(),
-          distance: m.villa_casadana_local_area_point_5_distance(),
-        },
       ],
     },
     experiences: {
