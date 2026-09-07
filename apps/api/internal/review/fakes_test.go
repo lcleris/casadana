@@ -219,3 +219,16 @@ func d(s string) time.Time {
 }
 
 func ptr[T any](v T) *T { return &v }
+
+type fakeMailer struct {
+	sent []Review
+	err  error
+}
+
+func (f *fakeMailer) SendOwnerNewReview(_ context.Context, r *Review) error {
+	if f.err != nil {
+		return f.err
+	}
+	f.sent = append(f.sent, *r)
+	return nil
+}

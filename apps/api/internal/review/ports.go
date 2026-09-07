@@ -41,3 +41,11 @@ type Clock interface {
 type EventRecorder interface {
 	Record(ctx context.Context, villaSlug, message string) error
 }
+
+// Mailer tells the owners that a review is waiting for them. Like
+// EventRecorder it is best-effort at the call site — a mail failure must never
+// cost us a review the database has already accepted — and a nil mailer
+// disables the notification.
+type Mailer interface {
+	SendOwnerNewReview(ctx context.Context, r *Review) error
+}

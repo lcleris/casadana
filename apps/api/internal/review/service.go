@@ -12,6 +12,7 @@ type Service struct {
 	allow    VillaAllowlist
 	clock    Clock
 	events   EventRecorder
+	mailer   Mailer
 }
 
 func NewService(
@@ -20,8 +21,9 @@ func NewService(
 	allow VillaAllowlist,
 	clock Clock,
 	events EventRecorder,
+	mailer Mailer,
 ) *Service {
-	return &Service{repo: repo, bookings: bookings, allow: allow, clock: clock, events: events}
+	return &Service{repo: repo, bookings: bookings, allow: allow, clock: clock, events: events, mailer: mailer}
 }
 
 type SubmitCommand struct {
@@ -55,6 +57,7 @@ func (s *Service) Submit(ctx context.Context, cmd SubmitCommand) (*Review, error
 		return nil, err
 	}
 	s.record(ctx, r.VillaSlug, fmt.Sprintf("Review by %s submitted", r.AuthorName))
+	s.notifyOwners(ctx, r)
 	return r, nil
 }
 
@@ -93,6 +96,7 @@ func (s *Service) SubmitPublic(ctx context.Context, cmd SubmitPublicCommand) (*R
 		return nil, err
 	}
 	s.record(ctx, r.VillaSlug, fmt.Sprintf("Review by %s submitted from the website", r.AuthorName))
+	s.notifyOwners(ctx, r)
 	return r, nil
 }
 
@@ -205,6 +209,23 @@ func patchMessage(r *Review, patch UpdatePatch) string {
 		return fmt.Sprintf("Review by %s unfeatured", r.AuthorName)
 	default:
 		return fmt.Sprintf("Review by %s edited", r.AuthorName)
+	}
+}
+
+// notifyOwners tells the owners a review is waiting for moderation. A review
+// lands pending and shows up nowhere until they act on it, so without this they
+// would have to go and look. Best-effort for the same reason as the activity
+// log: the review is saved, and failing here would tell the visitor their
+// review did not go through when it did.
+//
+// CreateByAdmin deliberately sends nothing: an owner who just typed a review in
+// the back-office does not need an email about it.
+func (s *Service) notifyOwners(ctx context.Context, r *Review) {
+	if s.mailer == nil {
+		return
+	}
+	if err := s.mailer.SendOwnerNewReview(ctx, r); err != nil {
+		slog.WarnContext(ctx, "owner new-review email failed", "review_id", r.ID, "err", err.Error())
 	}
 }
 

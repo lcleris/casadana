@@ -107,6 +107,7 @@ func main() {
 		slugAllowlist{},
 		realClock{},
 		audit.RecorderFor(auditSvc, audit.TypeReview).WithActorResolver(auditActor),
+		review.NewResendMailer(mailer),
 	)
 
 	requireAdmin := adminauth.RequireAdminSession(adminAuthSvc)

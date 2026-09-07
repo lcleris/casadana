@@ -7,15 +7,19 @@ import (
 )
 
 func newSvc(repo Repository, bookings BookingReader, clock Clock) *Service {
-	return NewService(repo, bookings, knownVillas(), clock, nil)
+	return NewService(repo, bookings, knownVillas(), clock, nil, nil)
 }
 
 func newSvcWithAllowlist(repo Repository, allow VillaAllowlist, clock Clock) *Service {
-	return NewService(repo, fakeBookingReader{}, allow, clock, nil)
+	return NewService(repo, fakeBookingReader{}, allow, clock, nil, nil)
 }
 
 func newSvcWithEvents(repo Repository, bookings BookingReader, clock Clock, events EventRecorder) *Service {
-	return NewService(repo, bookings, knownVillas(), clock, events)
+	return NewService(repo, bookings, knownVillas(), clock, events, nil)
+}
+
+func newSvcWithMailer(repo Repository, bookings BookingReader, clock Clock, mailer Mailer) *Service {
+	return NewService(repo, bookings, knownVillas(), clock, nil, mailer)
 }
 
 func TestSubmit_Happy(t *testing.T) {
@@ -617,5 +621,116 @@ func TestSubmitPublic_RecordsEvent(t *testing.T) {
 	}
 	if len(events.events) != 1 || events.events[0].villaSlug != "casadana" {
 		t.Fatalf("events = %+v, want one line for casadana", events.events)
+	}
+}
+
+// A review lands pending and appears nowhere until someone moderates it, so the
+// owners have to be told it is there.
+func TestSubmit_NotifiesOwners(t *testing.T) {
+	mailer := &fakeMailer{}
+	bookings := fakeBookingReader{bySlug: map[string]string{"booking-1": "casadana"}}
+	svc := newSvcWithMailer(&fakeRepo{}, bookings, fixedClock{t: d("2026-08-01")}, mailer)
+
+	r, err := svc.Submit(context.Background(), SubmitCommand{
+		BookingID:  "booking-1",
+		AuthorName: "Jane",
+		Rating:     5,
+		Body:       "Loved it.",
+	})
+	if err != nil {
+		t.Fatalf("Submit: %v", err)
+	}
+	if len(mailer.sent) != 1 {
+		t.Fatalf("sent %d owner notifications, want 1", len(mailer.sent))
+	}
+	if mailer.sent[0].ID != r.ID {
+		t.Errorf("notified about review %q, want %q", mailer.sent[0].ID, r.ID)
+	}
+}
+
+// The villa-page form is the path a stranger uses, and the one the owners are
+// least likely to be watching for.
+func TestSubmitPublic_NotifiesOwners(t *testing.T) {
+	mailer := &fakeMailer{}
+	svc := newSvcWithMailer(&fakeRepo{}, fakeBookingReader{}, fixedClock{t: d("2026-08-01")}, mailer)
+
+	if _, err := svc.SubmitPublic(context.Background(), SubmitPublicCommand{
+		VillaSlug:  "casadana",
+		AuthorName: "Jane",
+		Rating:     4,
+		Body:       "Very nice.",
+	}); err != nil {
+		t.Fatalf("SubmitPublic: %v", err)
+	}
+	if len(mailer.sent) != 1 {
+		t.Fatalf("sent %d owner notifications, want 1", len(mailer.sent))
+	}
+	sent := mailer.sent[0]
+	if sent.AuthorName != "Jane" || sent.Rating != 4 || sent.Body != "Very nice." {
+		t.Errorf("notification carries %+v, not the review that was submitted", sent)
+	}
+	// Provenance travels with the notification so the owners can tell a form
+	// submission from a booking-backed one.
+	if sent.Source != SourceWebsite {
+		t.Errorf("Source = %q, want %q", sent.Source, SourceWebsite)
+	}
+}
+
+// An owner transcribing a review in the back-office does not need an email
+// telling them a review just arrived.
+func TestCreateByAdmin_SendsNoMail(t *testing.T) {
+	mailer := &fakeMailer{}
+	svc := newSvcWithMailer(&fakeRepo{}, fakeBookingReader{}, fixedClock{t: d("2026-08-01")}, mailer)
+
+	if _, err := svc.CreateByAdmin(context.Background(), CreateByAdminCommand{
+		VillaSlug:  "casadana",
+		AuthorName: "Jane",
+		Rating:     5,
+		Body:       "From Airbnb.",
+	}); err != nil {
+		t.Fatalf("CreateByAdmin: %v", err)
+	}
+	if len(mailer.sent) != 0 {
+		t.Errorf("sent %d owner notifications, want none", len(mailer.sent))
+	}
+}
+
+// The review is already stored by the time the mail goes out. Failing the
+// submission here would tell a visitor their review did not go through when it
+// did — and they would write it again.
+func TestSubmitPublic_MailFailureKeepsTheReview(t *testing.T) {
+	repo := &fakeRepo{}
+	mailer := &fakeMailer{err: errors.New("resend down")}
+	svc := newSvcWithMailer(repo, fakeBookingReader{}, fixedClock{t: d("2026-08-01")}, mailer)
+
+	if _, err := svc.SubmitPublic(context.Background(), SubmitPublicCommand{
+		VillaSlug:  "casadana",
+		AuthorName: "Jane",
+		Rating:     4,
+		Body:       "Very nice.",
+	}); err != nil {
+		t.Fatalf("SubmitPublic: %v", err)
+	}
+	if len(repo.saved) != 1 {
+		t.Errorf("saved %d reviews, want 1: a mail failure must not lose the review", len(repo.saved))
+	}
+}
+
+// Every other test in this file runs with no mailer at all, which is the
+// configuration a nil mailer has to survive.
+func TestSubmitPublic_NoMailerConfigured(t *testing.T) {
+	repo := &fakeRepo{}
+	svc := newSvcWithAllowlist(repo, knownVillas(), fixedClock{t: d("2026-08-01")})
+
+	if _, err := svc.SubmitPublic(context.Background(), SubmitPublicCommand{
+		VillaSlug:  "casadana",
+		AuthorName: "Jane",
+		Rating:     4,
+		Body:       "Very nice.",
+	}); err != nil {
+		t.Fatalf("SubmitPublic: %v", err)
+	}
+	if len(repo.saved) != 1 {
+		t.Errorf("saved %d reviews, want 1", len(repo.saved))
 	}
 }
