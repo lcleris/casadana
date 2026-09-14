@@ -9,6 +9,13 @@ CASA DANA & CASAY — {{ .Tagline }}
 --
 {{ range .Details }}{{ .Label }}: {{ .Value }}
 {{ end }}--
+{{ end }}{{ with .ChecklistsIntro }}
+{{ . }}
+{{ end }}{{ range .Checklists }}
+{{ .Title }}
+{{ range .Items }}  - {{ . }}
+{{ end }}{{ end }}{{ range .Closing }}
+{{ . }}
 {{ end }}{{ with .Note }}
 {{ . }}
 {{ end }}
