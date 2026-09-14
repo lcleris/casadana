@@ -1,6 +1,9 @@
 package email
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // catalog holds every string that appears in an email, per locale. Values with
 // %s placeholders are documented at their use site in booking.go; the argument
@@ -10,7 +13,7 @@ import "fmt"
 // half-translated email can't ship.
 var catalog = map[Locale]map[string]string{
 	LocaleFR: {
-		"brand.tagline":  "Deux adresses familiales, Los Alcázares",
+		"brand.tagline":  "Deux lieux, une seule promesse : vous faire vivre des vacances inoubliables",
 		"footer.signed":  "Delphine & Christophe",
 		"footer.role":    "Vos hôtes",
 		"footer.reply":   "Vous pouvez répondre directement à cet e-mail.",
@@ -25,6 +28,11 @@ var catalog = map[Locale]map[string]string{
 		"label.message":  "Message",
 		"label.ref":      "Référence",
 
+		// Appended to the date in guest mail only, so a guest never has to hunt
+		// for the arrival window in a separate message.
+		"window.checkin":  "entre 16h et 22h",
+		"window.checkout": "avant 11h",
+
 		"greeting":           "Bonjour %s,",
 		"guests.adult.one":   "%d adulte",
 		"guests.adult.other": "%d adultes",
@@ -32,23 +40,44 @@ var catalog = map[Locale]map[string]string{
 		"guests.child.other": "%d enfants",
 
 		// %s = villa name
-		"received.subject": "Votre demande de réservation — %s",
+		"received.subject": "Votre demande de séjour — %s",
 		"received.heading": "Demande reçue",
-		"received.p1":      "Nous avons bien reçu votre demande de séjour à %s. Elle n'est pas encore confirmée : nous vérifions les disponibilités et nous revenons vers vous très vite.",
-		"received.p2":      "Si vous souhaitez nous préciser quelque chose, répondez simplement à cet e-mail.",
-		"received.note":    "Aucun montant ne vous est débité à ce stade.",
+		"received.p1":      "Merci pour votre demande de séjour à %s 🌿",
+		"received.p2":      "Nous avons bien reçu votre demande pour les dates suivantes :",
+		"received.p3":      "À ce stade, votre réservation n'est pas encore confirmée. Nous allons vérifier les disponibilités et reviendrons vers vous très prochainement afin de vous transmettre les informations nécessaires et de finaliser ensemble votre réservation.",
+		"received.p4":      "Si vous souhaitez déjà nous préciser quelque chose concernant votre séjour, n'hésitez pas à répondre directement à cet e-mail.",
+		"received.note":    "Aucun montant ne vous est débité à ce stade. Au plaisir de vous accueillir prochainement sous le soleil de la Costa Cálida ☀️",
 
+		// An approval opens the contract stage: it asks for the traveller details
+		// Spanish law requires, and says plainly that the dates are only held once
+		// the deposit lands.
+		"approved.subject": "Votre demande pour %s a été acceptée",
+		"approved.heading": "Demande acceptée",
 		// %s = villa name, %s = check-in, %s = check-out
-		"approved.subject": "Votre séjour à %s est confirmé",
-		"approved.heading": "Séjour confirmé",
-		"approved.p1":      "Bonne nouvelle : votre séjour à %s du %s au %s est confirmé.",
-		"approved.p2":      "Nous vous écrirons quelques jours avant votre arrivée avec les informations pratiques : accès au logement, horaires d'arrivée et contacts sur place.",
-		"approved.note":    "Un empêchement, une question ? Écrivez-nous, nous trouverons une solution.",
+		"approved.p1": "Bonne nouvelle : votre demande de séjour à %s du %s au %s a bien été acceptée. 🌴☀️",
+		"approved.p2": "Afin de préparer votre contrat de réservation, pourriez-vous répondre directement à cet e-mail en nous communiquant les informations suivantes :",
+		// Items are pipe-separated: the catalog stays a flat map[string]string, so
+		// the same key-set and placeholder checks cover these lines too.
+		"approved.list.booker.title": "Pour la personne ayant réservé",
+		"approved.list.booker.items": "Nom et prénom|Adresse postale|Adresse e-mail|Numéro de téléphone|Date de naissance",
+		"approved.list.guests.title": "Pour les personnes qui vous accompagnent",
+		"approved.list.guests.items": "Nom et prénom de chaque voyageur",
+		"approved.p3":                "Nous savons que cela représente plusieurs informations à transmettre, mais certaines données concernant les voyageurs doivent être recueillies afin de respecter les obligations légales en Espagne.",
+		"approved.p4":                "Dès réception de ces informations, vous recevrez votre contrat de réservation dans les 24 heures, accompagné des modalités de paiement de l'acompte.",
+		"approved.p5":                "Vos dates seront définitivement bloquées dès réception de l'acompte prévu dans le contrat.",
+		"approved.p6":                "Merci beaucoup pour votre collaboration. 😊",
+		"approved.note":              "Au plaisir de vous accueillir très bientôt !",
 
 		"rejected.subject": "Votre demande pour %s",
 		"rejected.heading": "Demande non retenue",
-		"rejected.p1":      "Merci de l'intérêt que vous portez à %s. Nous ne pouvons malheureusement pas accueillir votre demande pour les dates du %s au %s.",
-		"rejected.p2":      "D'autres dates sont peut-être libres, et notre second logement l'est parfois quand le premier ne l'est pas. Répondez à cet e-mail et nous chercherons avec vous.",
+		"rejected.p1":      "Merci pour l'intérêt que vous portez à %s.",
+		// %s = check-in, %s = check-out
+		"rejected.p2": "Malheureusement, nous ne pouvons pas confirmer votre demande pour les dates du %s au %s.",
+		// %s = the other villa, named so the guest can picture it; the .nosibling
+		// variant is what ships if there is ever only one property left.
+		"rejected.p3":           "N'hésitez pas à nous répondre directement à cet e-mail : d'autres dates sont peut-être encore disponibles, et notre second logement, %s, peut également être libre sur cette période.",
+		"rejected.p3.nosibling": "N'hésitez pas à nous répondre directement à cet e-mail : d'autres dates sont peut-être encore disponibles.",
+		"rejected.p4":           "Nous regarderons avec plaisir les possibilités avec vous. 🌴",
 
 		"cancelled.subject": "Votre réservation à %s a été annulée",
 		"cancelled.heading": "Réservation annulée",
@@ -80,7 +109,7 @@ var catalog = map[Locale]map[string]string{
 		"review.source.direct":  "Depuis une réservation",
 	},
 	LocaleEN: {
-		"brand.tagline":  "Two family homes, Los Alcázares",
+		"brand.tagline":  "Two places, one promise: holidays you will never forget",
 		"footer.signed":  "Delphine & Christophe",
 		"footer.role":    "Your hosts",
 		"footer.reply":   "You can reply directly to this email.",
@@ -95,28 +124,45 @@ var catalog = map[Locale]map[string]string{
 		"label.message":  "Message",
 		"label.ref":      "Reference",
 
+		"window.checkin":  "between 4pm and 10pm",
+		"window.checkout": "before 11am",
+
 		"greeting":           "Hello %s,",
 		"guests.adult.one":   "%d adult",
 		"guests.adult.other": "%d adults",
 		"guests.child.one":   "%d child",
 		"guests.child.other": "%d children",
 
-		"received.subject": "Your booking request — %s",
+		"received.subject": "Your stay request — %s",
 		"received.heading": "Request received",
-		"received.p1":      "We've received your request to stay at %s. It isn't confirmed yet: we're checking availability and will get back to you very soon.",
-		"received.p2":      "If there's anything you'd like to tell us, simply reply to this email.",
-		"received.note":    "Nothing is charged at this stage.",
+		"received.p1":      "Thank you for your request to stay at %s 🌿",
+		"received.p2":      "We have received your request for the following dates:",
+		"received.p3":      "At this stage your booking is not confirmed yet. We will check availability and come back to you very shortly with everything you need, so we can finalise your booking together.",
+		"received.p4":      "If there is already something you would like to tell us about your stay, simply reply to this email.",
+		"received.note":    "Nothing is charged at this stage. We look forward to welcoming you under the Costa Cálida sun ☀️",
 
-		"approved.subject": "Your stay at %s is confirmed",
-		"approved.heading": "Stay confirmed",
-		"approved.p1":      "Good news: your stay at %s from %s to %s is confirmed.",
-		"approved.p2":      "We'll write to you a few days before you arrive with the practical details: how to get in, arrival times and who to contact locally.",
-		"approved.note":    "Plans changed, or a question? Write to us and we'll find a way.",
+		"approved.subject": "Your request for %s has been accepted",
+		"approved.heading": "Request accepted",
+		"approved.p1":      "Good news: your request to stay at %s from %s to %s has been accepted. 🌴☀️",
+		"approved.p2":      "So that we can prepare your booking contract, could you reply directly to this email with the following details:",
 
-		"rejected.subject": "Your request for %s",
-		"rejected.heading": "Request not accepted",
-		"rejected.p1":      "Thank you for your interest in %s. Unfortunately we can't take your request for %s to %s.",
-		"rejected.p2":      "Other dates may be free, and our second property is sometimes available when the first one isn't. Reply to this email and we'll look with you.",
+		"approved.list.booker.title": "For the person who made the booking",
+		"approved.list.booker.items": "First and last name|Postal address|Email address|Phone number|Date of birth",
+		"approved.list.guests.title": "For everyone travelling with you",
+		"approved.list.guests.items": "First and last name of each guest",
+		"approved.p3":                "We know that is a fair amount to send over, but some traveller details have to be collected to meet legal requirements in Spain.",
+		"approved.p4":                "As soon as we have them, you will receive your booking contract within 24 hours, together with how to pay the deposit.",
+		"approved.p5":                "Your dates are held for good once the deposit set out in the contract reaches us.",
+		"approved.p6":                "Thank you very much for your help. 😊",
+		"approved.note":              "We look forward to welcoming you very soon!",
+
+		"rejected.subject":      "Your request for %s",
+		"rejected.heading":      "Request not accepted",
+		"rejected.p1":           "Thank you for your interest in %s.",
+		"rejected.p2":           "Unfortunately we cannot confirm your request for the dates of %s to %s.",
+		"rejected.p3":           "Do reply directly to this email: other dates may still be available, and our second property, %s, may also be free over that period.",
+		"rejected.p3.nosibling": "Do reply directly to this email: other dates may still be available.",
+		"rejected.p4":           "We would be glad to look at the options with you. 🌴",
 
 		"cancelled.subject": "Your booking at %s has been cancelled",
 		"cancelled.heading": "Booking cancelled",
@@ -145,7 +191,7 @@ var catalog = map[Locale]map[string]string{
 		"review.source.direct":  "From a booking",
 	},
 	LocaleES: {
-		"brand.tagline":  "Dos casas familiares, Los Alcázares",
+		"brand.tagline":  "Dos lugares, una sola promesa: unas vacaciones inolvidables",
 		"footer.signed":  "Delphine & Christophe",
 		"footer.role":    "Sus anfitriones",
 		"footer.reply":   "Puede responder directamente a este correo.",
@@ -160,28 +206,45 @@ var catalog = map[Locale]map[string]string{
 		"label.message":  "Mensaje",
 		"label.ref":      "Referencia",
 
+		"window.checkin":  "entre las 16:00 y las 22:00",
+		"window.checkout": "antes de las 11:00",
+
 		"greeting":           "Hola %s:",
 		"guests.adult.one":   "%d adulto",
 		"guests.adult.other": "%d adultos",
 		"guests.child.one":   "%d niño",
 		"guests.child.other": "%d niños",
 
-		"received.subject": "Su solicitud de reserva — %s",
+		"received.subject": "Su solicitud de estancia — %s",
 		"received.heading": "Solicitud recibida",
-		"received.p1":      "Hemos recibido su solicitud de estancia en %s. Todavía no está confirmada: estamos comprobando la disponibilidad y le responderemos muy pronto.",
-		"received.p2":      "Si desea indicarnos algo, basta con responder a este correo.",
-		"received.note":    "No se le cobra ningún importe en esta fase.",
+		"received.p1":      "Gracias por su solicitud de estancia en %s 🌿",
+		"received.p2":      "Hemos recibido su solicitud para las fechas siguientes:",
+		"received.p3":      "Por el momento su reserva todavía no está confirmada. Vamos a comprobar la disponibilidad y le responderemos muy pronto con toda la información necesaria para finalizar juntos su reserva.",
+		"received.p4":      "Si desea indicarnos algo sobre su estancia, no dude en responder directamente a este correo.",
+		"received.note":    "No se le cobra ningún importe en esta fase. Esperamos recibirle pronto bajo el sol de la Costa Cálida ☀️",
 
-		"approved.subject": "Su estancia en %s está confirmada",
-		"approved.heading": "Estancia confirmada",
-		"approved.p1":      "Buenas noticias: su estancia en %s del %s al %s está confirmada.",
-		"approved.p2":      "Le escribiremos unos días antes de su llegada con la información práctica: acceso al alojamiento, horarios de llegada y contactos en el lugar.",
-		"approved.note":    "¿Un imprevisto, una duda? Escríbanos y encontraremos una solución.",
+		"approved.subject": "Su solicitud para %s ha sido aceptada",
+		"approved.heading": "Solicitud aceptada",
+		"approved.p1":      "Buenas noticias: su solicitud de estancia en %s del %s al %s ha sido aceptada. 🌴☀️",
+		"approved.p2":      "Para preparar su contrato de reserva, ¿podría responder directamente a este correo indicándonos los siguientes datos?",
 
-		"rejected.subject": "Su solicitud para %s",
-		"rejected.heading": "Solicitud no aceptada",
-		"rejected.p1":      "Gracias por su interés en %s. Lamentablemente no podemos atender su solicitud para las fechas del %s al %s.",
-		"rejected.p2":      "Puede que otras fechas estén libres, y nuestro segundo alojamiento lo está a veces cuando el primero no. Responda a este correo y lo buscaremos con usted.",
+		"approved.list.booker.title": "De la persona que ha reservado",
+		"approved.list.booker.items": "Nombre y apellidos|Dirección postal|Correo electrónico|Número de teléfono|Fecha de nacimiento",
+		"approved.list.guests.title": "De las personas que le acompañan",
+		"approved.list.guests.items": "Nombre y apellidos de cada viajero",
+		"approved.p3":                "Sabemos que son varios datos, pero cierta información sobre los viajeros debe recogerse para cumplir con las obligaciones legales en España.",
+		"approved.p4":                "En cuanto los recibamos, le enviaremos su contrato de reserva en un plazo de 24 horas, junto con las condiciones de pago de la señal.",
+		"approved.p5":                "Sus fechas quedarán bloqueadas definitivamente en cuanto recibamos la señal prevista en el contrato.",
+		"approved.p6":                "Muchas gracias por su colaboración. 😊",
+		"approved.note":              "¡Esperamos recibirle muy pronto!",
+
+		"rejected.subject":      "Su solicitud para %s",
+		"rejected.heading":      "Solicitud no aceptada",
+		"rejected.p1":           "Gracias por el interés que muestra por %s.",
+		"rejected.p2":           "Lamentablemente no podemos confirmar su solicitud para las fechas del %s al %s.",
+		"rejected.p3":           "No dude en responder directamente a este correo: puede que otras fechas sigan disponibles y que nuestro segundo alojamiento, %s, también esté libre en ese periodo.",
+		"rejected.p3.nosibling": "No dude en responder directamente a este correo: puede que otras fechas sigan disponibles.",
+		"rejected.p4":           "Estaremos encantados de estudiar las posibilidades con usted. 🌴",
 
 		"cancelled.subject": "Su reserva en %s ha sido cancelada",
 		"cancelled.heading": "Reserva cancelada",
@@ -233,4 +296,22 @@ func plural(loc Locale, prefix string, n int) string {
 		suffix = ".one"
 	}
 	return tf(loc, prefix+suffix, n)
+}
+
+// tlist resolves a key whose value is a pipe-separated list of bullet points.
+// Storing lists this way keeps the catalog one flat map, so the key-set and
+// placeholder checks in catalog_test.go cover bulleted copy too.
+func tlist(loc Locale, key string) []string {
+	raw := t(loc, key)
+	if raw == "" {
+		return nil
+	}
+	parts := strings.Split(raw, "|")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if p = strings.TrimSpace(p); p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }

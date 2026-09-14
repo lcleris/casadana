@@ -21,6 +21,10 @@ type BookingData struct {
 	Adults     int
 	Children   int
 	Message    string
+	// OtherVillaName is the display name of the sibling property, offered to a
+	// guest whose dates don't work here. Empty when there is no obvious other
+	// one, in which case the mention is dropped rather than left vague.
+	OtherVillaName string
 	// Locale the guest browsed the site in. Empty falls back to DefaultLocale.
 	Locale Locale
 }
@@ -52,11 +56,21 @@ func (d BookingData) guestsLine(loc Locale) string {
 
 // stayDetails is the block every guest email repeats, so a guest can check the
 // dates without digging up the original request.
-func (d BookingData) stayDetails(loc Locale) []detail {
+//
+// withWindows appends the arrival and departure hours to the dates. Guest mail
+// carries them — it is the one place a guest will look for them — while the
+// owners' notification stays terse, since the hours are the same every time and
+// tell the owners nothing.
+func (d BookingData) stayDetails(loc Locale, withWindows bool) []detail {
+	checkIn, checkOut := formatDate(d.CheckIn, loc), formatDate(d.CheckOut, loc)
+	if withWindows {
+		checkIn = fmt.Sprintf("%s · %s", checkIn, t(loc, "window.checkin"))
+		checkOut = fmt.Sprintf("%s · %s", checkOut, t(loc, "window.checkout"))
+	}
 	return []detail{
 		{Label: t(loc, "label.villa"), Value: d.VillaName},
-		{Label: t(loc, "label.checkin"), Value: formatDate(d.CheckIn, loc)},
-		{Label: t(loc, "label.checkout"), Value: formatDate(d.CheckOut, loc)},
+		{Label: t(loc, "label.checkin"), Value: checkIn},
+		{Label: t(loc, "label.checkout"), Value: checkOut},
 		{Label: t(loc, "label.nights"), Value: fmt.Sprintf("%d", d.nights())},
 		{Label: t(loc, "label.guests"), Value: d.guestsLine(loc)},
 	}
@@ -72,8 +86,11 @@ func (d BookingData) receivedContent() content {
 	c.Subject = tf(loc, "received.subject", d.VillaName)
 	c.Heading = t(loc, "received.heading")
 	c.Greeting = tf(loc, "greeting", d.GuestName)
+	// The first two paragraphs announce the recap, so they sit above the table;
+	// everything that follows from it sits below.
 	c.Paragraphs = []string{tf(loc, "received.p1", d.VillaName), t(loc, "received.p2")}
-	c.Details = d.stayDetails(loc)
+	c.Details = d.stayDetails(loc, true)
+	c.Closing = []string{t(loc, "received.p3"), t(loc, "received.p4")}
 	c.Note = t(loc, "received.note")
 	return c
 }
@@ -86,9 +103,21 @@ func (d BookingData) approvedContent() content {
 	c.Greeting = tf(loc, "greeting", d.GuestName)
 	c.Paragraphs = []string{
 		tf(loc, "approved.p1", d.VillaName, formatDate(d.CheckIn, loc), formatDate(d.CheckOut, loc)),
-		t(loc, "approved.p2"),
 	}
-	c.Details = d.stayDetails(loc)
+	c.Details = d.stayDetails(loc, true)
+	c.ChecklistsIntro = t(loc, "approved.p2")
+	// Spain requires a record of every traveller, so an approval is also the
+	// email that collects them — asked for as a list the guest can tick off.
+	c.Checklists = []checklist{
+		{Title: t(loc, "approved.list.booker.title"), Items: tlist(loc, "approved.list.booker.items")},
+		{Title: t(loc, "approved.list.guests.title"), Items: tlist(loc, "approved.list.guests.items")},
+	}
+	c.Closing = []string{
+		t(loc, "approved.p3"),
+		t(loc, "approved.p4"),
+		t(loc, "approved.p5"),
+		t(loc, "approved.p6"),
+	}
 	c.Note = t(loc, "approved.note")
 	return c
 }
@@ -99,9 +128,17 @@ func (d BookingData) rejectedContent() content {
 	c.Subject = tf(loc, "rejected.subject", d.VillaName)
 	c.Heading = t(loc, "rejected.heading")
 	c.Greeting = tf(loc, "greeting", d.GuestName)
+	// A refusal is the one email that names the other property: the dates are
+	// what fell through, not the stay, and the sibling is often free.
+	elsewhere := t(loc, "rejected.p3.nosibling")
+	if d.OtherVillaName != "" {
+		elsewhere = tf(loc, "rejected.p3", d.OtherVillaName)
+	}
 	c.Paragraphs = []string{
-		tf(loc, "rejected.p1", d.VillaName, formatDate(d.CheckIn, loc), formatDate(d.CheckOut, loc)),
-		t(loc, "rejected.p2"),
+		tf(loc, "rejected.p1", d.VillaName),
+		tf(loc, "rejected.p2", formatDate(d.CheckIn, loc), formatDate(d.CheckOut, loc)),
+		elsewhere,
+		t(loc, "rejected.p4"),
 	}
 	return c
 }
@@ -116,7 +153,7 @@ func (d BookingData) cancelledContent() content {
 		tf(loc, "cancelled.p1", d.VillaName, formatDate(d.CheckIn, loc), formatDate(d.CheckOut, loc)),
 		t(loc, "cancelled.p2"),
 	}
-	c.Details = d.stayDetails(loc)
+	c.Details = d.stayDetails(loc, true)
 	return c
 }
 
@@ -134,7 +171,7 @@ func (d BookingData) ownerContent() content {
 	if message == "" {
 		message = t(loc, "owner.nomessage")
 	}
-	c.Details = append(d.stayDetails(loc),
+	c.Details = append(d.stayDetails(loc, false),
 		detail{Label: t(loc, "label.name"), Value: d.GuestName},
 		detail{Label: t(loc, "label.email"), Value: d.GuestEmail},
 		detail{Label: t(loc, "label.phone"), Value: d.GuestPhone},
@@ -149,7 +186,9 @@ func (m *Mailer) SendGuestRequestReceived(ctx context.Context, d BookingData) er
 	return m.sendGuest(ctx, d, "received", d.receivedContent())
 }
 
-// SendGuestApproved tells the guest the stay is confirmed.
+// SendGuestApproved accepts the request and opens the contract stage: it asks
+// the guest for the traveller details the contract needs. The dates are only
+// held for good once the deposit arrives, which the email says in as many words.
 func (m *Mailer) SendGuestApproved(ctx context.Context, d BookingData) error {
 	return m.sendGuest(ctx, d, "approved", d.approvedContent())
 }
