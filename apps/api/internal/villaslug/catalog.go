@@ -37,3 +37,23 @@ func All() []string {
 	}
 	return out
 }
+
+// sibling pairs the two properties: when one can't take a request, the other
+// is the first thing worth offering. Written out rather than derived from
+// known, so adding a third villa surfaces here as a decision to make instead
+// of silently naming an arbitrary one.
+var sibling = map[string]string{
+	"casadana":  "casacasay",
+	"casacasay": "casadana",
+}
+
+// OtherDisplayName returns the guest-facing name of the other property, or an
+// empty string when the slug has no single obvious counterpart. Callers are
+// expected to drop the mention entirely rather than print a placeholder.
+func OtherDisplayName(slug string) string {
+	other, ok := sibling[slug]
+	if !ok {
+		return ""
+	}
+	return DisplayName(other)
+}
