@@ -24,7 +24,7 @@
                 <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.1;color:#16294f;">
                   Casa <em>DaNa</em> &amp; <em>CasAy</em>
                 </div>
-                <div style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a6a3b;padding-top:10px;">
+                <div style="font-family:'Courier New',Courier,monospace;font-size:10px;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#8a6a3b;padding-top:10px;">
                   {{ .Tagline }}
                 </div>
               </td>
@@ -65,6 +65,37 @@
                   </tr>
                   {{ end }}
                 </table>
+              </td>
+            </tr>
+            {{ end }}
+            {{ with .ChecklistsIntro }}
+            <tr>
+              <td style="padding:28px 40px 0 40px;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#3d4453;">
+                {{ . }}
+              </td>
+            </tr>
+            {{ end }}
+            {{ range .Checklists }}
+            <tr>
+              <td style="padding:26px 40px 0 40px;">
+                <div style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7c8290;">
+                  {{ .Title }}
+                </div>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="padding-top:6px;">
+                  {{ range .Items }}
+                  <tr>
+                    <td style="padding:6px 10px 0 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#8a6a3b;width:1px;vertical-align:top;">&bull;</td>
+                    <td style="padding:6px 0 0 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#16294f;vertical-align:top;">{{ . }}</td>
+                  </tr>
+                  {{ end }}
+                </table>
+              </td>
+            </tr>
+            {{ end }}
+            {{ range .Closing }}
+            <tr>
+              <td style="padding:20px 40px 0 40px;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#3d4453;">
+                {{ . }}
               </td>
             </tr>
             {{ end }}

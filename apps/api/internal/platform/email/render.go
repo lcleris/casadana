@@ -23,6 +23,14 @@ type detail struct {
 	Value string
 }
 
+// checklist is a titled set of bullet points — what an email asks the reader
+// to send back. Kept apart from Paragraphs because a list of things to gather
+// is scanned, not read.
+type checklist struct {
+	Title string
+	Items []string
+}
+
 // content is everything the shared layout needs. Every email in this package
 // is the same layout with different content, which is what keeps five
 // transactional messages from drifting into five different-looking emails.
@@ -35,6 +43,14 @@ type content struct {
 	Greeting   string
 	Paragraphs []string
 	Details    []detail
+	// ChecklistsIntro is the line that introduces the bullet lists. It has to
+	// sit against them rather than in Paragraphs: "the details below" must not
+	// end up pointing at the stay recap.
+	ChecklistsIntro string
+	Checklists      []checklist
+	// Closing is the copy that only makes sense once the reader has seen the
+	// recap: Paragraphs lead into the table, Closing picks up after it.
+	Closing    []string
 	Note       string
 	SignedName string
 	SignedRole string
