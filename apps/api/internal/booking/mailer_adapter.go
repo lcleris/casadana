@@ -22,16 +22,19 @@ func NewResendMailer(m *email.Mailer) Mailer { return &ResendMailer{inner: m} }
 // something a guest reads.
 func mailData(b *Booking) email.BookingData {
 	return email.BookingData{
-		ID:         b.ID,
-		VillaName:  villaslug.DisplayName(b.VillaSlug),
-		GuestName:  b.GuestName,
-		GuestEmail: b.GuestEmail,
-		GuestPhone: b.GuestPhone,
-		CheckIn:    b.CheckIn,
-		CheckOut:   b.CheckOut,
-		Adults:     b.Adults,
-		Children:   b.Children,
-		Message:    b.Message,
+		ID:        b.ID,
+		VillaName: villaslug.DisplayName(b.VillaSlug),
+		// The refusal email offers the other property by name. Empty for an
+		// unknown slug, which drops the mention rather than inventing one.
+		OtherVillaName: villaslug.OtherDisplayName(b.VillaSlug),
+		GuestName:      b.GuestName,
+		GuestEmail:     b.GuestEmail,
+		GuestPhone:     b.GuestPhone,
+		CheckIn:        b.CheckIn,
+		CheckOut:       b.CheckOut,
+		Adults:         b.Adults,
+		Children:       b.Children,
+		Message:        b.Message,
 		// The locale the guest browsed in, captured at request time. Guest mail
 		// sent weeks later — an approval, a cancellation — is still written in
 		// their language because of it.

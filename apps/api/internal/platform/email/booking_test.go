@@ -26,7 +26,10 @@ func sample(loc Locale) BookingData {
 		Adults:     2,
 		Children:   1,
 		Message:    "Nous arriverons tard le soir.",
-		Locale:     loc,
+
+		OtherVillaName: "Casa CasAy",
+
+		Locale: loc,
 	}
 }
 
@@ -58,9 +61,13 @@ func TestContents_AreCompleteInEveryLocale(t *testing.T) {
 			if len(c.Paragraphs) == 0 {
 				t.Errorf("%s/%s: no body copy", loc, kind)
 			}
-			for _, s := range append([]string{c.Subject, c.Heading, c.Greeting, c.Note}, c.Paragraphs...) {
+			for _, s := range everyString(c) {
 				if strings.Contains(s, "%!") || strings.Contains(s, "%s") || strings.Contains(s, "%d") {
 					t.Errorf("%s/%s: unfilled placeholder in %q", loc, kind, s)
+				}
+				// A pipe means a bullet list was rendered as one run-on line.
+				if strings.Contains(s, "|") {
+					t.Errorf("%s/%s: unsplit list in %q", loc, kind, s)
 				}
 			}
 		}
@@ -170,5 +177,86 @@ func TestStayDetails_NightsAndGuests(t *testing.T) {
 	odd.CheckOut = odd.CheckIn
 	if got := odd.nights(); got != 0 {
 		t.Errorf("nights for an empty range = %d, want 0", got)
+	}
+}
+
+// everyString flattens every piece of copy an email renders, so a completeness
+// sweep covers the blocks below the recap table too — those are where an
+// approval now keeps most of its text.
+func everyString(c content) []string {
+	out := []string{c.Subject, c.Heading, c.Greeting, c.Note, c.Tagline, c.ChecklistsIntro}
+	out = append(out, c.Paragraphs...)
+	out = append(out, c.Closing...)
+	for _, d := range c.Details {
+		out = append(out, d.Label, d.Value)
+	}
+	for _, l := range c.Checklists {
+		out = append(out, l.Title)
+		out = append(out, l.Items...)
+	}
+	return out
+}
+
+// An approval is the email that collects the traveller details the Spanish
+// register requires: if the list renders empty, the owners find out weeks later
+// when they have no contract to write.
+func TestApprovedContent_AsksForTravellerDetails(t *testing.T) {
+	for _, loc := range []Locale{LocaleFR, LocaleEN, LocaleES} {
+		c := sample(loc).approvedContent()
+		if len(c.Checklists) != 2 {
+			t.Fatalf("%s: %d checklists, want 2", loc, len(c.Checklists))
+		}
+		if got := len(c.Checklists[0].Items); got != 5 {
+			t.Errorf("%s: booker asked for %d details, want 5", loc, got)
+		}
+		for _, l := range c.Checklists {
+			if l.Title == "" {
+				t.Errorf("%s: untitled checklist", loc)
+			}
+			if len(l.Items) == 0 {
+				t.Errorf("%s: checklist %q has no items", loc, l.Title)
+			}
+		}
+	}
+}
+
+// A refusal points at the other property by name — that is the whole reason
+// the email is worth sending — but must not leave a dangling clause when there
+// is no other property to name.
+func TestRejectedContent_NamesTheOtherVilla(t *testing.T) {
+	joined := func(c content) string { return strings.Join(c.Paragraphs, "\n") }
+
+	with := joined(sample(LocaleFR).rejectedContent())
+	if !strings.Contains(with, "Casa CasAy") {
+		t.Errorf("refusal does not name the other villa: %q", with)
+	}
+
+	alone := sample(LocaleFR)
+	alone.OtherVillaName = ""
+	without := joined(alone.rejectedContent())
+	if strings.Contains(without, "second logement") {
+		t.Errorf("refusal promises a second property there isn't one: %q", without)
+	}
+	if !strings.Contains(without, "d'autres dates") {
+		t.Errorf("refusal dropped the invitation to try other dates: %q", without)
+	}
+}
+
+// The arrival window belongs in guest mail, where a guest goes looking for it,
+// and nowhere near the owners' notification.
+func TestStayDetails_ArrivalWindowIsGuestFacingOnly(t *testing.T) {
+	d := sample(LocaleFR)
+
+	guest := d.receivedContent()
+	if !strings.Contains(guest.Details[1].Value, "entre 16h et 22h") {
+		t.Errorf("guest check-in = %q, want the arrival window", guest.Details[1].Value)
+	}
+	if !strings.Contains(guest.Details[2].Value, "avant 11h") {
+		t.Errorf("guest check-out = %q, want the departure deadline", guest.Details[2].Value)
+	}
+
+	owner := d.ownerContent()
+	if strings.Contains(owner.Details[1].Value, "16h") {
+		t.Errorf("owner check-in = %q, want the bare date", owner.Details[1].Value)
 	}
 }
