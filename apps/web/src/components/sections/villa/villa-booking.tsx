@@ -58,6 +58,23 @@ const getDaysOfWeek = () => [
 // with a 422.
 const MAX_WINDOW_DAYS = 400
 
+type NightState = "free" | "booked" | "pending"
+
+const NIGHT_FILL: Record<NightState, string> = {
+  free: "transparent",
+  booked: "var(--color-surface-dim)",
+  pending: "color-mix(in oklch, var(--color-secondary-container) 55%, transparent)",
+}
+
+// A calendar day holds the end of the previous night (morning, top-left) and
+// the start of its own night (afternoon, bottom-right). Splitting the cell on
+// the diagonal shows a changeover day as half taken: one guest checks out in
+// the morning, the next can check in that afternoon.
+function dayBackground(morning: NightState, afternoon: NightState): string | undefined {
+  if (morning === "free" && afternoon === "free") return undefined
+  return `linear-gradient(to bottom right, ${NIGHT_FILL[morning]} 50%, ${NIGHT_FILL[afternoon]} 50%)`
+}
+
 function fmt(date: Date) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
@@ -249,6 +266,28 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   const isBlocked = (date: Date) => blockedNights.has(format(date, "yyyy-MM-dd"))
   const isPendingDate = (date: Date) => pendingNights.has(format(date, "yyyy-MM-dd"))
   const isUnavailable = (date: Date) => isBlocked(date) || isPendingDate(date)
+  const nightState = (date: Date): NightState =>
+    isBlocked(date) ? "booked" : isPendingDate(date) ? "pending" : "free"
+
+  // A stay only occupies its nights: arrival day up to the day before
+  // departure. The departure day is left out on purpose — check-out is in the
+  // morning and check-in in the afternoon, so one guest can leave on the day
+  // the next one arrives.
+  const isStayFree = (from: Date, to: Date) => {
+    for (let day = from; day < to; day = addDays(day, 1)) {
+      if (isUnavailable(day)) return false
+    }
+    return true
+  }
+
+  // Default departure for a fresh arrival: a week later, cut short at the
+  // next held night so the suggestion never runs into another stay.
+  const defaultCheckOutFrom = (arrival: Date) => {
+    const latest = addDays(arrival, 7)
+    let departure = addDays(arrival, 1)
+    while (departure < latest && !isUnavailable(departure)) departure = addDays(departure, 1)
+    return departure
+  }
 
   // `nights` is the API's own answer for every day in the window: a per-date
   // override wins, then the highest matching season rule, then the villa's base
@@ -336,18 +375,24 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     return out
   }, [viewMonth])
 
+  // Whether `date` can end the stay being picked. Its own night may be held —
+  // that is the next guest arriving the same afternoon.
+  const canDepartOn = (date: Date) =>
+    activeField === "out" && date > checkIn && isStayFree(checkIn, date)
+
   const pickDate = (date: Date) => {
-    if (isUnavailable(date)) return
-    if (activeField === "in" || date < checkIn) {
-      setValue("checkIn", date, { shouldDirty: true })
-      if (checkOut <= date) {
-        setValue("checkOut", new Date(date.getTime() + 7 * 86_400_000), { shouldDirty: true })
-      }
-      setActiveField("out")
-    } else {
+    if (canDepartOn(date)) {
       setValue("checkOut", date, { shouldDirty: true })
       setActiveField(null)
+      return
     }
+    // Anything else starts a new stay, which needs its first night free.
+    if (isUnavailable(date)) return
+    setValue("checkIn", date, { shouldDirty: true })
+    if (checkOut <= date || !isStayFree(date, checkOut)) {
+      setValue("checkOut", defaultCheckOutFrom(date), { shouldDirty: true })
+    }
+    setActiveField("out")
   }
 
   const openCal = (field: "in" | "out") => {
@@ -505,58 +550,105 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                       </span>
                     )
                   }
-                  if (isBlocked(cell.date)) {
-                    return (
-                      <span
-                        key={i}
-                        aria-disabled="true"
-                        title={m.villa_booking_night_booked()}
-                        className="text-on-surface-variant/40 flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px] line-through"
-                      >
-                        {cell.d}
-                      </span>
-                    )
-                  }
-                  if (isPendingDate(cell.date)) {
-                    return (
-                      <span
-                        key={i}
-                        aria-disabled="true"
-                        title={m.villa_booking_night_pending()}
-                        className="text-secondary decoration-secondary/60 flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px] underline decoration-dashed decoration-2 underline-offset-4"
-                      >
-                        {cell.d}
-                      </span>
-                    )
-                  }
                   const isCI = sameDay(cell.date, checkIn)
                   const isCO = sameDay(cell.date, checkOut)
+                  const morning = nightState(addDays(cell.date, -1))
+                  const afternoon = nightState(cell.date)
+                  const background = dayBackground(morning, afternoon)
+                  // A held night can still be picked as the departure day.
+                  const departureOnly = afternoon !== "free" && canDepartOn(cell.date)
+                  const selectable = isCI || isCO || departureOnly
+                  if (!selectable && afternoon !== "free") {
+                    return (
+                      <span
+                        key={i}
+                        aria-disabled="true"
+                        title={
+                          afternoon === "booked"
+                            ? m.villa_booking_night_booked()
+                            : m.villa_booking_night_pending()
+                        }
+                        style={{ backgroundImage: background }}
+                        className={cn(
+                          "flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px]",
+                          afternoon === "booked"
+                            ? "text-on-surface-variant/50 line-through"
+                            : "text-secondary decoration-secondary/60 underline decoration-dashed decoration-2 underline-offset-4",
+                        )}
+                      >
+                        {cell.d}
+                      </span>
+                    )
+                  }
+                  // Free afternoon after a held night: the previous guest
+                  // leaves that morning, the next one can arrive.
+                  const arrivalAfterDeparture = afternoon === "free" && morning !== "free"
                   const inRange = cell.date > checkIn && cell.date < checkOut
-                  const showPrice = !(isCI || isCO)
+                  // No night is bought on a departure day, so it carries no price.
+                  const showPrice = !(isCI || isCO || departureOnly)
                   const priceCents = priceCentsFor(cell.date)
                   return (
                     <button
                       key={i}
                       type="button"
+                      title={
+                        departureOnly
+                          ? m.villa_booking_departure_only()
+                          : arrivalAfterDeparture
+                            ? m.villa_booking_arrival_after_departure()
+                            : undefined
+                      }
                       onClick={() => pickDate(cell.date as Date)}
+                      style={{ backgroundImage: background }}
                       className={cn(
-                        "text-on-surface flex min-h-[42px] flex-col items-center justify-center gap-0.5 text-[13px] transition-colors",
+                        "text-on-surface flex min-h-[42px] items-center justify-center text-[13px] transition-colors",
                         inRange && "bg-secondary-container text-on-secondary-container",
-                        (isCI || isCO) &&
-                          "bg-primary text-on-primary mx-auto size-[42px] rounded-full",
                         !inRange && !isCI && !isCO && "hover:bg-surface-container-low",
                       )}
                     >
-                      <span>{cell.d}</span>
-                      {showPrice && (
-                        <span className="text-on-surface-variant font-mono text-[9px] leading-none">
-                          €{Math.round(priceCents / 100)}
-                        </span>
-                      )}
+                      <span
+                        className={cn(
+                          "flex flex-col items-center justify-center gap-0.5",
+                          (isCI || isCO) && "bg-primary text-on-primary size-[42px] rounded-full",
+                        )}
+                      >
+                        <span>{cell.d}</span>
+                        {showPrice && (
+                          <span className="text-on-surface-variant font-mono text-[9px] leading-none">
+                            €{Math.round(priceCents / 100)}
+                          </span>
+                        )}
+                      </span>
                     </button>
                   )
                 })}
               </div>
+              <ul className="text-on-surface-variant mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-[9.5px] tracking-[0.12em] uppercase">
+                <li className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="size-3"
+                    style={{ backgroundImage: dayBackground("booked", "booked") }}
+                  />
+                  {m.villa_booking_night_booked()}
+                </li>
+                <li className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="size-3"
+                    style={{ backgroundImage: dayBackground("pending", "pending") }}
+                  />
+                  {m.villa_booking_night_pending()}
+                </li>
+                <li className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="border-outline-variant size-3 border"
+                    style={{ backgroundImage: dayBackground("booked", "free") }}
+                  />
+                  {m.villa_booking_legend_changeover()}
+                </li>
+              </ul>
             </div>
           )}
         </div>
