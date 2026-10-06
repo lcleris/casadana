@@ -36,7 +36,8 @@ interface VillaBookingProps {
 interface BookingFormValues {
   name: string
   checkIn: Date
-  checkOut: Date
+  // Null until the guest picks it: no stay length is suggested for them.
+  checkOut: Date | null
   guests: number
   email: string
   tel: string
@@ -57,6 +58,23 @@ const getDaysOfWeek = () => [
 // pricing service). Kept in sync by hand — the API answers a wider window
 // with a 422.
 const MAX_WINDOW_DAYS = 400
+
+type NightState = "free" | "booked" | "pending"
+
+const NIGHT_FILL: Record<NightState, string> = {
+  free: "transparent",
+  booked: "var(--color-surface-dim)",
+  pending: "color-mix(in oklch, var(--color-secondary-container) 55%, transparent)",
+}
+
+// A calendar day holds the end of the previous night (morning, top-left) and
+// the start of its own night (afternoon, bottom-right). Splitting the cell on
+// the diagonal shows a changeover day as half taken: one guest checks out in
+// the morning, the next can check in that afternoon.
+function dayBackground(morning: NightState, afternoon: NightState): string | undefined {
+  if (morning === "free" && afternoon === "free") return undefined
+  return `linear-gradient(to bottom right, ${NIGHT_FILL[morning]} 50%, ${NIGHT_FILL[afternoon]} 50%)`
+}
 
 function fmt(date: Date) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
@@ -82,26 +100,24 @@ function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
-// Default arrival = tomorrow (gives the guest at least one day of buffer);
-// default departure = +7 nights from arrival.
-function defaultDates(): { checkIn: Date; checkOut: Date } {
-  const today = startOfDay(new Date())
-  const checkIn = addDays(today, 1)
-  const checkOut = addDays(checkIn, 7)
-  return { checkIn, checkOut }
-}
+// Characters a phone number may contain. Anything else is dropped as it is
+// typed, so letters never reach the field.
+const NOT_PHONE_CHAR = /[^0-9+\s().-]/g
+// 6–15 digits once the separators are ignored, with an optional leading +.
+const PHONE_PATTERN = /^\+?[\s().-]*(?:\d[\s().-]*){6,15}$/
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) {
   // Computed once at mount — dates won't shift if the user keeps the page open
   // across midnight, which is fine for a booking flow.
-  const defaults = useMemo(defaultDates, [])
+  const today = useMemo(() => startOfDay(new Date()), [])
 
   const { control, register, handleSubmit, watch, setValue, setError } = useForm<BookingFormValues>(
     {
       defaultValues: {
         name: "",
-        checkIn: defaults.checkIn,
-        checkOut: defaults.checkOut,
+        checkIn: today,
+        checkOut: null,
         guests: booking.defaultGuests,
         email: "",
         tel: "",
@@ -112,11 +128,17 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
   const checkIn = watch("checkIn")
   const checkOut = watch("checkOut")
+  // Where the stay ends for pricing and the calendar window: the arrival day
+  // itself (zero nights) until a departure is picked.
+  const stayEnd = checkOut ?? checkIn
   const guests = watch("guests")
 
   const [activeField, setActiveField] = useState<"in" | "out" | null>(null)
+  // Day under the pointer while the departure is being picked, so the stay
+  // can be previewed before the click that sets it.
+  const [hoverDate, setHoverDate] = useState<Date | null>(null)
   const [viewMonth, setViewMonth] = useState<Date>(
-    () => new Date(defaults.checkIn.getFullYear(), defaults.checkIn.getMonth(), 1),
+    () => new Date(today.getFullYear(), today.getMonth(), 1),
   )
   const popRef = useRef<HTMLDivElement | null>(null)
   const ciRef = useRef<HTMLButtonElement | null>(null)
@@ -173,7 +195,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     // day takes one extra day.
     const calTo = addDays(endOfMonth(addMonths(viewMonth, 1)), 1)
     let from = checkIn < calFrom ? checkIn : calFrom
-    let to = checkOut > calTo ? checkOut : calTo
+    let to = stayEnd > calTo ? stayEnd : calTo
     // The API rejects a window wider than MAX_WINDOW_DAYS, which a guest can
     // reach by browsing a year away from their own dates. The stay wins that
     // budget — the sidebar total is the number that has to be right — and the
@@ -183,7 +205,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       else to = addDays(from, MAX_WINDOW_DAYS)
     }
     return { from: format(from, "yyyy-MM-dd"), to: format(to, "yyyy-MM-dd") }
-  }, [viewMonth, checkIn, checkOut])
+  }, [viewMonth, checkIn, stayEnd])
 
   const { data: availability } = useGetVillaAvailability(
     villaSlug,
@@ -249,6 +271,19 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   const isBlocked = (date: Date) => blockedNights.has(format(date, "yyyy-MM-dd"))
   const isPendingDate = (date: Date) => pendingNights.has(format(date, "yyyy-MM-dd"))
   const isUnavailable = (date: Date) => isBlocked(date) || isPendingDate(date)
+  const nightState = (date: Date): NightState =>
+    isBlocked(date) ? "booked" : isPendingDate(date) ? "pending" : "free"
+
+  // A stay only occupies its nights: arrival day up to the day before
+  // departure. The departure day is left out on purpose — check-out is in the
+  // morning and check-in in the afternoon, so one guest can leave on the day
+  // the next one arrives.
+  const isStayFree = (from: Date, to: Date) => {
+    for (let day = from; day < to; day = addDays(day, 1)) {
+      if (isUnavailable(day)) return false
+    }
+    return true
+  }
 
   // `nights` is the API's own answer for every day in the window: a per-date
   // override wins, then the highest matching season rule, then the villa's base
@@ -269,17 +304,17 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   const priceCentsFor = (date: Date): number =>
     nightPricesByDate.get(format(date, "yyyy-MM-dd")) ?? baseNightlyCents
 
-  const nights = nightsBetween(checkIn, checkOut)
+  const nights = nightsBetween(checkIn, stayEnd)
   // Inline the per-night lookup to keep the dep array honest (priceCentsFor is
   // a plain function reference that React can't track).
   const nightsCents = useMemo(() => {
     let sum = 0
-    for (let day = new Date(checkIn); day < checkOut; day = addDays(day, 1)) {
+    for (let day = new Date(checkIn); day < stayEnd; day = addDays(day, 1)) {
       const key = format(day, "yyyy-MM-dd")
       sum += nightPricesByDate.get(key) ?? baseNightlyCents
     }
     return sum
-  }, [checkIn, checkOut, nightPricesByDate, baseNightlyCents])
+  }, [checkIn, stayEnd, nightPricesByDate, baseNightlyCents])
   const nightsSubtotal = nightsCents / 100
   const cleaningFee = cleaningFeeCents / 100
   const conciergeFee = conciergeFeeCents / 100
@@ -291,7 +326,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   // whenever seasonal rates or overrides make the stay span more than one tier.
   const priceBreakdown = useMemo(() => {
     const counts = new Map<number, number>()
-    for (let day = new Date(checkIn); day < checkOut; day = addDays(day, 1)) {
+    for (let day = new Date(checkIn); day < stayEnd; day = addDays(day, 1)) {
       const key = format(day, "yyyy-MM-dd")
       const priceCents = nightPricesByDate.get(key) ?? baseNightlyCents
       counts.set(priceCents, (counts.get(priceCents) ?? 0) + 1)
@@ -299,7 +334,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     return Array.from(counts.entries())
       .map(([priceCents, count]) => ({ priceCents, count }))
       .sort((a, b) => a.priceCents - b.priceCents)
-  }, [checkIn, checkOut, nightPricesByDate, baseNightlyCents])
+  }, [checkIn, stayEnd, nightPricesByDate, baseNightlyCents])
 
   useEffect(() => {
     if (!activeField) return
@@ -336,27 +371,57 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     return out
   }, [viewMonth])
 
+  // Whether `date` can end the stay being picked. Its own night may be held —
+  // that is the next guest arriving the same afternoon.
+  const canDepartOn = (date: Date) =>
+    activeField === "out" && date > checkIn && isStayFree(checkIn, date)
+
   const pickDate = (date: Date) => {
-    if (isUnavailable(date)) return
-    if (activeField === "in" || date < checkIn) {
-      setValue("checkIn", date, { shouldDirty: true })
-      if (checkOut <= date) {
-        setValue("checkOut", new Date(date.getTime() + 7 * 86_400_000), { shouldDirty: true })
-      }
-      setActiveField("out")
-    } else {
+    if (canDepartOn(date)) {
       setValue("checkOut", date, { shouldDirty: true })
       setActiveField(null)
+      setHoverDate(null)
+      return
     }
+    // Anything else starts a new stay, which needs its first night free. The
+    // departure is cleared: the guest picks it next, with a live preview.
+    if (isUnavailable(date) || date < today) return
+    setValue("checkIn", date, { shouldDirty: true })
+    setValue("checkOut", null, { shouldDirty: true })
+    setActiveField("out")
   }
 
   const openCal = (field: "in" | "out") => {
     setActiveField(field)
-    const target = field === "in" ? checkIn : checkOut
+    const target = field === "in" ? checkIn : stayEnd
     setViewMonth(new Date(target.getFullYear(), target.getMonth(), 1))
   }
 
+  // While the departure is being picked, the hovered day stands in for it.
+  const previewOut = activeField === "out" && hoverDate && canDepartOn(hoverDate) ? hoverDate : null
+  const shownOut = previewOut ?? checkOut
+
+  // First rule the request breaks, shown under the disabled button. Dates come
+  // first: they are the part a guest cannot fix by typing.
+  const name = watch("name")
+  const email = watch("email")
+  const tel = watch("tel")
+  const blockReason = !checkOut
+    ? m.villa_booking_reason_pick_departure()
+    : !isStayFree(checkIn, checkOut)
+      ? m.villa_booking_reason_dates_unavailable()
+      : !name.trim() || !email.trim() || !tel.trim()
+        ? m.villa_booking_reason_fill_contact()
+        : !EMAIL_PATTERN.test(email.trim())
+          ? m.villa_booking_reason_invalid_email()
+          : !PHONE_PATTERN.test(tel.trim())
+            ? m.villa_booking_reason_invalid_phone()
+            : null
+
+  const telField = register("tel", { required: true, pattern: PHONE_PATTERN })
+
   const onSubmit = (values: BookingFormValues) => {
+    if (!values.checkOut || blockReason) return
     createBooking({
       data: {
         villa_slug: villaSlug,
@@ -451,7 +516,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
               {m.villa_booking_check_out()}
             </span>
             <span className="font-display text-primary mt-1 block text-[17px] italic">
-              {fmt(checkOut)}
+              {checkOut ? fmt(checkOut) : m.villa_booking_add_date()}
             </span>
           </button>
 
@@ -485,7 +550,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                   <ChevronRight size={14} />
                 </button>
               </div>
-              <div className="grid grid-cols-7 gap-0.5">
+              <div className="grid grid-cols-7 gap-0.5" onMouseLeave={() => setHoverDate(null)}>
                 {getDaysOfWeek().map((d) => (
                   <div
                     key={d}
@@ -495,7 +560,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                   </div>
                 ))}
                 {cells.map((cell, i) => {
-                  if (cell.muted || !cell.date) {
+                  if (cell.muted || !cell.date || cell.date < today) {
                     return (
                       <span
                         key={i}
@@ -505,58 +570,110 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                       </span>
                     )
                   }
-                  if (isBlocked(cell.date)) {
-                    return (
-                      <span
-                        key={i}
-                        aria-disabled="true"
-                        title={m.villa_booking_night_booked()}
-                        className="text-on-surface-variant/40 flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px] line-through"
-                      >
-                        {cell.d}
-                      </span>
-                    )
-                  }
-                  if (isPendingDate(cell.date)) {
-                    return (
-                      <span
-                        key={i}
-                        aria-disabled="true"
-                        title={m.villa_booking_night_pending()}
-                        className="text-secondary decoration-secondary/60 flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px] underline decoration-dashed decoration-2 underline-offset-4"
-                      >
-                        {cell.d}
-                      </span>
-                    )
-                  }
                   const isCI = sameDay(cell.date, checkIn)
-                  const isCO = sameDay(cell.date, checkOut)
-                  const inRange = cell.date > checkIn && cell.date < checkOut
-                  const showPrice = !(isCI || isCO)
+                  const isCO = shownOut !== null && sameDay(cell.date, shownOut)
+                  const morning = nightState(addDays(cell.date, -1))
+                  const afternoon = nightState(cell.date)
+                  const background = dayBackground(morning, afternoon)
+                  // A held night can still be picked as the departure day.
+                  const departureOnly = afternoon !== "free" && canDepartOn(cell.date)
+                  const selectable = isCI || isCO || departureOnly
+                  if (!selectable && afternoon !== "free") {
+                    return (
+                      <span
+                        key={i}
+                        aria-disabled="true"
+                        title={
+                          afternoon === "booked"
+                            ? m.villa_booking_night_booked()
+                            : m.villa_booking_night_pending()
+                        }
+                        style={{ backgroundImage: background }}
+                        className={cn(
+                          "flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px]",
+                          afternoon === "booked"
+                            ? "text-on-surface-variant/50 line-through"
+                            : "text-secondary decoration-secondary/60 underline decoration-dashed decoration-2 underline-offset-4",
+                        )}
+                      >
+                        {cell.d}
+                      </span>
+                    )
+                  }
+                  // Free afternoon after a held night: the previous guest
+                  // leaves that morning, the next one can arrive.
+                  const arrivalAfterDeparture = afternoon === "free" && morning !== "free"
+                  const inRange = shownOut !== null && cell.date > checkIn && cell.date < shownOut
+                  // No night is bought on a departure day, so it carries no price.
+                  const showPrice = !(isCI || isCO || departureOnly)
                   const priceCents = priceCentsFor(cell.date)
                   return (
                     <button
                       key={i}
                       type="button"
+                      title={
+                        departureOnly
+                          ? m.villa_booking_departure_only()
+                          : arrivalAfterDeparture
+                            ? m.villa_booking_arrival_after_departure()
+                            : undefined
+                      }
                       onClick={() => pickDate(cell.date as Date)}
+                      onMouseEnter={() => setHoverDate(cell.date as Date)}
+                      style={{ backgroundImage: background }}
                       className={cn(
-                        "text-on-surface flex min-h-[42px] flex-col items-center justify-center gap-0.5 text-[13px] transition-colors",
-                        inRange && "bg-secondary-container text-on-secondary-container",
-                        (isCI || isCO) &&
-                          "bg-primary text-on-primary mx-auto size-[42px] rounded-full",
+                        "text-on-surface flex min-h-[42px] items-center justify-center text-[13px] transition-colors",
+                        inRange &&
+                          (previewOut
+                            ? "bg-secondary-container/50 text-on-secondary-container"
+                            : "bg-secondary-container text-on-secondary-container"),
                         !inRange && !isCI && !isCO && "hover:bg-surface-container-low",
                       )}
                     >
-                      <span>{cell.d}</span>
-                      {showPrice && (
-                        <span className="text-on-surface-variant font-mono text-[9px] leading-none">
-                          €{Math.round(priceCents / 100)}
-                        </span>
-                      )}
+                      <span
+                        className={cn(
+                          "flex flex-col items-center justify-center gap-0.5",
+                          (isCI || isCO) && "bg-primary text-on-primary size-[42px] rounded-full",
+                          isCO && previewOut && "bg-primary/70",
+                        )}
+                      >
+                        <span>{cell.d}</span>
+                        {showPrice && (
+                          <span className="text-on-surface-variant font-mono text-[9px] leading-none">
+                            €{Math.round(priceCents / 100)}
+                          </span>
+                        )}
+                      </span>
                     </button>
                   )
                 })}
               </div>
+              <ul className="text-on-surface-variant mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-[9.5px] tracking-[0.12em] uppercase">
+                <li className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="size-3"
+                    style={{ backgroundImage: dayBackground("booked", "booked") }}
+                  />
+                  {m.villa_booking_night_booked()}
+                </li>
+                <li className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="size-3"
+                    style={{ backgroundImage: dayBackground("pending", "pending") }}
+                  />
+                  {m.villa_booking_night_pending()}
+                </li>
+                <li className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="border-outline-variant size-3 border"
+                    style={{ backgroundImage: dayBackground("booked", "free") }}
+                  />
+                  {m.villa_booking_legend_changeover()}
+                </li>
+              </ul>
             </div>
           )}
         </div>
@@ -618,7 +735,7 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
               autoComplete="email"
               placeholder={m.villa_booking_email_placeholder()}
               className={inputClassName}
-              {...register("email", { required: true })}
+              {...register("email", { required: true, pattern: EMAIL_PATTERN })}
             />
           </label>
           <label className="border-outline-variant block border-b px-4 py-3">
@@ -631,7 +748,11 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
               autoComplete="tel"
               placeholder={m.villa_booking_phone_placeholder()}
               className={inputClassName}
-              {...register("tel", { required: true })}
+              {...telField}
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(NOT_PHONE_CHAR, "")
+                return telField.onChange(e)
+              }}
             />
           </label>
           <label className="border-outline-variant block border-b px-4 py-3">
@@ -655,12 +776,17 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || blockReason !== null}
           className="bg-primary text-on-primary hover:bg-primary-container mt-4 inline-flex h-auto w-full items-center justify-center gap-3 rounded-none px-6 py-[18px] font-mono text-[11px] tracking-[0.28em] uppercase disabled:opacity-60"
         >
           {isPending ? m.villa_booking_request_sending() : m.villa_booking_request_book()}
           {!isPending && <ArrowRight size={12} />}
         </Button>
+        {blockReason && (
+          <p className="text-on-surface-variant mt-2 text-center text-[12.5px]" role="status">
+            {blockReason}
+          </p>
+        )}
         <Button
           type="button"
           variant="outline"
@@ -670,47 +796,53 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
         </Button>
       </form>
 
-      <div className="border-outline-variant mt-6 grid gap-3 border-t pt-5 text-[13.5px]">
-        {priceBreakdown.length > 1 ? (
-          priceBreakdown.map(({ priceCents, count }) => (
-            <div key={priceCents} className="text-on-surface-variant flex justify-between">
+      {/* No total before a departure is picked: zero nights plus the fees
+          would read as a price for the stay. */}
+      {checkOut && (
+        <div className="border-outline-variant mt-6 grid gap-3 border-t pt-5 text-[13.5px]">
+          {priceBreakdown.length > 1 ? (
+            priceBreakdown.map(({ priceCents, count }) => (
+              <div key={priceCents} className="text-on-surface-variant flex justify-between">
+                <span>
+                  {m.villa_booking_nights_at_price({
+                    count,
+                    nightsWord:
+                      count === 1
+                        ? m.villa_booking_night_singular()
+                        : m.villa_booking_night_plural(),
+                    price: Math.round(priceCents / 100),
+                  })}
+                </span>
+                <span>€{((priceCents * count) / 100).toLocaleString()}</span>
+              </div>
+            ))
+          ) : (
+            <div className="text-on-surface-variant flex justify-between">
               <span>
-                {m.villa_booking_nights_at_price({
-                  count,
-                  nightsWord:
-                    count === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural(),
-                  price: Math.round(priceCents / 100),
-                })}
+                {nights}{" "}
+                {nights === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural()}
               </span>
-              <span>€{((priceCents * count) / 100).toLocaleString()}</span>
+              <span>€{nightsSubtotal.toLocaleString()}</span>
             </div>
-          ))
-        ) : (
-          <div className="text-on-surface-variant flex justify-between">
-            <span>
-              {nights}{" "}
-              {nights === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural()}
-            </span>
-            <span>€{nightsSubtotal.toLocaleString()}</span>
+          )}
+          {cleaningFee > 0 && (
+            <div className="text-on-surface-variant flex justify-between">
+              <span>{m.villa_booking_cleaning_fee()}</span>
+              <span>€{cleaningFee.toLocaleString()}</span>
+            </div>
+          )}
+          {conciergeFee > 0 && (
+            <div className="text-on-surface-variant flex justify-between">
+              <span>{m.villa_booking_concierge_fee()}</span>
+              <span>€{conciergeFee.toLocaleString()}</span>
+            </div>
+          )}
+          <div className="font-display text-primary border-outline-variant mt-1 flex justify-between border-t pt-3.5 text-[22px] italic">
+            <span>{m.villa_booking_total()}</span>
+            <span>€{total.toLocaleString()}</span>
           </div>
-        )}
-        {cleaningFee > 0 && (
-          <div className="text-on-surface-variant flex justify-between">
-            <span>{m.villa_booking_cleaning_fee()}</span>
-            <span>€{cleaningFee.toLocaleString()}</span>
-          </div>
-        )}
-        {conciergeFee > 0 && (
-          <div className="text-on-surface-variant flex justify-between">
-            <span>{m.villa_booking_concierge_fee()}</span>
-            <span>€{conciergeFee.toLocaleString()}</span>
-          </div>
-        )}
-        <div className="font-display text-primary border-outline-variant mt-1 flex justify-between border-t pt-3.5 text-[22px] italic">
-          <span>{m.villa_booking_total()}</span>
-          <span>€{total.toLocaleString()}</span>
         </div>
-      </div>
+      )}
       <p className="text-on-surface-variant mt-4 text-center text-xs italic">
         {m.villa_booking_no_charge_note()}
       </p>
