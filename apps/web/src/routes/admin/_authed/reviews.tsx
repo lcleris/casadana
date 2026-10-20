@@ -67,16 +67,16 @@ function ReviewsPage() {
   // ?page=3 would be rewritten to page 1 before the data ever arrived.
   useEffect(() => {
     if (data && page > maxPage) {
-      navigate({ replace: true, search: (prev) => ({ ...prev, page: maxPage }) })
+      void navigate({ replace: true, search: (prev) => ({ ...prev, page: maxPage }) })
     }
   }, [data, page, maxPage, navigate])
 
   const goToPage = (nextPage: number) => {
-    navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
+    void navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
   }
 
   const switchProperty = (nextProperty: Property) => {
-    navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
+    void navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
   }
 
   return (

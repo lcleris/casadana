@@ -7,9 +7,9 @@ import { ToastProvider } from "@/components/ui/toast"
 export const Route = createFileRoute("/admin/_authed")({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.fetchQuery(getAdminMeQueryOptions())
+      await context.queryClient.query(getAdminMeQueryOptions())
     } catch {
-      throw redirect({ to: "/admin/login" })
+      redirect({ to: "/admin/login", throw: true })
     }
   },
   component: AuthedAdminLayout,

@@ -8,7 +8,7 @@ import type { ReviewCategoryRatings } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -76,19 +76,19 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { register, handleSubmit, reset, watch, setValue } = useForm<AddReviewFormValues>({
+  const { register, handleSubmit, reset, control, setValue } = useForm<AddReviewFormValues>({
     defaultValues: DEFAULT_VALUES,
   })
-  const rating = watch("rating")
+  const rating = useWatch({ control, name: "rating" })
 
   const { mutate: createReview, isPending } = useCreateAdminReview({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListAdminReviewsQueryKey() })
-        queryClient.invalidateQueries({ queryKey: getListVillaReviewsQueryKey(property) })
+        void queryClient.invalidateQueries({ queryKey: getListAdminReviewsQueryKey() })
+        void queryClient.invalidateQueries({ queryKey: getListVillaReviewsQueryKey(property) })
         // An approved review shifts the computed figures, so the breakdown card
         // has to refetch alongside the lists.
-        queryClient.invalidateQueries({ queryKey: getGetVillaReviewMetaQueryKey(property) })
+        void queryClient.invalidateQueries({ queryKey: getGetVillaReviewMetaQueryKey(property) })
         toast("Avis ajouté")
         setOpen(false)
         reset(DEFAULT_VALUES)
@@ -102,7 +102,7 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
   const onSubmit = (values: AddReviewFormValues) => {
     const authorName = values.authorName.trim()
     const body = values.body.trim()
-    if (!authorName || !body) {
+    if (authorName === "" || body === "") {
       toast("Renseignez le nom et le commentaire")
       return
     }
@@ -129,7 +129,12 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Ajouter un avis</DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e)
+          }}
+          className="flex flex-col gap-3"
+        >
           <Field>
             <FieldLabel htmlFor="reviewAuthorName">Nom du voyageur</FieldLabel>
             <Input id="reviewAuthorName" {...register("authorName")} />

@@ -33,7 +33,7 @@ function PricingPage() {
   const navigate = useNavigate({ from: Route.fullPath })
 
   const switchProperty = (nextProperty: Property) => {
-    navigate({ search: (prev) => ({ ...prev, property: nextProperty }) })
+    void navigate({ search: (prev) => ({ ...prev, property: nextProperty }) })
   }
 
   return (

@@ -5,7 +5,7 @@ import {
 } from "@casa-dana/api"
 import type { PricingSettings } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { AdminCard } from "@/components/admin/ui/admin-card"
 import { AdminField, FieldActions, FieldGrid } from "@/components/admin/ui/admin-field"
@@ -45,6 +45,65 @@ function toForm(settings: PricingSettings, property: Property): BasePricingForm 
   }
 }
 
+interface BasePricingDraft {
+  source: PricingSettings | undefined
+  form: BasePricingForm
+}
+
+interface BasePricingFieldSpec {
+  key: keyof BasePricingForm
+  label: string
+  min: number
+}
+
+const FIELDS: Array<BasePricingFieldSpec> = [
+  { key: "basePrice", label: "Prix de base par nuit (€)", min: 0 },
+  { key: "minNights", label: "Nuits minimum", min: 1 },
+  { key: "cleaningFee", label: "Frais de ménage (€)", min: 0 },
+  { key: "conciergeFee", label: "Frais de conciergerie (€)", min: 0 },
+]
+
+function BasePricingFields({
+  form,
+  setField,
+}: {
+  form: BasePricingForm
+  setField: (key: keyof BasePricingForm, value: string) => void
+}) {
+  return (
+    <FieldGrid>
+      {FIELDS.map(({ key, label, min }) => (
+        <AdminField key={key} label={label} htmlFor={key}>
+          <Input
+            id={key}
+            type="number"
+            min={min}
+            value={form[key]}
+            onChange={(e) => {
+              setField(key, e.target.value)
+            }}
+          />
+        </AdminField>
+      ))}
+    </FieldGrid>
+  )
+}
+
+function useBasePricingForm(property: Property, settings: PricingSettings | undefined) {
+  const [draft, setDraft] = useState<BasePricingDraft | null>(null)
+
+  // The server copy re-seeds the form whenever it changes — the first load, and
+  // the refetch that follows a save: an edit only survives while it was made on
+  // top of the settings currently loaded. Switching villa remounts the card.
+  const seeded = settings === undefined ? EMPTY_FORM : toForm(settings, property)
+  const form = draft !== null && draft.source === settings ? draft.form : seeded
+
+  const setField = (key: keyof BasePricingForm, value: string) => {
+    setDraft({ source: settings, form: { ...form, [key]: value } })
+  }
+  return { form, setField }
+}
+
 interface BasePricingCardProps {
   property: Property
 }
@@ -53,22 +112,16 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
   const queryClient = useQueryClient()
   const { toast } = useToast()
   const { data: settings, isPending } = useGetVillaPricingSettings(property)
-  const [form, setForm] = useState<BasePricingForm>(EMPTY_FORM)
-
-  // Re-seed from the server copy whenever it changes — the first load, and the
-  // refetch that follows a save. Switching villa remounts the card entirely.
-  useEffect(() => {
-    if (settings) {
-      setForm(toForm(settings, property))
-    }
-  }, [settings, property])
+  const { form, setField } = useBasePricingForm(property, settings)
 
   const { mutate: saveSettings, isPending: isSaving } = usePutVillaPricingSettings({
     mutation: {
       onSuccess: () => {
         // The slug is baked into the URL-shaped query key, so it has to be
         // passed here — a no-arg call would build a key matching nothing.
-        queryClient.invalidateQueries({ queryKey: getGetVillaPricingSettingsQueryKey(property) })
+        void queryClient.invalidateQueries({
+          queryKey: getGetVillaPricingSettingsQueryKey(property),
+        })
         toast("Tarifs enregistrés")
       },
       onError: () => {
@@ -78,7 +131,7 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
   })
 
   const handleSave = () => {
-    const minNights = Number.parseInt(form.minNights, 10)
+    const minNights = Math.trunc(Number(form.minNights))
     saveSettings({
       slug: property,
       data: {
@@ -104,52 +157,7 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
         <EmptyState message="Chargement…" />
       ) : (
         <>
-          <FieldGrid>
-            <AdminField label="Prix de base par nuit (€)" htmlFor="basePrice">
-              <Input
-                id="basePrice"
-                type="number"
-                min={0}
-                value={form.basePrice}
-                onChange={(e) => {
-                  setForm((prev) => ({ ...prev, basePrice: e.target.value }))
-                }}
-              />
-            </AdminField>
-            <AdminField label="Nuits minimum" htmlFor="minNights">
-              <Input
-                id="minNights"
-                type="number"
-                min={1}
-                value={form.minNights}
-                onChange={(e) => {
-                  setForm((prev) => ({ ...prev, minNights: e.target.value }))
-                }}
-              />
-            </AdminField>
-            <AdminField label="Frais de ménage (€)" htmlFor="cleaningFee">
-              <Input
-                id="cleaningFee"
-                type="number"
-                min={0}
-                value={form.cleaningFee}
-                onChange={(e) => {
-                  setForm((prev) => ({ ...prev, cleaningFee: e.target.value }))
-                }}
-              />
-            </AdminField>
-            <AdminField label="Frais de conciergerie (€)" htmlFor="conciergeFee">
-              <Input
-                id="conciergeFee"
-                type="number"
-                min={0}
-                value={form.conciergeFee}
-                onChange={(e) => {
-                  setForm((prev) => ({ ...prev, conciergeFee: e.target.value }))
-                }}
-              />
-            </AdminField>
-          </FieldGrid>
+          <BasePricingFields form={form} setField={setField} />
           <FieldActions>
             <Button type="button" disabled={isSaving} onClick={handleSave}>
               {isSaving ? "Enregistrement…" : "Enregistrer le tarif de base"}

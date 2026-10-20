@@ -8,13 +8,16 @@ import { Input } from "@/components/ui/input"
 
 export const Route = createFileRoute("/admin/login")({
   beforeLoad: async ({ context }) => {
-    const alreadyAuthed = await context.queryClient
-      .fetchQuery(getAdminMeQueryOptions())
-      .then(() => true)
-      .catch(() => false)
-    if (alreadyAuthed) {
-      throw redirect({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
+    try {
+      await context.queryClient.query(getAdminMeQueryOptions())
+    } catch {
+      return
     }
+    redirect({
+      to: "/admin/reservations",
+      search: { property: "casadana", page: 1 },
+      throw: true,
+    })
   },
   component: AdminLoginPage,
 })
@@ -38,7 +41,7 @@ function AdminLoginPage() {
   const { mutate: login, isPending } = useAdminLogin({
     mutation: {
       onSuccess: () => {
-        navigate({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
+        void navigate({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
       },
       onError: (err) => {
         const message =
@@ -57,7 +60,9 @@ function AdminLoginPage() {
   return (
     <div className="bg-primary flex min-h-screen items-center justify-center px-4">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={(event) => {
+          void handleSubmit(onSubmit)(event)
+        }}
         className="bg-surface shadow-editorial w-full max-w-sm rounded-xl p-10"
       >
         <p className="text-on-surface-variant mb-1.5 font-mono text-[11px] tracking-[0.22em] uppercase">

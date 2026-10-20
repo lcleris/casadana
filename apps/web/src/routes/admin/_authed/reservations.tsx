@@ -58,11 +58,11 @@ function ReservationsPage() {
   const maxPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
 
   const goToPage = (nextPage: number) => {
-    navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
+    void navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
   }
 
   const switchProperty = (nextProperty: Property) => {
-    navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
+    void navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
   }
 
   return (

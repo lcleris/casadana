@@ -19,7 +19,7 @@ export default function AdminSidebar() {
     mutation: {
       onSuccess: () => {
         queryClient.clear()
-        navigate({ to: "/admin/login" })
+        void navigate({ to: "/admin/login" })
       },
     },
   })

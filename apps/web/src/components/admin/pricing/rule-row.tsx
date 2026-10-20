@@ -1,6 +1,6 @@
 import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/api"
 import { Trash2 } from "lucide-react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Input } from "@/components/ui/input"
 
@@ -35,20 +35,22 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
     }
   }
 
-  const flush = useCallback(() => {
+  const flush = () => {
     cancelTimer()
     const patch = pending.current
     pending.current = {}
     if (Object.keys(patch).length > 0) {
       onSave(patch)
     }
-  }, [onSave])
+  }
 
   // The card passes a fresh closure every render, so `flush` is never stable —
   // the unmount effect reads the latest one through a ref rather than
   // re-subscribing (and firing early) on each render.
   const flushRef = useRef(flush)
-  flushRef.current = flush
+  useEffect(() => {
+    flushRef.current = flush
+  })
 
   // Switching villa or navigating away unmounts the row mid-debounce; the edit
   // the user already made should still land.
