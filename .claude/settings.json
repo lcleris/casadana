@@ -15,5 +15,23 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "ponytail@claude-community": true,
+    "pstack@cursor-plugins": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-community": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-community"
+      }
+    },
+    "cursor-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "cursor/plugins"
+      }
+    }
   }
 }
