@@ -1,0 +1,427 @@
+{
+  "info": {
+    "title": "Casa Dana API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.1",
+  "components": {
+    "schemas": {
+      "AdminLoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AdminUser": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "BookingResponse": {
+        "type": "object",
+        "properties": {
+          "adults": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "check_in": {
+            "type": "string",
+            "format": "date"
+          },
+          "check_out": {
+            "type": "string",
+            "format": "date"
+          },
+          "children": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "guest_email": {
+            "type": "string",
+            "format": "email"
+          },
+          "guest_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "$ref": "#/components/schemas/BookingSource"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BookingStatus"
+          },
+          "villa_slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_in",
+          "check_out",
+          "created_at",
+          "guest_email",
+          "guest_name",
+          "id",
+          "status",
+          "villa_slug"
+        ]
+      },
+      "BookingSource": {
+        "enum": [
+          "direct",
+          "airbnb",
+          "booking_com"
+        ],
+        "type": "string"
+      },
+      "BookingStatus": {
+        "enum": [
+          "pending",
+          "approved",
+          "rejected",
+          "cancelled",
+          "paid"
+        ],
+        "type": "string"
+      },
+      "CreateBookingRequest": {
+        "type": "object",
+        "properties": {
+          "adults": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "check_in": {
+            "type": "string",
+            "format": "date"
+          },
+          "check_out": {
+            "type": "string",
+            "format": "date",
+            "description": "Must be strictly after check_in."
+          },
+          "children": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20,
+            "default": 0
+          },
+          "guest_email": {
+            "type": "string",
+            "maxLength": 255,
+            "format": "email"
+          },
+          "guest_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "guest_phone": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 40
+          },
+          "locale": {
+            "enum": [
+              "fr",
+              "en",
+              "es"
+            ],
+            "type": "string",
+            "description": "Language of every email about this booking. Falls back to fr."
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "default": ""
+          },
+          "source": {
+            "$ref": "#/components/schemas/BookingSource"
+          },
+          "villa_slug": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "adults",
+          "check_in",
+          "check_out",
+          "guest_email",
+          "guest_name",
+          "guest_phone",
+          "villa_slug"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "const": "ok"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ListBookingsResponse": {
+        "type": "object",
+        "properties": {
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingResponse"
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "page": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "total": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "bookings",
+          "limit",
+          "page",
+          "total"
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/api/admin/login": {
+      "post": {
+        "operationId": "adminLogin",
+        "tags": [
+          "admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me": {
+      "get": {
+        "operationId": "adminMe",
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bookings": {
+      "post": {
+        "operationId": "createBooking",
+        "tags": [
+          "bookings"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listBookings",
+        "tags": [
+          "bookings"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991,
+              "default": 1
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected",
+                "cancelled",
+                "paid"
+              ],
+              "type": "string"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "villa_slug",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListBookingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": [
+          "health"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

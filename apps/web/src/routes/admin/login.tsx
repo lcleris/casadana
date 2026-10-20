@@ -1,15 +1,17 @@
-import { ApiError, getAdminMeQueryOptions, useAdminLogin } from "@casa-dana/api"
+import { ORPCError } from "@orpc/client"
+import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { orpc } from "@/lib/orpc"
 
 export const Route = createFileRoute("/admin/login")({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.query(getAdminMeQueryOptions())
+      await context.queryClient.query(orpc.admin.me.queryOptions())
     } catch {
       return
     }
@@ -38,23 +40,23 @@ function AdminLoginPage() {
     defaultValues: { email: "", password: "" },
   })
 
-  const { mutate: login, isPending } = useAdminLogin({
-    mutation: {
+  const { mutate: login, isPending } = useMutation(
+    orpc.admin.login.mutationOptions({
       onSuccess: () => {
         void navigate({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
       },
       onError: (err) => {
         const message =
-          err instanceof ApiError && err.code === "INVALID_CREDENTIALS"
+          err instanceof ORPCError && err.code === "INVALID_CREDENTIALS"
             ? "E-mail ou mot de passe incorrect."
             : "Une erreur est survenue. Réessayez."
         setError("password", { type: "invalid", message })
       },
-    },
-  })
+    }),
+  )
 
   const onSubmit = (values: LoginFormValues) => {
-    login({ data: values })
+    login(values)
   }
 
   return (

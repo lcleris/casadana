@@ -1,13 +1,13 @@
-import { getAdminMeQueryOptions } from "@casa-dana/api"
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 
 import AdminSidebar from "@/components/admin/admin-sidebar"
 import { ToastProvider } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 
 export const Route = createFileRoute("/admin/_authed")({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.query(getAdminMeQueryOptions())
+      await context.queryClient.query(orpc.admin.me.queryOptions())
     } catch {
       redirect({ to: "/admin/login", throw: true })
     }
