@@ -644,11 +644,6 @@
       "count": 1
     }
   },
-  "apps/web/src/lib/query-client.ts": {
-    "curly": {
-      "count": 1
-    }
-  },
   "apps/web/src/lib/use-published-rating.ts": {
     "curly": {
       "count": 1

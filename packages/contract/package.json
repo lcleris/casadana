@@ -1,0 +1,21 @@
+{
+  "name": "@casa-dana/contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "bun src/generate-openapi.ts ../../apps/api/internal/openapi/contract.json"
+  },
+  "dependencies": {
+    "@orpc/contract": "^1.15.7",
+    "@orpc/openapi": "^1.15.7",
+    "@orpc/zod": "^1.15.7",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.3"
+  }
+}
