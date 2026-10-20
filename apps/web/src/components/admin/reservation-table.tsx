@@ -1,12 +1,10 @@
 import {
-  type BookingResponse,
-  type BookingStatus,
-  type PatchBookingRequestStatus,
   getListBookingsQueryKey,
   useDeleteBooking,
   useListBookings,
   usePatchBooking,
 } from "@casa-dana/api"
+import type { BookingResponse, BookingStatus, PatchBookingRequestStatus } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 
@@ -84,7 +82,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
         queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Statut mis à jour")
       },
-      onError: () => toast("Impossible de mettre à jour le statut"),
+      onError: () => {
+        toast("Impossible de mettre à jour le statut")
+      },
     },
   })
 
@@ -94,7 +94,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
         queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Réservation supprimée")
       },
-      onError: () => toast("Impossible de supprimer la réservation"),
+      onError: () => {
+        toast("Impossible de supprimer la réservation")
+      },
     },
   })
 
@@ -163,7 +165,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
                             ? "Ces dates chevauchent une réservation déjà confirmée."
                             : undefined
                         }
-                        onClick={() => patchStatus({ id: b.id, data: { status: next } })}
+                        onClick={() => {
+                          patchStatus({ id: b.id, data: { status: next } })
+                        }}
                       >
                         {label}
                       </Button>
@@ -174,7 +178,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
               <td className="px-5 py-3">
                 <button
                   type="button"
-                  onClick={() => handleDelete(b.id)}
+                  onClick={() => {
+                    handleDelete(b.id)
+                  }}
                   aria-label="Supprimer la réservation"
                   className="text-on-surface-variant hover:bg-error-container hover:text-on-error-container rounded-md p-1.5"
                 >

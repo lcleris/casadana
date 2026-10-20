@@ -12,7 +12,7 @@ import VillaLocalArea from "@/components/sections/villa/villa-local-area"
 import VillaReviews from "@/components/sections/villa/villa-reviews"
 import VillaRibbon from "@/components/sections/villa/villa-ribbon"
 import VillaSister from "@/components/sections/villa/villa-sister"
-import { GalleryCategory } from "@/constants/gallery-categories.const"
+import type { GalleryCategory } from "@/constants/gallery-categories.const"
 import { getVilla } from "@/constants/villas.const"
 import { m } from "@/paraglide/messages"
 
@@ -42,7 +42,7 @@ export default function VillaDetailPage() {
   }
 
   const openAll = () => {
-    const firstCat = (Object.keys(villa.gallery.images) as GalleryCategory[]).find(
+    const firstCat = (Object.keys(villa.gallery.images) as Array<GalleryCategory>).find(
       (c) => villa.gallery.images[c].length > 0,
     )
     if (firstCat) {
@@ -70,7 +70,9 @@ export default function VillaDetailPage() {
         category={lbCategory}
         images={villa.gallery.images}
         onCategory={setLbCategory}
-        onClose={() => setLbOpen(false)}
+        onClose={() => {
+          setLbOpen(false)
+        }}
       />
     </>
   )

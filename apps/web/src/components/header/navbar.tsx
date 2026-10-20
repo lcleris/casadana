@@ -23,7 +23,7 @@ function NavBrand() {
   )
 }
 
-function NavLinks({ links }: { links: NavLink[] }) {
+function NavLinks({ links }: { links: Array<NavLink> }) {
   return (
     <nav className="hidden items-center justify-center gap-7 lg:flex">
       {links.map((link) => (
@@ -44,13 +44,17 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
     handleScroll()
     window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
-  const links: NavLink[] = [
+  const links: Array<NavLink> = [
     { href: "/#collection", label: m.nav_link_collection() },
     { href: "/villa/casadana", label: m.nav_link_dana() },
     { href: "/villa/casacasay", label: m.nav_link_casay() },

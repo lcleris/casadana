@@ -5,7 +5,7 @@ import App from "./App"
 
 import "./globals.css"
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.querySelector("#root")!).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,

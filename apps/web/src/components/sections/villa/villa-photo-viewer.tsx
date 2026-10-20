@@ -54,7 +54,9 @@ export default function VillaPhotoViewer({
 
   const go = useCallback(
     (delta: number) => {
-      if (index === null || total === 0) return
+      if (index === null || total === 0) {
+        return
+      }
       onIndexChange(wrap(index + delta, total))
     },
     [index, total, onIndexChange],
@@ -62,7 +64,9 @@ export default function VillaPhotoViewer({
 
   // Left/right arrows move through the set. Escape is handled by the Dialog.
   useEffect(() => {
-    if (!open || !hasSiblings) return
+    if (!open || !hasSiblings) {
+      return
+    }
     const handler = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
         event.preventDefault()
@@ -73,15 +77,21 @@ export default function VillaPhotoViewer({
       }
     }
     document.addEventListener("keydown", handler)
-    return () => document.removeEventListener("keydown", handler)
+    return () => {
+      document.removeEventListener("keydown", handler)
+    }
   }, [open, hasSiblings, go])
 
   // Warm the neighbours so stepping through a large gallery does not flash.
   useEffect(() => {
-    if (!open || !hasSiblings) return
+    if (!open || !hasSiblings) {
+      return
+    }
     for (const offset of [-1, 1]) {
       const neighbour = photos[wrap(currentIndex + offset, total)]
-      if (!neighbour) continue
+      if (!neighbour) {
+        continue
+      }
       const preloader = new Image()
       preloader.src = neighbour.src
     }
@@ -97,9 +107,13 @@ export default function VillaPhotoViewer({
     const startX = touchStartX.current
     touchStartX.current = null
     const endX = event.changedTouches[0]?.clientX
-    if (startX === null || endX === undefined) return
+    if (startX === null || endX === undefined) {
+      return
+    }
     const deltaX = endX - startX
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) {
+      return
+    }
     go(deltaX < 0 ? 1 : -1)
   }
 
@@ -107,7 +121,9 @@ export default function VillaPhotoViewer({
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose()
+        if (!nextOpen) {
+          onClose()
+        }
       }}
     >
       <DialogPortal>
@@ -142,7 +158,9 @@ export default function VillaPhotoViewer({
           <div
             className="relative flex flex-1 items-center justify-center overflow-hidden p-4 md:px-20 md:py-10"
             onClick={(event) => {
-              if (event.target === event.currentTarget) onClose()
+              if (event.target === event.currentTarget) {
+                onClose()
+              }
             }}
           >
             {current && (
@@ -158,7 +176,9 @@ export default function VillaPhotoViewer({
               <>
                 <button
                   type="button"
-                  onClick={() => go(-1)}
+                  onClick={() => {
+                    go(-1)
+                  }}
                   aria-label={m.villa_photo_viewer_previous()}
                   className={`${CONTROL_CLASS} bg-inverse-surface/50 absolute top-1/2 left-3 -translate-y-1/2 md:left-6`}
                 >
@@ -166,7 +186,9 @@ export default function VillaPhotoViewer({
                 </button>
                 <button
                   type="button"
-                  onClick={() => go(1)}
+                  onClick={() => {
+                    go(1)
+                  }}
                   aria-label={m.villa_photo_viewer_next()}
                   className={`${CONTROL_CLASS} bg-inverse-surface/50 absolute top-1/2 right-3 -translate-y-1/2 md:right-6`}
                 >

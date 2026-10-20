@@ -8,7 +8,8 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { GalleryCategory, getCategoryLabel } from "@/constants/gallery-categories.const"
+import type { GalleryCategory } from "@/constants/gallery-categories.const"
+import { getCategoryLabel } from "@/constants/gallery-categories.const"
 import type { GalleryEntry } from "@/constants/villas.const"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -28,7 +29,9 @@ interface VillaLightboxProps {
 // (8 + 4 = 12 columns, so every row fills edge-to-edge). A trailing odd tile
 // takes the full row instead of leaving a half-filled gap.
 function spanClassFor(index: number, total: number): string {
-  if (index === total - 1 && total % 2 === 1) return "md:col-span-12"
+  if (index === total - 1 && total % 2 === 1) {
+    return "md:col-span-12"
+  }
   return index % 2 === 0 ? "md:col-span-8" : "md:col-span-4"
 }
 
@@ -44,7 +47,9 @@ export default function VillaLightbox({
   const [photoIndex, setPhotoIndex] = useState<number | null>(null)
 
   useEffect(() => {
-    if (!open) setPhotoIndex(null)
+    if (!open) {
+      setPhotoIndex(null)
+    }
   }, [open])
 
   const categories = (Object.keys(images) as Array<GalleryCategory>).filter(
@@ -61,7 +66,9 @@ export default function VillaLightbox({
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose()
+        if (!nextOpen) {
+          onClose()
+        }
       }}
     >
       <DialogPortal>
@@ -79,7 +86,9 @@ export default function VillaLightbox({
                 <button
                   key={c}
                   type="button"
-                  onClick={() => selectCategory(c)}
+                  onClick={() => {
+                    selectCategory(c)
+                  }}
                   className={cn(
                     "rounded-full border px-3.5 py-2 font-mono text-[10.5px] tracking-[0.18em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
                     c === category
@@ -107,7 +116,9 @@ export default function VillaLightbox({
                 <button
                   key={`${img.src}-${i}`}
                   type="button"
-                  onClick={() => setPhotoIndex(i)}
+                  onClick={() => {
+                    setPhotoIndex(i)
+                  }}
                   className={cn(
                     "group relative cursor-zoom-in overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
                     spanClassFor(i, tiles.length),
@@ -133,7 +144,9 @@ export default function VillaLightbox({
             photos={tiles}
             index={photoIndex}
             onIndexChange={setPhotoIndex}
-            onClose={() => setPhotoIndex(null)}
+            onClose={() => {
+              setPhotoIndex(null)
+            }}
           />
         </DialogPopup>
       </DialogPortal>

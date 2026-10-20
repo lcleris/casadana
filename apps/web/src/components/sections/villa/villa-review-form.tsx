@@ -1,4 +1,5 @@
-import { ApiError, type ReviewCategoryRatings, useSubmitVillaReview } from "@casa-dana/api"
+import { ApiError, useSubmitVillaReview } from "@casa-dana/api"
+import type { ReviewCategoryRatings } from "@casa-dana/api"
 import { ArrowRight } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -51,7 +52,9 @@ const DEFAULT_VALUES: ReviewFormValues = {
 function toCategoryRatings(scores: Record<CategoryKey, number>): ReviewCategoryRatings | undefined {
   const scored: ReviewCategoryRatings = {}
   for (const key of CATEGORY_KEYS) {
-    if (scores[key] > 0) scored[key] = scores[key]
+    if (scores[key] > 0) {
+      scored[key] = scores[key]
+    }
   }
   return Object.keys(scored).length > 0 ? scored : undefined
 }
@@ -83,7 +86,9 @@ function StarPicker({ value, describeStar, size, onChange }: StarPickerProps) {
           type="button"
           aria-label={describeStar(n)}
           aria-pressed={n === value}
-          onClick={() => onChange(n)}
+          onClick={() => {
+            onChange(n)
+          }}
           className={cn(
             "leading-none transition-colors",
             glyphSize,
@@ -136,7 +141,9 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
     },
   })
 
-  const handleRating = (next: number) => setValue("rating", next, { shouldDirty: true })
+  const handleRating = (next: number) => {
+    setValue("rating", next, { shouldDirty: true })
+  }
 
   const handleCategory = (key: CategoryKey, next: number) => {
     // Clicking the score already set clears it: a visitor who tapped a
@@ -247,7 +254,9 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
                     describeStar={(count) =>
                       m.villa_reviews_form_aria_rate({ category: label, count })
                     }
-                    onChange={(next) => handleCategory(key, next)}
+                    onChange={(next) => {
+                      handleCategory(key, next)
+                    }}
                   />
                 </div>
               )

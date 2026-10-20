@@ -24,9 +24,7 @@ export default function RatingBreakdownCard({ property }: RatingBreakdownCardPro
       sub="Calculé à partir des avis publiés — publier ou masquer un avis fait bouger ces chiffres."
       flush={!meta}
     >
-      {!meta ? (
-        <EmptyState message={isPending ? "Chargement…" : "Notes indisponibles."} />
-      ) : (
+      {meta ? (
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
           <div className="sm:w-44 sm:shrink-0">
             {/* display_avg reads 0 with nothing approved, so the count is what tells
@@ -54,6 +52,8 @@ export default function RatingBreakdownCard({ property }: RatingBreakdownCardPro
             ))}
           </div>
         </div>
+      ) : (
+        <EmptyState message={isPending ? "Chargement…" : "Notes indisponibles."} />
       )}
     </AdminCard>
   )

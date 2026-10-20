@@ -1,9 +1,10 @@
 import { useGetVillaPricingSettings } from "@casa-dana/api"
 import { Link } from "@tanstack/react-router"
 import { ArrowRight } from "lucide-react"
-import { DynamicIcon, type IconName } from "lucide-react/dynamic"
+import { DynamicIcon } from "lucide-react/dynamic"
+import type { IconName } from "lucide-react/dynamic"
 
-import { GalleryCategory } from "@/constants/gallery-categories.const"
+import type { GalleryCategory } from "@/constants/gallery-categories.const"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -33,7 +34,7 @@ export interface PropertyCardProps {
   imageAlt: string
   layout: "left" | "right"
   features: Array<{ icon: IconName; label: string }>
-  galleryImages?: GalleryImage[]
+  galleryImages?: Array<GalleryImage>
 }
 
 function PropertyImage({

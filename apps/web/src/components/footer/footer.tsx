@@ -8,7 +8,7 @@ interface FooterLink {
   external?: boolean
 }
 
-function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
+function FooterColumn({ title, links }: { title: string; links: Array<FooterLink> }) {
   return (
     <div>
       <h5 className="mb-4 font-mono text-[11px] font-medium tracking-[0.22em] text-white uppercase">
@@ -52,19 +52,19 @@ function FooterBrand(): ReactNode {
 }
 
 export default function Footer() {
-  const collection: FooterLink[] = [
+  const collection: Array<FooterLink> = [
     { href: "/villa/casadana", label: m.nav_link_dana() },
     { href: "/villa/casacasay", label: m.nav_link_casay() },
     { href: "#story", label: m.footer_link_story() },
   ]
 
-  const stay: FooterLink[] = [
+  const stay: Array<FooterLink> = [
     { href: "/villa/casadana#book", label: m.footer_link_book_direct() },
     { href: "/villa/casadana#book", label: m.footer_link_long_stays() },
     { href: "/villa/casadana#location", label: m.footer_link_getting_there() },
   ]
 
-  const follow: FooterLink[] = [
+  const follow: Array<FooterLink> = [
     {
       href: "https://www.instagram.com/casadana_casacasay/",
       label: "Instagram",

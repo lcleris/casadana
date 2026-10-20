@@ -22,7 +22,9 @@ export default function AdminUsersTable() {
         queryClient.invalidateQueries({ queryKey: getListAdminUsersQueryKey() })
         toast("Administrateur supprimé")
       },
-      onError: () => toast("Impossible de supprimer l'administrateur"),
+      onError: () => {
+        toast("Impossible de supprimer l'administrateur")
+      },
     },
   })
 

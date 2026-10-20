@@ -94,7 +94,9 @@ function ReviewsPage() {
               <button
                 key={p}
                 type="button"
-                onClick={() => switchProperty(p)}
+                onClick={() => {
+                  switchProperty(p)
+                }}
                 className={
                   p === property
                     ? "bg-primary text-on-primary rounded-md px-3 py-1.5 text-[13px] font-medium"

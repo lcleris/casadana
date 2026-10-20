@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getLocale, setLocale, type Locale } from "@/paraglide/runtime"
+import { getLocale, setLocale } from "@/paraglide/runtime"
+import type { Locale } from "@/paraglide/runtime"
 
 const LANGUAGES = {
   en: "EN",

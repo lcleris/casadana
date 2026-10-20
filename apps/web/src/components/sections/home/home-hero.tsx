@@ -1,5 +1,6 @@
 import bgHome from "@/assets/shared/bg-home.jpeg"
-import { type PublishedRating, usePublishedRating } from "@/lib/use-published-rating"
+import { usePublishedRating } from "@/lib/use-published-rating"
+import type { PublishedRating } from "@/lib/use-published-rating"
 import { m } from "@/paraglide/messages"
 import { getLocale } from "@/paraglide/runtime"
 
@@ -31,13 +32,13 @@ function useCollectionRatingValue(): string {
   })
 }
 
-function HeroStats({ stats }: { stats: VitalStat[] }) {
+function HeroStats({ stats }: { stats: Array<VitalStat> }) {
   return (
     <div className="grid grid-cols-2 border-y border-white/25 py-6 md:grid-cols-4 md:py-7">
       {stats.map((stat, index) => (
         <div
           key={stat.label}
-          className={`px-4 md:px-7 ${index !== 0 ? "md:border-l md:border-white/20" : ""} ${
+          className={`px-4 md:px-7 ${index === 0 ? "" : "md:border-l md:border-white/20"} ${
             index < stats.length - 2 ? "border-b border-white/20 pb-3 md:border-b-0 md:pb-0" : ""
           }`}
         >
@@ -54,7 +55,7 @@ function HeroStats({ stats }: { stats: VitalStat[] }) {
 export default function HomeHero() {
   const ratingValue = useCollectionRatingValue()
 
-  const stats: VitalStat[] = [
+  const stats: Array<VitalStat> = [
     { label: m.home_hero_stat_properties_label(), value: m.home_hero_stat_properties_value() },
     { label: m.home_hero_stat_sleeps_label(), value: m.home_hero_stat_sleeps_value() },
     { label: m.home_hero_stat_region_label(), value: m.home_hero_stat_region_value() },

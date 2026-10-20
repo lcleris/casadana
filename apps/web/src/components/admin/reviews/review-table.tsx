@@ -1,12 +1,11 @@
 import {
-  type Review,
-  type ReviewStatus,
   getGetVillaReviewMetaQueryKey,
   getListAdminReviewsQueryKey,
   getListVillaReviewsQueryKey,
   useDeleteReview,
   usePatchReview,
 } from "@casa-dana/api"
+import type { Review, ReviewStatus } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 
@@ -39,7 +38,9 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
       onSuccess: () => {
         invalidateReviews()
       },
-      onError: () => toast("Impossible de mettre à jour l'avis"),
+      onError: () => {
+        toast("Impossible de mettre à jour l'avis")
+      },
     },
   })
 
@@ -49,7 +50,9 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
         invalidateReviews()
         toast("Avis supprimé")
       },
-      onError: () => toast("Impossible de supprimer l'avis"),
+      onError: () => {
+        toast("Impossible de supprimer l'avis")
+      },
     },
   })
 
@@ -59,7 +62,9 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
     patchReview(
       { id: r.id, data: { featured } },
       {
-        onSuccess: () => toast(featured ? "Avis mis en avant" : "Avis retiré de la mise en avant"),
+        onSuccess: () => {
+          toast(featured ? "Avis mis en avant" : "Avis retiré de la mise en avant")
+        },
       },
     )
   }
@@ -67,7 +72,11 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
   const handleStatus = (r: Review, status: ReviewStatus) => {
     patchReview(
       { id: r.id, data: { status } },
-      { onSuccess: () => toast("Statut de l'avis mis à jour") },
+      {
+        onSuccess: () => {
+          toast("Statut de l'avis mis à jour")
+        },
+      },
     )
   }
 
@@ -110,7 +119,9 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
               <td className="px-5 py-3 align-top">
                 <Toggle
                   checked={r.featured}
-                  onChange={(next) => handleFeatured(r, next)}
+                  onChange={(next) => {
+                    handleFeatured(r, next)
+                  }}
                   label={`Mettre en avant l'avis de ${r.author_name}`}
                 />
               </td>
@@ -118,7 +129,9 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
                 <select
                   value={r.status}
                   aria-label={`Statut de l'avis de ${r.author_name}`}
-                  onChange={(e) => handleStatus(r, e.target.value as ReviewStatus)}
+                  onChange={(e) => {
+                    handleStatus(r, e.target.value as ReviewStatus)
+                  }}
                   className="border-outline-variant text-on-surface h-8 rounded-lg border bg-transparent px-2.5 text-[12.5px]"
                 >
                   {REVIEW_STATUSES.map((s) => (
@@ -131,7 +144,9 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
               <td className="px-5 py-3 align-top">
                 <button
                   type="button"
-                  onClick={() => handleDelete(r)}
+                  onClick={() => {
+                    handleDelete(r)
+                  }}
                   aria-label={`Supprimer l'avis de ${r.author_name}`}
                   className="text-on-surface-variant hover:bg-error-container hover:text-on-error-container rounded-md p-1.5"
                 >

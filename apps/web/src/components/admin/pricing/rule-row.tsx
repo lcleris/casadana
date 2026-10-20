@@ -39,7 +39,9 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
     cancelTimer()
     const patch = pending.current
     pending.current = {}
-    if (Object.keys(patch).length > 0) onSave(patch)
+    if (Object.keys(patch).length > 0) {
+      onSave(patch)
+    }
   }, [onSave])
 
   // The card passes a fresh closure every render, so `flush` is never stable —
@@ -50,19 +52,28 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
 
   // Switching villa or navigating away unmounts the row mid-debounce; the edit
   // the user already made should still land.
-  useEffect(() => () => flushRef.current(), [])
+  useEffect(
+    () => () => {
+      flushRef.current()
+    },
+    [],
+  )
 
   const queue = (patch: PatchSeasonRuleRequest) => {
     pending.current = { ...pending.current, ...patch }
     cancelTimer()
-    timer.current = setTimeout(() => flushRef.current(), SAVE_DEBOUNCE_MS)
+    timer.current = setTimeout(() => {
+      flushRef.current()
+    }, SAVE_DEBOUNCE_MS)
   }
 
   // Once a save lands the refetched rule is the truth, so drop whatever the
   // inputs were holding — unless an edit is still queued, in which case a
   // background refetch would otherwise wipe what the user is typing.
   useEffect(() => {
-    if (Object.keys(pending.current).length > 0) return
+    if (Object.keys(pending.current).length > 0) {
+      return
+    }
     setLabel(rule.label)
     setStartDate(rule.start_date)
     setEndDate(rule.end_date)
@@ -77,23 +88,31 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
       setLabel(rule.label)
       return
     }
-    if (next !== rule.label) queue({ label: next })
+    if (next !== rule.label) {
+      queue({ label: next })
+    }
   }
 
   const commitPrice = () => {
     const cents = euroInputToCents(price)
     setPrice(centsToEuroInput(cents))
-    if (cents !== rule.price_cents) queue({ price_cents: cents })
+    if (cents !== rule.price_cents) {
+      queue({ price_cents: cents })
+    }
   }
 
   const commitStartDate = (value: string) => {
     setStartDate(value)
-    if (value && value !== rule.start_date) queue({ start_date: value })
+    if (value && value !== rule.start_date) {
+      queue({ start_date: value })
+    }
   }
 
   const commitEndDate = (value: string) => {
     setEndDate(value)
-    if (value && value !== rule.end_date) queue({ end_date: value })
+    if (value && value !== rule.end_date) {
+      queue({ end_date: value })
+    }
   }
 
   // Dropping the queued patch first: PATCHing a row we are about to delete
@@ -109,27 +128,35 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
       <Input
         aria-label="Nom de la règle"
         value={label}
-        onChange={(e) => setLabel(e.target.value)}
+        onChange={(e) => {
+          setLabel(e.target.value)
+        }}
         onBlur={commitLabel}
       />
       <Input
         type="date"
         aria-label="Date de début"
         value={startDate}
-        onChange={(e) => commitStartDate(e.target.value)}
+        onChange={(e) => {
+          commitStartDate(e.target.value)
+        }}
       />
       <Input
         type="date"
         aria-label="Date de fin"
         value={endDate}
-        onChange={(e) => commitEndDate(e.target.value)}
+        onChange={(e) => {
+          commitEndDate(e.target.value)
+        }}
       />
       <Input
         type="number"
         min={0}
         aria-label="Prix par nuit en euros"
         value={price}
-        onChange={(e) => setPrice(e.target.value)}
+        onChange={(e) => {
+          setPrice(e.target.value)
+        }}
         onBlur={commitPrice}
       />
       <button

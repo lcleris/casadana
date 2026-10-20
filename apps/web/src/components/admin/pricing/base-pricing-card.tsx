@@ -1,9 +1,9 @@
 import {
-  type PricingSettings,
   getGetVillaPricingSettingsQueryKey,
   useGetVillaPricingSettings,
   usePutVillaPricingSettings,
 } from "@casa-dana/api"
+import type { PricingSettings } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 
@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/toast"
 
-import { DEFAULT_MIN_NIGHTS, type Property, defaultBasePriceCents } from "./defaults"
+import { DEFAULT_MIN_NIGHTS, defaultBasePriceCents } from "./defaults"
+import type { Property } from "./defaults"
 import { centsToEuroInput, euroInputToCents } from "./money"
 
 interface BasePricingForm {
@@ -57,7 +58,9 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
   // Re-seed from the server copy whenever it changes — the first load, and the
   // refetch that follows a save. Switching villa remounts the card entirely.
   useEffect(() => {
-    if (settings) setForm(toForm(settings, property))
+    if (settings) {
+      setForm(toForm(settings, property))
+    }
   }, [settings, property])
 
   const { mutate: saveSettings, isPending: isSaving } = usePutVillaPricingSettings({
@@ -68,7 +71,9 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
         queryClient.invalidateQueries({ queryKey: getGetVillaPricingSettingsQueryKey(property) })
         toast("Tarifs enregistrés")
       },
-      onError: () => toast("Impossible d'enregistrer les tarifs"),
+      onError: () => {
+        toast("Impossible d'enregistrer les tarifs")
+      },
     },
   })
 
@@ -106,7 +111,9 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
                 type="number"
                 min={0}
                 value={form.basePrice}
-                onChange={(e) => setForm((prev) => ({ ...prev, basePrice: e.target.value }))}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, basePrice: e.target.value }))
+                }}
               />
             </AdminField>
             <AdminField label="Nuits minimum" htmlFor="minNights">
@@ -115,7 +122,9 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
                 type="number"
                 min={1}
                 value={form.minNights}
-                onChange={(e) => setForm((prev) => ({ ...prev, minNights: e.target.value }))}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, minNights: e.target.value }))
+                }}
               />
             </AdminField>
             <AdminField label="Frais de ménage (€)" htmlFor="cleaningFee">
@@ -124,7 +133,9 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
                 type="number"
                 min={0}
                 value={form.cleaningFee}
-                onChange={(e) => setForm((prev) => ({ ...prev, cleaningFee: e.target.value }))}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, cleaningFee: e.target.value }))
+                }}
               />
             </AdminField>
             <AdminField label="Frais de conciergerie (€)" htmlFor="conciergeFee">
@@ -133,7 +144,9 @@ export default function BasePricingCard({ property }: BasePricingCardProps) {
                 type="number"
                 min={0}
                 value={form.conciergeFee}
-                onChange={(e) => setForm((prev) => ({ ...prev, conciergeFee: e.target.value }))}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, conciergeFee: e.target.value }))
+                }}
               />
             </AdminField>
           </FieldGrid>

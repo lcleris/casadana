@@ -8,7 +8,9 @@ interface VillaFaqProps {
 }
 
 export default function VillaFaq({ data }: VillaFaqProps) {
-  if (!data) return null
+  if (!data) {
+    return null
+  }
   return (
     <section className="mx-auto max-w-[1440px] px-6 py-20 md:px-10 md:py-[140px]">
       <div className="grid items-start gap-12 md:grid-cols-[1fr_1.4fr] md:gap-24">

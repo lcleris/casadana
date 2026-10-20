@@ -16,7 +16,9 @@ export function Toggle({ checked, onChange, label, disabled }: ToggleProps) {
       aria-checked={checked}
       aria-label={label}
       disabled={disabled}
-      onClick={() => onChange(!checked)}
+      onClick={() => {
+        onChange(!checked)
+      }}
       className={cn(
         "relative h-[22px] w-[38px] shrink-0 rounded-full transition-colors disabled:opacity-50",
         checked ? "bg-primary" : "bg-outline-variant",

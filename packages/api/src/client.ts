@@ -1,13 +1,15 @@
-import Axios, { AxiosError, AxiosRequestConfig } from "axios"
+import type { AxiosError, AxiosRequestConfig } from "axios"
+import Axios from "axios"
 
 export const AXIOS_INSTANCE = Axios.create({
-  baseURL:
-    (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE_URL) || "",
+  baseURL: (import.meta !== undefined && (import.meta as any).env?.VITE_API_BASE_URL) || "",
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 })
 
-export type ApiErrorBody = { error: { code: string; message: string } }
+export interface ApiErrorBody {
+  error: { code: string; message: string }
+}
 
 export class ApiError extends Error {
   public code: string
@@ -25,10 +27,9 @@ export class ApiError extends Error {
   }
 }
 
-export const customAxios = <T>(config: AxiosRequestConfig): Promise<T> => {
-  return AXIOS_INSTANCE({ ...config })
+export const customAxios = async <T>(config: AxiosRequestConfig): Promise<T> =>
+  AXIOS_INSTANCE({ ...config })
     .then((res) => res.data as T)
     .catch((e: AxiosError<ApiErrorBody>) => {
       throw ApiError.fromAxios(e)
     })
-}

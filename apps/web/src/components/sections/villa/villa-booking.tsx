@@ -72,7 +72,9 @@ const NIGHT_FILL: Record<NightState, string> = {
 // the diagonal shows a changeover day as half taken: one guest checks out in
 // the morning, the next can check in that afternoon.
 function dayBackground(morning: NightState, afternoon: NightState): string | undefined {
-  if (morning === "free" && afternoon === "free") return undefined
+  if (morning === "free" && afternoon === "free") {
+    return undefined
+  }
   return `linear-gradient(to bottom right, ${NIGHT_FILL[morning]} 50%, ${NIGHT_FILL[afternoon]} 50%)`
 }
 
@@ -169,7 +171,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
             for (const part of err.message.split(";")) {
               const [rawField, tag] = part.split(":").map((s) => s.trim())
               const field = fieldMap[rawField ?? ""]
-              if (field) setError(field, { type: tag || "invalid", message: tag })
+              if (field) {
+                setError(field, { type: tag || "invalid", message: tag })
+              }
             }
             setTopLevelError(null)
           } else if (err.code === "DATES_CONFLICT") {
@@ -201,8 +205,11 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     // budget — the sidebar total is the number that has to be right — and the
     // calendar keeps whatever is left.
     if (differenceInCalendarDays(to, from) > MAX_WINDOW_DAYS) {
-      if (calFrom < checkIn) from = addDays(to, -MAX_WINDOW_DAYS)
-      else to = addDays(from, MAX_WINDOW_DAYS)
+      if (calFrom < checkIn) {
+        from = addDays(to, -MAX_WINDOW_DAYS)
+      } else {
+        to = addDays(from, MAX_WINDOW_DAYS)
+      }
     }
     return { from: format(from, "yyyy-MM-dd"), to: format(to, "yyyy-MM-dd") }
   }, [viewMonth, checkIn, stayEnd])
@@ -280,7 +287,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   // the next one arrives.
   const isStayFree = (from: Date, to: Date) => {
     for (let day = from; day < to; day = addDays(day, 1)) {
-      if (isUnavailable(day)) return false
+      if (isUnavailable(day)) {
+        return false
+      }
     }
     return true
   }
@@ -296,7 +305,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       // A villa with no base rate configured resolves to 0; leaving it out
       // falls the night back to the editorial figure rather than advertising
       // a free night.
-      if (night.price_cents > 0) map.set(night.date, night.price_cents)
+      if (night.price_cents > 0) {
+        map.set(night.date, night.price_cents)
+      }
     }
     return map
   }, [pricing])
@@ -331,13 +342,15 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       const priceCents = nightPricesByDate.get(key) ?? baseNightlyCents
       counts.set(priceCents, (counts.get(priceCents) ?? 0) + 1)
     }
-    return Array.from(counts.entries())
+    return [...counts.entries()]
       .map(([priceCents, count]) => ({ priceCents, count }))
       .sort((a, b) => a.priceCents - b.priceCents)
   }, [checkIn, stayEnd, nightPricesByDate, baseNightlyCents])
 
   useEffect(() => {
-    if (!activeField) return
+    if (!activeField) {
+      return
+    }
     const handler = (e: MouseEvent) => {
       const target = e.target as Node
       if (
@@ -350,7 +363,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       setActiveField(null)
     }
     document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
+    return () => {
+      document.removeEventListener("mousedown", handler)
+    }
   }, [activeField])
 
   const cells = useMemo(() => {
@@ -385,7 +400,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     }
     // Anything else starts a new stay, which needs its first night free. The
     // departure is cleared: the guest picks it next, with a live preview.
-    if (isUnavailable(date) || date < today) return
+    if (isUnavailable(date) || date < today) {
+      return
+    }
     setValue("checkIn", date, { shouldDirty: true })
     setValue("checkOut", null, { shouldDirty: true })
     setActiveField("out")
@@ -406,9 +423,8 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   const name = watch("name")
   const email = watch("email")
   const tel = watch("tel")
-  const blockReason = !checkOut
-    ? m.villa_booking_reason_pick_departure()
-    : !isStayFree(checkIn, checkOut)
+  const blockReason = checkOut
+    ? !isStayFree(checkIn, checkOut)
       ? m.villa_booking_reason_dates_unavailable()
       : !name.trim() || !email.trim() || !tel.trim()
         ? m.villa_booking_reason_fill_contact()
@@ -417,11 +433,14 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
           : !PHONE_PATTERN.test(tel.trim())
             ? m.villa_booking_reason_invalid_phone()
             : null
+    : m.villa_booking_reason_pick_departure()
 
   const telField = register("tel", { required: true, pattern: PHONE_PATTERN })
 
   const onSubmit = (values: BookingFormValues) => {
-    if (!values.checkOut || blockReason) return
+    if (!values.checkOut || blockReason) {
+      return
+    }
     createBooking({
       data: {
         villa_slug: villaSlug,
@@ -490,7 +509,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
           <button
             ref={ciRef}
             type="button"
-            onClick={() => openCal("in")}
+            onClick={() => {
+              openCal("in")
+            }}
             className={cn(
               "border-outline-variant hover:bg-surface-container-low block border-r bg-white px-4 py-3.5 text-left transition-colors",
               activeField === "in" && "bg-surface-container-low",
@@ -506,7 +527,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
           <button
             ref={coRef}
             type="button"
-            onClick={() => openCal("out")}
+            onClick={() => {
+              openCal("out")
+            }}
             className={cn(
               "hover:bg-surface-container-low block bg-white px-4 py-3.5 text-left transition-colors",
               activeField === "out" && "bg-surface-container-low",
@@ -528,9 +551,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
               <div className="mb-3 flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
-                  }
+                  }}
                   aria-label={m.villa_booking_prev_month()}
                   className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
@@ -541,16 +564,21 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                 </h4>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
-                  }
+                  }}
                   aria-label={m.villa_booking_next_month()}
                   className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
                   <ChevronRight size={14} />
                 </button>
               </div>
-              <div className="grid grid-cols-7 gap-0.5" onMouseLeave={() => setHoverDate(null)}>
+              <div
+                className="grid grid-cols-7 gap-0.5"
+                onMouseLeave={() => {
+                  setHoverDate(null)
+                }}
+              >
                 {getDaysOfWeek().map((d) => (
                   <div
                     key={d}
@@ -618,8 +646,12 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                             ? m.villa_booking_arrival_after_departure()
                             : undefined
                       }
-                      onClick={() => pickDate(cell.date as Date)}
-                      onMouseEnter={() => setHoverDate(cell.date as Date)}
+                      onClick={() => {
+                        pickDate(cell.date as Date)
+                      }}
+                      onMouseEnter={() => {
+                        setHoverDate(cell.date as Date)
+                      }}
                       style={{ backgroundImage: background }}
                       className={cn(
                         "text-on-surface flex min-h-[42px] items-center justify-center text-[13px] transition-colors",
@@ -689,7 +721,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
               <span className="inline-flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => field.onChange(Math.max(1, field.value - 1))}
+                  onClick={() => {
+                    field.onChange(Math.max(1, field.value - 1))
+                  }}
                   aria-label={m.villa_booking_aria_remove_guest()}
                   className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
@@ -701,7 +735,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
                 </span>
                 <button
                   type="button"
-                  onClick={() => field.onChange(Math.min(booking.maxGuests, field.value + 1))}
+                  onClick={() => {
+                    field.onChange(Math.min(booking.maxGuests, field.value + 1))
+                  }}
                   aria-label={m.villa_booking_aria_add_guest()}
                   className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
                 >
@@ -749,8 +785,8 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
               placeholder={m.villa_booking_phone_placeholder()}
               className={inputClassName}
               {...telField}
-              onChange={(e) => {
-                e.target.value = e.target.value.replace(NOT_PHONE_CHAR, "")
+              onChange={async (e) => {
+                e.target.value = e.target.value.replaceAll(NOT_PHONE_CHAR, "")
                 return telField.onChange(e)
               }}
             />

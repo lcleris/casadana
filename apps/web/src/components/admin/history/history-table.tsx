@@ -1,5 +1,6 @@
 import type { HistoryEvent, HistoryEventType } from "@casa-dana/api"
-import { CalendarDays, Circle, type LucideIcon, Star, Tag, UserCog } from "lucide-react"
+import { CalendarDays, Circle, Star, Tag, UserCog } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 const TYPE_ICONS: Record<HistoryEventType, LucideIcon> = {
   reservation: CalendarDays,

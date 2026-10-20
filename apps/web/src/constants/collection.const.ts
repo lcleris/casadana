@@ -10,7 +10,7 @@ import CASACASAY_TERRACE from "@/assets/casadessy/terrace1.jpeg"
 import type { PropertyCardProps } from "@/components/sections/property-card"
 import { m } from "@/paraglide/messages"
 
-import { GalleryCategory } from "./gallery-categories.const"
+import type { GalleryCategory } from "./gallery-categories.const"
 
 export const properties = [
   {
@@ -43,28 +43,28 @@ export const properties = [
         alt: "Casa DaNa - Main Salon",
         label: "MAIN SALON",
         size: "large" as const,
-        category: "LIVING_SPACES" as GalleryCategory,
+        category: "LIVING_SPACES",
       },
       {
         src: CASADANA_BEDROOM,
         alt: "Casa DaNa - Master Suite",
         label: "MASTER SUITE",
         size: "medium" as const,
-        category: "BEDROOMS" as GalleryCategory,
+        category: "BEDROOMS",
       },
       {
         src: CASADANA_KITCHEN,
         alt: "Casa DaNa - Gourmet Kitchen",
         label: "GOURMET KITCHEN",
         size: "medium" as const,
-        category: "KITCHEN" as GalleryCategory,
+        category: "KITCHEN",
       },
       {
         src: CASADANA_BATHROOM,
         alt: "Casa DaNa - Spa Bathroom",
         label: "SPA BATHROOM",
         size: "large" as const,
-        category: "BATHROOMS" as GalleryCategory,
+        category: "BATHROOMS",
       },
     ],
   },
@@ -98,35 +98,35 @@ export const properties = [
         alt: "Casa CasAy - Pool",
         label: "POOL VIEW",
         size: "large" as const,
-        category: "OUTDOOR" as GalleryCategory,
+        category: "OUTDOOR",
       },
       {
         src: CASACASAY_TERRACE,
         alt: "Casa CasAy - Terrace over the green",
         label: "GOLF TERRACE",
         size: "medium" as const,
-        category: "OUTDOOR" as GalleryCategory,
+        category: "OUTDOOR",
       },
       {
         src: CASACASAY_LIVING,
         alt: "Casa CasAy - Living room",
         label: "OPEN LIVING",
         size: "medium" as const,
-        category: "LIVING_SPACES" as GalleryCategory,
+        category: "LIVING_SPACES",
       },
       {
         src: CASACASAY_BEDROOM,
         alt: "Casa CasAy - Master bedroom",
         label: "MASTER BEDROOM",
         size: "large" as const,
-        category: "BEDROOMS" as GalleryCategory,
+        category: "BEDROOMS",
       },
       {
         src: CASACASAY_KITCHEN,
         alt: "Casa CasAy - Fitted kitchen",
         label: "FITTED KITCHEN",
         size: "medium" as const,
-        category: "KITCHEN" as GalleryCategory,
+        category: "KITCHEN",
       },
     ],
   },

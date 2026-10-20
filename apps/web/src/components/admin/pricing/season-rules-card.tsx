@@ -1,5 +1,4 @@
 import {
-  type PatchSeasonRuleRequest,
   getListVillaSeasonRulesQueryKey,
   useCreateVillaSeasonRule,
   useDeleteSeasonRule,
@@ -7,6 +6,7 @@ import {
   useListVillaSeasonRules,
   usePatchSeasonRule,
 } from "@casa-dana/api"
+import type { PatchSeasonRuleRequest } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { Plus } from "lucide-react"
@@ -16,7 +16,8 @@ import { EmptyState } from "@/components/admin/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
 
-import { type Property, defaultBasePriceCents } from "./defaults"
+import { defaultBasePriceCents } from "./defaults"
+import type { Property } from "./defaults"
 import { RuleRow } from "./rule-row"
 
 interface SeasonRulesCardProps {
@@ -41,7 +42,9 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
         queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle ajoutée")
       },
-      onError: () => toast("Impossible d'ajouter la règle"),
+      onError: () => {
+        toast("Impossible d'ajouter la règle")
+      },
     },
   })
 
@@ -51,7 +54,9 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
         queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle mise à jour")
       },
-      onError: () => toast("Impossible de mettre à jour la règle"),
+      onError: () => {
+        toast("Impossible de mettre à jour la règle")
+      },
     },
   })
 
@@ -61,7 +66,9 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
         queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle supprimée")
       },
-      onError: () => toast("Impossible de supprimer la règle"),
+      onError: () => {
+        toast("Impossible de supprimer la règle")
+      },
     },
   })
 
@@ -108,8 +115,12 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
             <RuleRow
               key={rule.id}
               rule={rule}
-              onSave={(patch) => handleSave(rule.id, patch)}
-              onDelete={() => deleteRule({ id: rule.id })}
+              onSave={(patch) => {
+                handleSave(rule.id, patch)
+              }}
+              onDelete={() => {
+                deleteRule({ id: rule.id })
+              }}
             />
           ))}
         </div>

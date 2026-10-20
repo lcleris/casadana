@@ -158,7 +158,7 @@ export default function VillaHero({
           {cells.map((cell, i) => (
             <div
               key={cell.label}
-              className={`px-4 md:px-7 ${i !== 0 ? "md:border-l md:border-white/20" : ""} ${
+              className={`px-4 md:px-7 ${i === 0 ? "" : "md:border-l md:border-white/20"} ${
                 i < cells.length - (cells.length % 2 === 0 ? 2 : 1)
                   ? "border-b border-white/20 pb-3 md:border-b-0 md:pb-0"
                   : ""

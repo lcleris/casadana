@@ -1,10 +1,10 @@
 import {
-  type ReviewCategoryRatings,
   getGetVillaReviewMetaQueryKey,
   getListAdminReviewsQueryKey,
   getListVillaReviewsQueryKey,
   useCreateAdminReview,
 } from "@casa-dana/api"
+import type { ReviewCategoryRatings } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
@@ -61,7 +61,9 @@ function toCategoryRatings(values: Record<CategoryKey, string>): ReviewCategoryR
   const scored: ReviewCategoryRatings = {}
   for (const { key } of CATEGORY_FIELDS) {
     const score = Number(values[key])
-    if (values[key].trim() !== "" && Number.isFinite(score)) scored[key] = score
+    if (values[key].trim() !== "" && Number.isFinite(score)) {
+      scored[key] = score
+    }
   }
   return Object.keys(scored).length > 0 ? scored : undefined
 }
@@ -91,7 +93,9 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
         setOpen(false)
         reset(DEFAULT_VALUES)
       },
-      onError: () => toast("Impossible d'ajouter l'avis"),
+      onError: () => {
+        toast("Impossible d'ajouter l'avis")
+      },
     },
   })
 
@@ -147,7 +151,9 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
                   type="button"
                   aria-label={n === 1 ? "Noter 1 étoile" : `Noter ${n} étoiles`}
                   aria-pressed={n === rating}
-                  onClick={() => setValue("rating", n)}
+                  onClick={() => {
+                    setValue("rating", n)
+                  }}
                   className={cn(
                     "rounded-md px-1 py-0.5 text-lg leading-none",
                     n <= rating ? "text-on-surface" : "text-on-surface-variant/50",

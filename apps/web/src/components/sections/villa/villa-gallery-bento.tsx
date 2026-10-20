@@ -1,7 +1,7 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { useMemo, useState } from "react"
 
-import { GalleryCategory } from "@/constants/gallery-categories.const"
+import type { GalleryCategory } from "@/constants/gallery-categories.const"
 import type { BentoTile, VillaData } from "@/constants/villas.const"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -62,7 +62,9 @@ export default function VillaGalleryBento({ data, onOpenAll }: VillaGalleryBento
 
   const openTile = (tile: BentoTile) => {
     const photos = photosFor(tile.category)
-    if (photos.length === 0) return
+    if (photos.length === 0) {
+      return
+    }
     const startIndex = photos.findIndex((photo) => photo.src === tile.src)
     setViewer({ category: tile.category, index: startIndex === -1 ? 0 : startIndex })
   }
@@ -148,7 +150,9 @@ export default function VillaGalleryBento({ data, onOpenAll }: VillaGalleryBento
               <button
                 key={`${tile.label}-${i}`}
                 type="button"
-                onClick={() => openTile(tile)}
+                onClick={() => {
+                  openTile(tile)
+                }}
                 className={cn(
                   "group focus-visible:outline-primary relative cursor-zoom-in overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2",
                   spanClass,
@@ -176,10 +180,12 @@ export default function VillaGalleryBento({ data, onOpenAll }: VillaGalleryBento
       <VillaPhotoViewer
         photos={viewerPhotos}
         index={viewer?.index ?? null}
-        onIndexChange={(index) =>
+        onIndexChange={(index) => {
           setViewer((current) => (current ? { ...current, index } : current))
-        }
-        onClose={() => setViewer(null)}
+        }}
+        onClose={() => {
+          setViewer(null)
+        }}
       />
     </section>
   )

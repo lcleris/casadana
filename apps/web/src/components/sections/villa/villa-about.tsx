@@ -1,4 +1,5 @@
-import { DynamicIcon, type IconName } from "lucide-react/dynamic"
+import { DynamicIcon } from "lucide-react/dynamic"
+import type { IconName } from "lucide-react/dynamic"
 
 import type { VillaData } from "@/constants/villas.const"
 
