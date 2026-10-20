@@ -18,9 +18,9 @@
     "dead-code:suppress": "fallow dead-code --save-baseline fallow-suppressions.json"
   },
   "devDependencies": {
-    "fallow": "^3.15.0",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
+    "fallow": "^3.34.1",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
     "typescript": "^7.0.2"
   }
 }
