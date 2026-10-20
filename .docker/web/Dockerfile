@@ -2,7 +2,7 @@ FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json bun.lock ./
+COPY package.json bun.lock bunfig.toml ./
 COPY packages ./packages
 COPY apps/web ./apps/web
 COPY .docker/web/nginx.conf ./nginx.conf
