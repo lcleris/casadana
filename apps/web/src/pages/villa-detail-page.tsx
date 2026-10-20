@@ -1,5 +1,5 @@
 import { useParams } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import VillaHero from "@/components/sections/villa-hero"
 import { nonEmptyCategories } from "@/components/sections/villa/non-empty-categories"
@@ -19,14 +19,10 @@ import type { VillaData } from "@/constants/villas.const"
 import { m } from "@/paraglide/messages"
 
 // Keyed by villa in VillaDetailPage: navigating to another villa remounts this,
-// which closes the lightbox and starts at the top of the page.
+// which closes the lightbox. The router resets the scroll on every navigation.
 function VillaDetail({ villaId, villa }: { villaId: string; villa: VillaData }) {
   const [lbOpen, setLbOpen] = useState(false)
   const [lbCategory, setLbCategory] = useState<GalleryCategory>("LIVING_SPACES")
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
 
   const openAll = () => {
     const [firstCat] = nonEmptyCategories(villa.gallery.images)

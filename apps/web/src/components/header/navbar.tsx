@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { ArrowRight } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -47,19 +47,19 @@ function NavLinks({ links }: { links: Array<NavLink> }) {
   )
 }
 
-export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
+function subscribeToScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true })
+  return () => {
+    window.removeEventListener("scroll", onChange)
+  }
+}
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    handleScroll()
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
+export default function Navbar() {
+  const isScrolled = useSyncExternalStore(
+    subscribeToScroll,
+    () => window.scrollY > 50,
+    () => false,
+  )
 
   return (
     <header

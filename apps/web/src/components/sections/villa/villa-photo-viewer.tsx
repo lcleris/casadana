@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { useEffect, useEffectEvent, useRef } from "react"
+import { useRef } from "react"
+import { preload } from "react-dom"
 
 import {
   Dialog,
@@ -34,6 +35,19 @@ function wrap(index: number, total: number): number {
   return ((index % total) + total) % total
 }
 
+/** Warms the neighbours so stepping through a large gallery does not flash. */
+function preloadNeighbours(photos: Array<ViewerPhoto>, index: number | null) {
+  if (index === null) {
+    return
+  }
+  for (const offset of [-1, 1]) {
+    const neighbour = photos[wrap(index + offset, photos.length)]
+    if (neighbour) {
+      preload(neighbour.src, { as: "image" })
+    }
+  }
+}
+
 const CONTROL_CLASS =
   "border-outline-variant/40 text-inverse-on-surface hover:border-outline-variant hover:bg-inverse-on-surface/10 inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border backdrop-blur-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
 
@@ -61,42 +75,17 @@ export default function VillaPhotoViewer({
     onIndexChange(wrap(index + delta, total))
   }
 
-  // Left/right arrows move through the set. Escape is handled by the Dialog.
-  const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
-    if (!open || !hasSiblings) {
-      return
-    }
+  // Left/right arrows move through the set. Escape is handled by the Dialog,
+  // which also keeps focus inside the popup, so its keydown sees every key.
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     const delta = ARROW_STEP[event.key]
     if (delta !== undefined) {
       event.preventDefault()
       go(delta)
     }
-  })
+  }
 
-  useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      onKeyDown(event)
-    }
-    document.addEventListener("keydown", handler)
-    return () => {
-      document.removeEventListener("keydown", handler)
-    }
-  }, [])
-
-  // Warm the neighbours so stepping through a large gallery does not flash.
-  useEffect(() => {
-    if (!open || !hasSiblings) {
-      return
-    }
-    for (const offset of [-1, 1]) {
-      const neighbour = photos[wrap(currentIndex + offset, total)]
-      if (!neighbour) {
-        continue
-      }
-      const preloader = new Image()
-      preloader.src = neighbour.src
-    }
-  }, [open, hasSiblings, photos, currentIndex, total])
+  preloadNeighbours(photos, index)
 
   const touchStartX = useRef<number | null>(null)
 
@@ -135,6 +124,7 @@ export default function VillaPhotoViewer({
         <DialogPopup
           aria-modal="true"
           className="text-inverse-on-surface fixed inset-0 z-[200] flex flex-col opacity-100 transition-opacity duration-300 outline-none data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
+          onKeyDown={handleKeyDown}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >

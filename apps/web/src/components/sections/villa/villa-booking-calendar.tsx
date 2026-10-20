@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useMemo } from "react"
-import type { RefObject } from "react"
 
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -205,7 +204,6 @@ function DayCell({ cell, priceCentsFor, onPick, onHover, ...rest }: DayCellProps
 }
 
 interface VillaBookingCalendarProps {
-  popRef: RefObject<HTMLDivElement | null>
   viewMonth: Date
   onViewMonthChange: (next: Date) => void
   onHoverChange: (date: Date | null) => void
@@ -220,7 +218,6 @@ interface VillaBookingCalendarProps {
 }
 
 export function VillaBookingCalendar({
-  popRef,
   viewMonth,
   onViewMonthChange,
   onHoverChange,
@@ -229,10 +226,7 @@ export function VillaBookingCalendar({
 }: VillaBookingCalendarProps) {
   const cells = useMemo(() => buildCalendarCells(viewMonth), [viewMonth])
   return (
-    <div
-      ref={popRef}
-      className="border-outline-variant editorial-shadow absolute top-[calc(100%+8px)] right-0 left-0 z-30 border bg-white p-5"
-    >
+    <div className="border-outline-variant editorial-shadow absolute top-[calc(100%+8px)] right-0 left-0 z-30 border bg-white p-5">
       <MonthNav viewMonth={viewMonth} onViewMonthChange={onViewMonthChange} />
       <div
         className="grid grid-cols-7 gap-0.5"

@@ -1,8 +1,7 @@
 import { ApiError, useCreateBooking } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
-import type { RefObject } from "react"
+import { useMemo, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
@@ -43,7 +42,6 @@ const TRIGGER_LABEL_CLASS =
 const TRIGGER_VALUE_CLASS = "font-display text-primary mt-1 block text-[17px] italic"
 
 interface DateTriggerProps {
-  buttonRef: RefObject<HTMLButtonElement | null>
   label: string
   value: string
   active: boolean
@@ -51,10 +49,9 @@ interface DateTriggerProps {
   onOpen: () => void
 }
 
-function DateTrigger({ buttonRef, label, value, active, className, onOpen }: DateTriggerProps) {
+function DateTrigger({ label, value, active, className, onOpen }: DateTriggerProps) {
   return (
     <button
-      ref={buttonRef}
       type="button"
       onClick={onOpen}
       className={cn(
@@ -89,6 +86,24 @@ function RatingStrip({ filledStars, score, count }: RatingStripProps) {
   )
 }
 
+/**
+ * Ref callback that calls `onOutside` on any mousedown outside the element:
+ * here the date triggers and the calendar they open.
+ */
+function dismissOnOutsideMouseDown(onOutside: () => void) {
+  return (element: HTMLElement | null) => {
+    const handler = ({ target }: MouseEvent) => {
+      if (!(target instanceof Node && element?.contains(target) === true)) {
+        onOutside()
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => {
+      document.removeEventListener("mousedown", handler)
+    }
+  }
+}
+
 export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) {
   // Computed once at mount — dates won't shift if the user keeps the page open
   // across midnight, which is fine for a booking flow.
@@ -118,9 +133,6 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   // can be previewed before the click that sets it.
   const [hoverDate, setHoverDate] = useState<Date | null>(null)
   const [viewMonth, setViewMonth] = useState<Date>(() => firstOfMonth(today))
-  const popRef = useRef<HTMLDivElement | null>(null)
-  const ciRef = useRef<HTMLButtonElement | null>(null)
-  const coRef = useRef<HTMLButtonElement | null>(null)
 
   const [submitted, setSubmitted] = useState(false)
   const [topLevelError, setTopLevelError] = useState<string | null>(null)
@@ -176,24 +188,13 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   const priceCentsFor = (date: Date): number =>
     nightPricesByDate.get(dayKey(date)) ?? baseNightlyCents
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (activeField === null) {
-        return
-      }
-      const { target } = e
-      const inside =
-        target instanceof Node &&
-        [popRef, ciRef, coRef].some((ref) => ref.current?.contains(target) === true)
-      if (!inside) {
+  const fieldsRef = useMemo(
+    () =>
+      dismissOnOutsideMouseDown(() => {
         setActiveField(null)
-      }
-    }
-    document.addEventListener("mousedown", handler)
-    return () => {
-      document.removeEventListener("mousedown", handler)
-    }
-  }, [activeField])
+      }),
+    [],
+  )
 
   // Whether `date` can end the stay being picked. Its own night may be held —
   // that is the next guest arriving the same afternoon.
@@ -291,9 +292,8 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
         }}
         noValidate
       >
-        <div className="border-outline-variant relative grid grid-cols-2 border">
+        <div ref={fieldsRef} className="border-outline-variant relative grid grid-cols-2 border">
           <DateTrigger
-            buttonRef={ciRef}
             label={m.villa_booking_check_in()}
             value={fmt(checkIn)}
             active={activeField === "in"}
@@ -303,7 +303,6 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
             }}
           />
           <DateTrigger
-            buttonRef={coRef}
             label={m.villa_booking_check_out()}
             value={checkOut === null ? m.villa_booking_add_date() : fmt(checkOut)}
             active={activeField === "out"}
@@ -315,7 +314,6 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
           {activeField !== null && (
             <VillaBookingCalendar
-              popRef={popRef}
               viewMonth={viewMonth}
               onViewMonthChange={setViewMonth}
               onHoverChange={setHoverDate}

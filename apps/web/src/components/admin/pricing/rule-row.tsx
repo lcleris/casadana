@@ -1,6 +1,6 @@
 import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/api"
 import { Trash2 } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useEffectEvent, useRef, useState } from "react"
 
 import { Input } from "@/components/ui/input"
 
@@ -19,11 +19,26 @@ interface RuleRowProps {
   onDelete: () => void
 }
 
+// Once a save lands the refetched rule is the truth, so the input picks up the
+// new value, unless the user has edited it since the last sync: a background
+// refetch would otherwise wipe what they are typing.
+function useSyncedInput(serverValue: string) {
+  const [value, setValue] = useState(serverValue)
+  const [synced, setSynced] = useState(serverValue)
+  if (serverValue !== synced) {
+    setSynced(serverValue)
+    if (value === synced) {
+      setValue(serverValue)
+    }
+  }
+  return [value, setValue] as const
+}
+
 export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
-  const [label, setLabel] = useState(rule.label)
-  const [startDate, setStartDate] = useState(rule.start_date)
-  const [endDate, setEndDate] = useState(rule.end_date)
-  const [price, setPrice] = useState(() => centsToEuroInput(rule.price_cents))
+  const [label, setLabel] = useSyncedInput(rule.label)
+  const [startDate, setStartDate] = useSyncedInput(rule.start_date)
+  const [endDate, setEndDate] = useSyncedInput(rule.end_date)
+  const [price, setPrice] = useSyncedInput(centsToEuroInput(rule.price_cents))
 
   const pending = useRef<PatchSeasonRuleRequest>({})
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -44,19 +59,12 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
     }
   }
 
-  // The card passes a fresh closure every render, so `flush` is never stable —
-  // the unmount effect reads the latest one through a ref rather than
-  // re-subscribing (and firing early) on each render.
-  const flushRef = useRef(flush)
-  useEffect(() => {
-    flushRef.current = flush
-  })
-
   // Switching villa or navigating away unmounts the row mid-debounce; the edit
   // the user already made should still land.
+  const flushOnUnmount = useEffectEvent(flush)
   useEffect(
     () => () => {
-      flushRef.current()
+      flushOnUnmount()
     },
     [],
   )
@@ -64,23 +72,8 @@ export function RuleRow({ rule, onSave, onDelete }: RuleRowProps) {
   const queue = (patch: PatchSeasonRuleRequest) => {
     pending.current = { ...pending.current, ...patch }
     cancelTimer()
-    timer.current = setTimeout(() => {
-      flushRef.current()
-    }, SAVE_DEBOUNCE_MS)
+    timer.current = setTimeout(flush, SAVE_DEBOUNCE_MS)
   }
-
-  // Once a save lands the refetched rule is the truth, so drop whatever the
-  // inputs were holding — unless an edit is still queued, in which case a
-  // background refetch would otherwise wipe what the user is typing.
-  useEffect(() => {
-    if (Object.keys(pending.current).length > 0) {
-      return
-    }
-    setLabel(rule.label)
-    setStartDate(rule.start_date)
-    setEndDate(rule.end_date)
-    setPrice(centsToEuroInput(rule.price_cents))
-  }, [rule])
 
   const commitLabel = () => {
     const next = label.trim()
