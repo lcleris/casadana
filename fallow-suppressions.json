@@ -21,14 +21,8 @@
     "apps/web/src/routes/__root.tsx:RouterContext"
   ],
   "private_type_leaks": [],
-  "unused_dependencies": [
-    "packages/api/package.json:zod"
-  ],
-  "unused_dev_dependencies": [
-    "apps/web/package.json:autoprefixer",
-    "apps/web/package.json:prettier-plugin-tailwindcss",
-    "apps/web/package.json:tailwindcss-animate"
-  ],
+  "unused_dependencies": [],
+  "unused_dev_dependencies": [],
   "circular_dependencies": [],
   "re_export_cycles": [],
   "unused_optional_dependencies": [],
