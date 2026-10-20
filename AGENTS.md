@@ -43,8 +43,6 @@ agent (Codex, Cursor, Copilot, Gemini, …) opens it directly.
   root. Claude Code does it from a hook (`scripts/ultracite-fix-edited.sh`).
 - Existing findings are frozen in `oxlint-suppressions.json` and
   `fallow-suppressions.json`. New code adds no rows: fix the finding.
-- Before a Bash `git commit`/`git push`, `.claude/hooks/fallow-gate.sh` runs
-  `fallow audit` on the change.
 
 ## Branches and environments
 
