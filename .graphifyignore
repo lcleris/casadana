@@ -1,0 +1,10 @@
+# Agent tooling, not casadana code.
+.agents/
+.claude/
+# Generated or translation catalogs: they dominate the graph without adding structure.
+apps/web/messages/
+apps/web/src/paraglide/
+apps/web/src/routeTree.gen.ts
+packages/api/src/generated/
+apps/api/internal/contractapi/api.gen.go
+apps/api/internal/db/
