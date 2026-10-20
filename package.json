@@ -19,7 +19,8 @@
     "dead-code": "fallow dead-code --baseline fallow-suppressions.json",
     "dead-code:ci": "fallow dead-code --baseline fallow-suppressions.json --fail-on-issues",
     "dead-code:all": "fallow dead-code",
-    "dead-code:suppress": "fallow dead-code --save-baseline fallow-suppressions.json"
+    "dead-code:suppress": "fallow dead-code --save-baseline fallow-suppressions.json",
+    "fallow:audit": "fallow audit"
   },
   "devDependencies": {
     "fallow": "^3.34.1",
