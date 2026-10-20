@@ -11,6 +11,8 @@ export default defineConfig({
   extends: [core, react, tanstack, reactDoctor, tanstackJsPlugins],
   ignorePatterns: [
     ...(core.ignorePatterns ?? []),
+    ".agents/**",
+    ".claude/skills/**",
     "apps/api/**",
     "apps/web/src/routeTree.gen.ts",
     "apps/web/src/paraglide/**",

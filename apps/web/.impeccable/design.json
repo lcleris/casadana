@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T00:00:00Z",
+  "title": "Design System: Casa DaNa & CasAy",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Harbour Navy",
+        "canonical": "oklch(23.6% 0.108 253)",
+        "tonalRamp": [
+          "oklch(15% 0.108 253)",
+          "oklch(26% 0.108 253)",
+          "oklch(37% 0.108 253)",
+          "oklch(48% 0.108 253)",
+          "oklch(59% 0.108 253)",
+          "oklch(70% 0.108 253)",
+          "oklch(82% 0.108 253)",
+          "oklch(95% 0.108 253)"
+        ]
+      },
+      "primary-container": {
+        "role": "primary",
+        "displayName": "Night Harbour",
+        "canonical": "oklch(32.8% 0.085 258)",
+        "tonalRamp": [
+          "oklch(15% 0.085 258)",
+          "oklch(26% 0.085 258)",
+          "oklch(37% 0.085 258)",
+          "oklch(48% 0.085 258)",
+          "oklch(59% 0.085 258)",
+          "oklch(70% 0.085 258)",
+          "oklch(82% 0.085 258)",
+          "oklch(95% 0.085 258)"
+        ]
+      },
+      "on-primary": {
+        "role": "primary",
+        "displayName": "Paper on Navy",
+        "canonical": "oklch(97.8% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "on-primary-container": {
+        "role": "primary",
+        "displayName": "Dusk Blue",
+        "canonical": "oklch(55.2% 0.062 265)",
+        "tonalRamp": [
+          "oklch(15% 0.062 265)",
+          "oklch(26% 0.062 265)",
+          "oklch(37% 0.062 265)",
+          "oklch(48% 0.062 265)",
+          "oklch(59% 0.062 265)",
+          "oklch(70% 0.062 265)",
+          "oklch(82% 0.062 265)",
+          "oklch(95% 0.062 265)"
+        ]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Ochre",
+        "canonical": "oklch(47.2% 0.123 62)",
+        "tonalRamp": [
+          "oklch(15% 0.123 62)",
+          "oklch(26% 0.123 62)",
+          "oklch(37% 0.123 62)",
+          "oklch(48% 0.123 62)",
+          "oklch(59% 0.123 62)",
+          "oklch(70% 0.123 62)",
+          "oklch(82% 0.123 62)",
+          "oklch(95% 0.123 62)"
+        ]
+      },
+      "secondary-container": {
+        "role": "secondary",
+        "displayName": "Sand",
+        "canonical": "oklch(81.2% 0.089 78)",
+        "tonalRamp": [
+          "oklch(15% 0.089 78)",
+          "oklch(26% 0.089 78)",
+          "oklch(37% 0.089 78)",
+          "oklch(48% 0.089 78)",
+          "oklch(59% 0.089 78)",
+          "oklch(70% 0.089 78)",
+          "oklch(82% 0.089 78)",
+          "oklch(95% 0.089 78)"
+        ]
+      },
+      "on-secondary-container": {
+        "role": "secondary",
+        "displayName": "Burnt Sand",
+        "canonical": "oklch(29% 0.085 68)",
+        "tonalRamp": [
+          "oklch(15% 0.085 68)",
+          "oklch(26% 0.085 68)",
+          "oklch(37% 0.085 68)",
+          "oklch(48% 0.085 68)",
+          "oklch(59% 0.085 68)",
+          "oklch(70% 0.085 68)",
+          "oklch(82% 0.085 68)",
+          "oklch(95% 0.085 68)"
+        ]
+      },
+      "secondary-fixed": {
+        "role": "secondary",
+        "displayName": "Sand (fixed)",
+        "canonical": "oklch(81.2% 0.089 78)",
+        "tonalRamp": [
+          "oklch(15% 0.089 78)",
+          "oklch(26% 0.089 78)",
+          "oklch(37% 0.089 78)",
+          "oklch(48% 0.089 78)",
+          "oklch(59% 0.089 78)",
+          "oklch(70% 0.089 78)",
+          "oklch(82% 0.089 78)",
+          "oklch(95% 0.089 78)"
+        ]
+      },
+      "tertiary": {
+        "role": "tertiary",
+        "displayName": "Ink",
+        "canonical": "oklch(12.9% 0.008 0)",
+        "tonalRamp": [
+          "oklch(15% 0.008 0)",
+          "oklch(26% 0.008 0)",
+          "oklch(37% 0.008 0)",
+          "oklch(48% 0.008 0)",
+          "oklch(59% 0.008 0)",
+          "oklch(70% 0.008 0)",
+          "oklch(82% 0.008 0)",
+          "oklch(95% 0.008 0)"
+        ]
+      },
+      "error": {
+        "role": "error",
+        "displayName": "Brick",
+        "canonical": "oklch(40.3% 0.211 29.2)",
+        "tonalRamp": [
+          "oklch(15% 0.15 29.2)",
+          "oklch(26% 0.15 29.2)",
+          "oklch(37% 0.15 29.2)",
+          "oklch(48% 0.15 29.2)",
+          "oklch(59% 0.15 29.2)",
+          "oklch(70% 0.15 29.2)",
+          "oklch(82% 0.15 29.2)",
+          "oklch(95% 0.15 29.2)"
+        ]
+      },
+      "error-container": {
+        "role": "error",
+        "displayName": "Brick Wash",
+        "canonical": "oklch(88.2% 0.082 25)",
+        "tonalRamp": [
+          "oklch(15% 0.082 25)",
+          "oklch(26% 0.082 25)",
+          "oklch(37% 0.082 25)",
+          "oklch(48% 0.082 25)",
+          "oklch(59% 0.082 25)",
+          "oklch(70% 0.082 25)",
+          "oklch(82% 0.082 25)",
+          "oklch(95% 0.082 25)"
+        ]
+      },
+      "on-error-container": {
+        "role": "error",
+        "displayName": "Brick Deep",
+        "canonical": "oklch(23.5% 0.145 18)",
+        "tonalRamp": [
+          "oklch(15% 0.145 18)",
+          "oklch(26% 0.145 18)",
+          "oklch(37% 0.145 18)",
+          "oklch(48% 0.145 18)",
+          "oklch(59% 0.145 18)",
+          "oklch(70% 0.145 18)",
+          "oklch(82% 0.145 18)",
+          "oklch(95% 0.145 18)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "oklch(97.8% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "oklch(97.8% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "surface-dim": {
+        "role": "neutral",
+        "displayName": "Booked Grey",
+        "canonical": "oklch(85.7% 0.003 60)",
+        "tonalRamp": [
+          "oklch(15% 0.003 60)",
+          "oklch(26% 0.003 60)",
+          "oklch(37% 0.003 60)",
+          "oklch(48% 0.003 60)",
+          "oklch(59% 0.003 60)",
+          "oklch(70% 0.003 60)",
+          "oklch(82% 0.003 60)",
+          "oklch(95% 0.003 60)"
+        ]
+      },
+      "surface-container-low": {
+        "role": "neutral",
+        "displayName": "Paper Low",
+        "canonical": "oklch(96.6% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "surface-container": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(94.6% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "surface-container-high": {
+        "role": "neutral",
+        "displayName": "Paper High",
+        "canonical": "oklch(92.6% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "inverse-surface": {
+        "role": "neutral",
+        "displayName": "Inverse Ink",
+        "canonical": "oklch(19% 0.008 60)",
+        "tonalRamp": [
+          "oklch(15% 0.008 60)",
+          "oklch(26% 0.008 60)",
+          "oklch(37% 0.008 60)",
+          "oklch(48% 0.008 60)",
+          "oklch(59% 0.008 60)",
+          "oklch(70% 0.008 60)",
+          "oklch(82% 0.008 60)",
+          "oklch(95% 0.008 60)"
+        ]
+      },
+      "inverse-on-surface": {
+        "role": "neutral",
+        "displayName": "Inverse Paper",
+        "canonical": "oklch(96% 0.002 60)",
+        "tonalRamp": [
+          "oklch(15% 0.002 60)",
+          "oklch(26% 0.002 60)",
+          "oklch(37% 0.002 60)",
+          "oklch(48% 0.002 60)",
+          "oklch(59% 0.002 60)",
+          "oklch(70% 0.002 60)",
+          "oklch(82% 0.002 60)",
+          "oklch(95% 0.002 60)"
+        ]
+      },
+      "on-surface": {
+        "role": "neutral",
+        "displayName": "Ink Text",
+        "canonical": "oklch(12.1% 0.012 60)",
+        "tonalRamp": [
+          "oklch(15% 0.012 60)",
+          "oklch(26% 0.012 60)",
+          "oklch(37% 0.012 60)",
+          "oklch(48% 0.012 60)",
+          "oklch(59% 0.012 60)",
+          "oklch(70% 0.012 60)",
+          "oklch(82% 0.012 60)",
+          "oklch(95% 0.012 60)"
+        ]
+      },
+      "on-surface-variant": {
+        "role": "neutral",
+        "displayName": "Driftwood",
+        "canonical": "oklch(48.8% 0.022 60)",
+        "tonalRamp": [
+          "oklch(15% 0.022 60)",
+          "oklch(26% 0.022 60)",
+          "oklch(37% 0.022 60)",
+          "oklch(48% 0.022 60)",
+          "oklch(59% 0.022 60)",
+          "oklch(70% 0.022 60)",
+          "oklch(82% 0.022 60)",
+          "oklch(95% 0.022 60)"
+        ]
+      },
+      "outline": {
+        "role": "neutral",
+        "displayName": "Outline",
+        "canonical": "oklch(55.5% 0.03 60)",
+        "tonalRamp": [
+          "oklch(15% 0.03 60)",
+          "oklch(26% 0.03 60)",
+          "oklch(37% 0.03 60)",
+          "oklch(48% 0.03 60)",
+          "oklch(59% 0.03 60)",
+          "oklch(70% 0.03 60)",
+          "oklch(82% 0.03 60)",
+          "oklch(95% 0.03 60)"
+        ]
+      },
+      "outline-variant": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(79.5% 0.02 60)",
+        "tonalRamp": [
+          "oklch(15% 0.02 60)",
+          "oklch(26% 0.02 60)",
+          "oklch(37% 0.02 60)",
+          "oklch(48% 0.02 60)",
+          "oklch(59% 0.02 60)",
+          "oklch(70% 0.02 60)",
+          "oklch(82% 0.02 60)",
+          "oklch(95% 0.02 60)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero titles over photography, one italic word per line."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles on the public site."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Italic Fraunces for prices, stat values, FAQ questions, booking values, brand wordmark."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Public-site paragraphs in Driftwood, 44 to 60ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase mono for eyebrows, nav links, buttons, field labels, meta."
+      },
+      "admin-title": {
+        "displayName": "Admin Title",
+        "purpose": "Admin card titles."
+      },
+      "admin-body": {
+        "displayName": "Admin Body",
+        "purpose": "Admin tables and form text."
+      }
+    },
+    "shadows": [
+      {
+        "name": "editorial",
+        "value": "0 30px 60px -25px oklch(23.6% 0.108 253 / 0.18), 0 8px 24px -12px oklch(23.6% 0.108 253 / 0.1)",
+        "purpose": "Photographs, booking panel and date popover, dialogs, login card, toast."
+      },
+      {
+        "name": "navbar-scrolled",
+        "value": "0 20px 40px -20px oklch(23.6% 0.108 253 / 0.12)",
+        "purpose": "Navbar once the page has scrolled past 50px."
+      }
+    ],
+    "motion": [
+      {
+        "name": "float-bg",
+        "value": "float-bg 22s ease-in-out infinite alternate (scale 1.05 to 1.14)",
+        "purpose": "Slow drift on the home hero photo."
+      },
+      {
+        "name": "marquee",
+        "value": "marquee 60s linear infinite (translateX -50%)",
+        "purpose": "Navy phrase ribbon on the home page."
+      },
+      {
+        "name": "scroll-cue",
+        "value": "scroll-cue 2.4s ease-in-out infinite (scaleX wipe)",
+        "purpose": "Hairline scroll cue in hero footers."
+      },
+      {
+        "name": "image-hover",
+        "value": "transform 700ms ease-out, scale 1.04 to 1.06",
+        "purpose": "Property and gallery photos on hover/focus."
+      },
+      {
+        "name": "ui-state",
+        "value": "300ms default easing",
+        "purpose": "Navbar scrolled state, nav underline, FAQ toggle rotation."
+      },
+      {
+        "name": "toast",
+        "value": "200ms, translateY 8px + opacity",
+        "purpose": "Toast enter/exit."
+      },
+      {
+        "name": "overlay-enter-exit",
+        "value": "none (tw-animate-css not loaded)",
+        "purpose": "Dialog backdrop, select and dropdown popups declare animate-in/fade-in-0/zoom-in-95 classes that currently produce no CSS."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Editorial Primary Button",
+      "kind": "button",
+      "refersTo": "button-editorial",
+      "description": "Square navy call to action on the public site (explore villa, CTA strip, booking submit).",
+      "html": "<a class=\"ds-btn-editorial\" href=\"#\">Explore the villa <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a>",
+      "css": ".ds-btn-editorial { display: inline-flex; align-items: center; gap: 12px; padding: 18px 28px; background: var(--color-primary); color: var(--color-on-primary); font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 11px; letter-spacing: 0.28em; text-decoration: none; border-radius: 0; transition: background-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-editorial:hover { background: var(--color-primary-container); } .ds-btn-editorial:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }"
+    },
+    {
+      "name": "Editorial Outline Button",
+      "kind": "button",
+      "refersTo": "button-editorial-outline",
+      "description": "Square hairline secondary action on paper (FAQ contact, booking secondary).",
+      "html": "<a class=\"ds-btn-outline\" href=\"#\">Ask a question</a>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; background: transparent; color: var(--color-primary); border: 1px solid var(--color-outline-variant); font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 11px; letter-spacing: 0.28em; text-decoration: none; border-radius: 0; transition: background-color 150ms; } .ds-btn-outline:hover { background: var(--color-surface-container-low); } .ds-btn-outline:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }"
+    },
+    {
+      "name": "Admin Button",
+      "kind": "button",
+      "refersTo": "button-admin-default",
+      "description": "shadcn Button default variant used across the back-office.",
+      "html": "<button class=\"ds-btn-admin\">Enregistrer</button>",
+      "css": ".ds-btn-admin { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px; background: var(--color-primary); color: var(--color-on-primary); font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 150ms; } .ds-btn-admin:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 50%, transparent); } .ds-btn-admin:active { transform: translateY(1px); } .ds-btn-admin:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Admin Input",
+      "kind": "input",
+      "refersTo": "input-admin",
+      "description": "shadcn Input used in admin forms and login.",
+      "html": "<input class=\"ds-input-admin\" type=\"email\" placeholder=\"E-mail\">",
+      "css": ".ds-input-admin { height: 32px; width: 100%; padding: 4px 10px; border: 1px solid var(--color-outline-variant); border-radius: 8px; background: transparent; color: var(--color-on-surface); font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 14px; outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-input-admin::placeholder { color: var(--color-on-surface-variant); } .ds-input-admin:focus-visible { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 50%, transparent); }"
+    },
+    {
+      "name": "Booking Field Row",
+      "kind": "input",
+      "refersTo": "input-booking",
+      "description": "Stacked white field row in the booking panel: mono label over a borderless navy input.",
+      "html": "<label class=\"ds-booking-field\"><span class=\"ds-booking-label\">Full name</span><input class=\"ds-booking-input\" placeholder=\"Your name\"></label>",
+      "css": ".ds-booking-field { display: block; padding: 12px 16px; background: #fff; border: 1px solid var(--color-outline-variant); } .ds-booking-label { display: block; color: var(--color-on-surface-variant); font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 10px; letter-spacing: 0.22em; } .ds-booking-input { margin-top: 4px; width: 100%; border: 0; padding: 0; background: transparent; color: var(--color-primary); font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 15px; outline: none; border-radius: 0; } .ds-booking-input::placeholder { color: color-mix(in oklch, var(--color-on-surface-variant) 50%, transparent); } .ds-booking-field:focus-within { border-color: var(--color-primary); }"
+    },
+    {
+      "name": "Public Navbar",
+      "kind": "nav",
+      "refersTo": "button-nav-reserve",
+      "description": "Fixed blurred navbar in its scrolled state: italic brand, mono links with scale-in underline, pill reserve button.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-nav-brand\" href=\"#\">Casa DaNa<small>Los Alcázares</small></a><nav class=\"ds-nav-links\"><a href=\"#\">Collection</a><a href=\"#\">Casa DaNa</a><a href=\"#\">Story</a></nav><a class=\"ds-nav-reserve\" href=\"#\">Reserve <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></header>",
+      "css": ".ds-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; padding: 16px 40px; background: color-mix(in oklch, var(--color-background) 95%, transparent); color: var(--color-primary); backdrop-filter: blur(12px); box-shadow: 0 20px 40px -20px oklch(23.6% 0.108 253 / 0.12); } .ds-nav-brand { font-family: var(--font-display, Fraunces, Georgia, serif); font-style: italic; font-size: 22px; line-height: 1; color: inherit; text-decoration: none; } .ds-nav-brand small { display: block; margin-top: 4px; font-style: normal; font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 9px; letter-spacing: 0.32em; opacity: 0.7; } .ds-nav-links { display: flex; gap: 28px; } .ds-nav-links a { position: relative; padding-bottom: 4px; color: inherit; text-decoration: none; font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 11px; letter-spacing: 0.22em; opacity: 0.9; } .ds-nav-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 300ms; } .ds-nav-links a:hover { opacity: 1; } .ds-nav-links a:hover::after { transform: scaleX(1); } .ds-nav-reserve { justify-self: end; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 9999px; border: 1px solid var(--color-primary); background: var(--color-primary); color: var(--color-on-primary); text-decoration: none; font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.22em; } .ds-nav-reserve:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }"
+    },
+    {
+      "name": "Category Chip",
+      "kind": "chip",
+      "refersTo": "chip-category",
+      "description": "Sand pill naming the villa category above property titles.",
+      "html": "<span class=\"ds-chip\">Family villa</span>",
+      "css": ".ds-chip { display: inline-block; padding: 6px 14px; border-radius: 9999px; background: var(--color-secondary-container); color: var(--color-on-secondary-container); font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 11px; letter-spacing: 0.22em; }"
+    },
+    {
+      "name": "Status Pills",
+      "kind": "chip",
+      "refersTo": "badge-status-pending",
+      "description": "Admin booking status pills, one tonal pair per status.",
+      "html": "<span class=\"ds-pill ds-pill-pending\">En attente</span> <span class=\"ds-pill ds-pill-approved\">Approuvée</span> <span class=\"ds-pill ds-pill-paid\">Payée</span> <span class=\"ds-pill ds-pill-rejected\">Refusée</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 9999px; font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 11.5px; font-weight: 600; } .ds-pill-pending { background: var(--color-secondary-container); color: var(--color-on-secondary-container); } .ds-pill-approved { background: var(--color-primary-container); color: var(--color-on-primary-container); } .ds-pill-paid { background: var(--color-primary); color: var(--color-on-primary); } .ds-pill-rejected { background: var(--color-error-container); color: var(--color-on-error-container); }"
+    },
+    {
+      "name": "Admin Card",
+      "kind": "card",
+      "refersTo": "card-admin",
+      "description": "Back-office settings card with a hairline header row.",
+      "html": "<div class=\"ds-admin-card\"><div class=\"ds-admin-card-head\"><h3>Tarif de base</h3><p>Prix par nuit hors saison.</p></div><div class=\"ds-admin-card-body\">Contenu</div></div>",
+      "css": ".ds-admin-card { border: 1px solid var(--color-outline-variant); border-radius: 8px; background: var(--color-surface); font-family: var(--font-body, Inter, system-ui, sans-serif); } .ds-admin-card-head { padding: 16px 20px; border-bottom: 1px solid var(--color-outline-variant); } .ds-admin-card-head h3 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--color-on-surface); } .ds-admin-card-head p { margin: 2px 0 0; font-size: 12.5px; color: var(--color-on-surface-variant); } .ds-admin-card-body { padding: 20px; font-size: 13px; color: var(--color-on-surface); }"
+    },
+    {
+      "name": "Section Headline",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Ochre mono eyebrow with a leading rule over a light Fraunces headline with one italic word.",
+      "html": "<div class=\"ds-section-head\"><span class=\"ds-eyebrow\">The house</span><h2>Inside <em>Casa DaNa</em></h2></div>",
+      "css": ".ds-eyebrow { display: inline-flex; align-items: center; gap: 12px; color: var(--color-secondary); font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace); text-transform: uppercase; font-size: 11px; letter-spacing: 0.22em; } .ds-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: currentColor; } .ds-section-head h2 { margin: 16px 0 0; font-family: var(--font-display, Fraunces, Georgia, serif); font-weight: 300; font-size: clamp(40px, 5.4vw, 72px); line-height: 1; letter-spacing: -0.025em; color: var(--color-primary); } .ds-section-head em { font-style: italic; font-variation-settings: 'SOFT' 60, 'WONK' 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Villa Journal",
+    "overview": "**Creative North Star: \"The Villa Journal\"**\n\nThe public site reads like a printed travel magazine laid over full-bleed photography of the two houses. Headlines are set in a light, soft-axis serif (Fraunces) with one word in each title switched to italic for emphasis; small print is set in tracked, uppercase monospace (JetBrains Mono) like captions and folios; body copy is a quiet sans (Inter). Color is restrained: a deep navy carries the brand, a warm sand/ochre is the single accent, and everything else sits on a nearly white, very slightly warm paper. The public pages are square-cornered and generous, with 140px vertical section rhythm on desktop and a 1440px editorial container.\n\nThe back-office (`/admin`) is a separate, denser register built on the shadcn/Base UI primitives in `components/ui`: Inter throughout, 13 to 14.5px text, 8px-rounded cards with hairline borders, a navy sidebar, and tonal status pills. It shares the palette with the public site but drops the editorial typography, except for the monospace used on numbers and small meta lines.\n\nDepth is mostly flat. One navy-tinted, long-falloff shadow (\"editorial shadow\") lifts photographs, the booking panel, dialogs and the toast; everything else separates with hairline borders and tonal surface steps.",
+    "keyCharacteristics": [
+      "Light Fraunces display type with an italic word per title (`italic-display`, SOFT 60).",
+      "Uppercase monospace labels tracked at 0.22em to 0.28em for eyebrows, meta, buttons and form labels.",
+      "Navy primary, sand accent, warm off-white paper; color is used in large blocks (navy marquee, navy footer, sand CTA strip), not sprinkled.",
+      "Square corners on the public site; pills only for chips, round icon buttons and the nav \"Reserve\" button.",
+      "Admin is a compact shadcn-style tool UI on the same tokens, with 8px radii.",
+      "No dark theme: a `dark` custom variant is declared and shadcn `dark:` classes exist, but no dark token values are defined."
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Sand/Ochre is the only accent. New emphasis uses navy weight or italic Fraunces before it reaches for another hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Navy Block Rule",
+        "body": "Navy appears in solid, full-width blocks (marquee, footer, admin sidebar, primary buttons) rather than as thin decorative strokes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Italic Word Rule",
+        "body": "Each editorial headline sets exactly one word or name in italic (`italic-display`: italic with SOFT 60, WONK 0). The italic word carries the emphasis; weight stays light.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Caption Rule",
+        "body": "Anything that labels rather than says (eyebrow, field label, button, meta, legend) is uppercase JetBrains Mono with wide tracking. Body sentences are never set in mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Navy Shadow Rule",
+        "body": "Shadows are tinted with the primary navy, never neutral black, and are reserved for photographs and floating panels.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the theme roles (`primary`, `secondary-container`, `on-surface-variant`, `outline-variant`...) rather than raw OKLCH or Tailwind palette colors; the shadcn aliases already map onto them.",
+      "Do set public-site headlines in light Fraunces with one italic word (`italic-display`), and every label, eyebrow and button in uppercase JetBrains Mono with 0.22em to 0.28em tracking.",
+      "Do keep public-site buttons, panels and photos square, and reserve full rounding for chips, round icon buttons and the nav reserve pill.",
+      "Do keep admin screens on the `components/ui` primitives and `AdminCard` / `StatTile` / `AdminField`, with 8px radii and 13 to 14.5px Inter.",
+      "Do use the editorial shadow (navy-tinted) for anything that floats; separate everything else with hairlines and surface steps.",
+      "Do show ratings and review counts only from approved back-office reviews (`usePublishedRating`); with none, show nothing or 0, never a placeholder score."
+    ],
+    "donts": [
+      "Don't introduce a second accent hue alongside Sand/Ochre.",
+      "Don't use neutral black or Tailwind default shadows on the public site.",
+      "Don't apply shadcn's rounded defaults to public-site buttons and inputs; override to `rounded-none` as the booking panel does.",
+      "Don't rely on `animate-in` / `fade-in-*` / `zoom-in-*` classes for overlay motion until `tw-animate-css` (or equivalent keyframes) is actually loaded.",
+      "Don't add `dark:` styling expecting it to work; there are no dark token values."
+    ]
+  }
+}
