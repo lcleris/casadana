@@ -1,4 +1,5 @@
-import { type BookingStatus, useListBookings } from "@casa-dana/api"
+import { useListBookings } from "@casa-dana/api"
+import type { BookingStatus } from "@casa-dana/api"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 
@@ -57,11 +58,11 @@ function ReservationsPage() {
   const maxPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
 
   const goToPage = (nextPage: number) => {
-    navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
+    void navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
   }
 
   const switchProperty = (nextProperty: Property) => {
-    navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
+    void navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
   }
 
   return (
@@ -79,7 +80,9 @@ function ReservationsPage() {
               <button
                 key={p}
                 type="button"
-                onClick={() => switchProperty(p)}
+                onClick={() => {
+                  switchProperty(p)
+                }}
                 className={
                   p === property
                     ? "bg-primary text-on-primary rounded-md px-3 py-1.5 text-[13px] font-medium"
@@ -113,7 +116,9 @@ function ReservationsPage() {
               variant="outline"
               size="sm"
               disabled={page <= 1}
-              onClick={() => goToPage(page - 1)}
+              onClick={() => {
+                goToPage(page - 1)
+              }}
             >
               ‹ Précédent
             </Button>
@@ -125,7 +130,9 @@ function ReservationsPage() {
               variant="outline"
               size="sm"
               disabled={page >= maxPage}
-              onClick={() => goToPage(page + 1)}
+              onClick={() => {
+                goToPage(page + 1)
+              }}
             >
               Suivant ›
             </Button>

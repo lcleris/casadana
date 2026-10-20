@@ -7,6 +7,6 @@ export function centsToEuroInput(cents: number): string {
 
 /** A blank or unparseable field reads as 0 rather than submitting NaN. */
 export function euroInputToCents(input: string): number {
-  const euros = Number.parseFloat(input)
+  const euros = Number(input)
   return Number.isFinite(euros) ? Math.round(euros * 100) : 0
 }

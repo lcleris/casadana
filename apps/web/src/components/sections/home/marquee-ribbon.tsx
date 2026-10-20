@@ -1,12 +1,14 @@
 import { m } from "@/paraglide/messages"
 
+const PHRASE_MESSAGES = [
+  m.home_marquee_hosted_since,
+  m.home_marquee_direct_booking,
+  m.home_marquee_two_casas,
+  m.home_marquee_region,
+]
+
 export default function MarqueeRibbon() {
-  const phrases = [
-    m.home_marquee_hosted_since(),
-    m.home_marquee_direct_booking(),
-    m.home_marquee_two_casas(),
-    m.home_marquee_region(),
-  ]
+  const phrases = PHRASE_MESSAGES.map((message) => message())
 
   return (
     <div className="bg-primary text-on-primary border-primary-container overflow-hidden border-t py-6 md:py-7">

@@ -7,9 +7,9 @@ import { orpc } from "@/lib/orpc"
 export const Route = createFileRoute("/admin/_authed")({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.fetchQuery(orpc.admin.me.queryOptions())
+      await context.queryClient.query(orpc.admin.me.queryOptions())
     } catch {
-      throw redirect({ to: "/admin/login" })
+      redirect({ to: "/admin/login", throw: true })
     }
   },
   component: AuthedAdminLayout,

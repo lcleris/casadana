@@ -19,12 +19,14 @@ export default function AdminSidebar() {
     mutation: {
       onSuccess: () => {
         queryClient.clear()
-        navigate({ to: "/admin/login" })
+        void navigate({ to: "/admin/login" })
       },
     },
   })
 
-  const handleLogout = () => logout()
+  const handleLogout = () => {
+    logout()
+  }
 
   return (
     <aside className="bg-primary text-on-primary flex h-screen flex-col gap-6 p-4">

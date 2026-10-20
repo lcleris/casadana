@@ -1,16 +1,16 @@
 import {
-  type BookingResponse,
-  type BookingStatus,
-  type PatchBookingRequestStatus,
   getListBookingsQueryKey,
   useDeleteBooking,
   useListBookings,
   usePatchBooking,
 } from "@casa-dana/api"
+import type { BookingResponse, BookingStatus, PatchBookingRequestStatus } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
+import { useState } from "react"
 
 import { BOOKING_SOURCE_LABELS, BOOKING_STATUS_LABELS } from "@/components/admin/booking-status"
+import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
 
@@ -55,6 +55,7 @@ interface ReservationTableProps {
 export default function ReservationTable({ bookings, property }: ReservationTableProps) {
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   // Invalidate at the endpoint prefix (not the exact page/limit key) so this
   // also refreshes the stat row's separate limit:1 queries, not just this page.
   const bookingsQueryKey = getListBookingsQueryKey()
@@ -81,26 +82,34 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
   const { mutate: patchStatus } = usePatchBooking({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
+        void queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Statut mis à jour")
       },
-      onError: () => toast("Impossible de mettre à jour le statut"),
+      onError: () => {
+        toast("Impossible de mettre à jour le statut")
+      },
     },
   })
 
   const { mutate: deleteBooking } = useDeleteBooking({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
+        void queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Réservation supprimée")
       },
-      onError: () => toast("Impossible de supprimer la réservation"),
+      onError: () => {
+        toast("Impossible de supprimer la réservation")
+      },
     },
   })
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Supprimer cette réservation ?")) {
-      deleteBooking({ id })
+    setPendingDelete(id)
+  }
+
+  const confirmDelete = () => {
+    if (pendingDelete !== null) {
+      deleteBooking({ id: pendingDelete })
     }
   }
 
@@ -123,7 +132,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
             <th className="px-5 py-2.5">Voyageurs</th>
             <th className="px-5 py-2.5">Source</th>
             <th className="px-5 py-2.5">Statut</th>
-            <th className="px-5 py-2.5" />
+            <th className="px-5 py-2.5">
+              <span className="sr-only">Actions</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -163,7 +174,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
                             ? "Ces dates chevauchent une réservation déjà confirmée."
                             : undefined
                         }
-                        onClick={() => patchStatus({ id: b.id, data: { status: next } })}
+                        onClick={() => {
+                          patchStatus({ id: b.id, data: { status: next } })
+                        }}
                       >
                         {label}
                       </Button>
@@ -174,7 +187,9 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
               <td className="px-5 py-3">
                 <button
                   type="button"
-                  onClick={() => handleDelete(b.id)}
+                  onClick={() => {
+                    handleDelete(b.id)
+                  }}
                   aria-label="Supprimer la réservation"
                   className="text-on-surface-variant hover:bg-error-container hover:text-on-error-container rounded-md p-1.5"
                 >
@@ -185,6 +200,16 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
           ))}
         </tbody>
       </table>
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        question="Supprimer cette réservation ?"
+        onConfirm={confirmDelete}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDelete(null)
+          }
+        }}
+      />
     </div>
   )
 }

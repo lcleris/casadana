@@ -1,148 +1,138 @@
-import {
-  ApiError,
-  useCreateBooking,
-  useGetVillaAvailability,
-  useGetVillaPricing,
-  useGetVillaPricingSettings,
-} from "@casa-dana/api"
-import { keepPreviousData, useQueryClient } from "@tanstack/react-query"
-import {
-  addDays,
-  addMonths,
-  differenceInCalendarDays,
-  endOfMonth,
-  format,
-  parseISO,
-  startOfMonth,
-} from "date-fns"
-import { ArrowRight, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { ApiError, useCreateBooking } from "@casa-dana/api"
+import { useQueryClient } from "@tanstack/react-query"
+import { ArrowRight } from "lucide-react"
+import { useMemo, useState } from "react"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import type { VillaData } from "@/constants/villas.const"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
 import { getLocale } from "@/paraglide/runtime"
 
+import { VillaBookingCalendar } from "./villa-booking-calendar"
+import { ContactFields, GuestsField } from "./villa-booking-fields"
+import { useVillaBookingPricing } from "./villa-booking-pricing"
+import { VillaBookingSummary } from "./villa-booking-summary"
+import {
+  dayKey,
+  firstOfMonth,
+  fmt,
+  getBlockReason,
+  isStayFree,
+  isUnavailable,
+  parseValidationMessage,
+  startOfToday,
+  topLevelErrorMessage,
+} from "./villa-booking-utils"
+import type { BookingFormValues } from "./villa-booking-utils"
+
 interface VillaBookingProps {
   villaSlug: string
   booking: VillaData["booking"]
 }
 
-interface BookingFormValues {
-  name: string
-  checkIn: Date
-  // Null until the guest picks it: no stay length is suggested for them.
-  checkOut: Date | null
-  guests: number
-  email: string
-  tel: string
-  description: string
+type ActiveField = "in" | "out" | null
+
+const PANEL_CLASS =
+  "bg-background border-outline-variant editorial-shadow border p-6 md:sticky md:top-28 md:p-8"
+const TRIGGER_LABEL_CLASS =
+  "text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase"
+const TRIGGER_VALUE_CLASS = "font-display text-primary mt-1 block text-[17px] italic"
+
+interface DateTriggerProps {
+  label: string
+  value: string
+  active: boolean
+  className: string
+  onOpen: () => void
 }
 
-const getDaysOfWeek = () => [
-  m.villa_booking_day_mo(),
-  m.villa_booking_day_tu(),
-  m.villa_booking_day_we(),
-  m.villa_booking_day_th(),
-  m.villa_booking_day_fr(),
-  m.villa_booking_day_sa(),
-  m.villa_booking_day_su(),
-]
-
-// Mirrors the API's own cap on a pricing window (maxCalendarDays in the
-// pricing service). Kept in sync by hand — the API answers a wider window
-// with a 422.
-const MAX_WINDOW_DAYS = 400
-
-type NightState = "free" | "booked" | "pending"
-
-const NIGHT_FILL: Record<NightState, string> = {
-  free: "transparent",
-  booked: "var(--color-surface-dim)",
-  pending: "color-mix(in oklch, var(--color-secondary-container) 55%, transparent)",
-}
-
-// A calendar day holds the end of the previous night (morning, top-left) and
-// the start of its own night (afternoon, bottom-right). Splitting the cell on
-// the diagonal shows a changeover day as half taken: one guest checks out in
-// the morning, the next can check in that afternoon.
-function dayBackground(morning: NightState, afternoon: NightState): string | undefined {
-  if (morning === "free" && afternoon === "free") return undefined
-  return `linear-gradient(to bottom right, ${NIGHT_FILL[morning]} 50%, ${NIGHT_FILL[afternoon]} 50%)`
-}
-
-function fmt(date: Date) {
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-}
-
-function fmtMonth(date: Date) {
-  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-}
-
-function nightsBetween(a: Date, b: Date) {
-  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86_400_000))
-}
-
-function sameDay(a: Date, b: Date) {
+function DateTrigger({ label, value, active, className, onOpen }: DateTriggerProps) {
   return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
+    <button
+      type="button"
+      onClick={onOpen}
+      className={cn(
+        "hover:bg-surface-container-low block bg-white px-4 py-3.5 text-left transition-colors",
+        className,
+        active && "bg-surface-container-low",
+      )}
+    >
+      <span className={TRIGGER_LABEL_CLASS}>{label}</span>
+      <span className={TRIGGER_VALUE_CLASS}>{value}</span>
+    </button>
   )
 }
 
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+interface RatingStripProps {
+  filledStars: number
+  score: number
+  count: number
 }
 
-// Characters a phone number may contain. Anything else is dropped as it is
-// typed, so letters never reach the field.
-const NOT_PHONE_CHAR = /[^0-9+\s().-]/g
-// 6–15 digits once the separators are ignored, with an optional leading +.
-const PHONE_PATTERN = /^\+?[\s().-]*(?:\d[\s().-]*){6,15}$/
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+function RatingStrip({ filledStars, score, count }: RatingStripProps) {
+  return (
+    <div className="border-outline-variant mb-6 flex flex-col gap-1 border-b pb-6 font-mono text-[11px] tracking-[0.1em]">
+      <span className="text-secondary text-[13px] tracking-[2px]">
+        {"★".repeat(filledStars)}
+        {"☆".repeat(5 - filledStars)}
+      </span>
+      <span className="text-on-surface-variant">
+        {score.toFixed(2)} · {m.villa_booking_review_count({ count })}
+      </span>
+    </div>
+  )
+}
+
+/**
+ * Ref callback that calls `onOutside` on any mousedown outside the element:
+ * here the date triggers and the calendar they open.
+ */
+function dismissOnOutsideMouseDown(onOutside: () => void) {
+  return (element: HTMLElement | null) => {
+    const handler = ({ target }: MouseEvent) => {
+      if (!(target instanceof Node && element?.contains(target) === true)) {
+        onOutside()
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => {
+      document.removeEventListener("mousedown", handler)
+    }
+  }
+}
 
 export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) {
   // Computed once at mount — dates won't shift if the user keeps the page open
   // across midnight, which is fine for a booking flow.
-  const today = useMemo(() => startOfDay(new Date()), [])
+  const today = useMemo(() => startOfToday(), [])
 
-  const { control, register, handleSubmit, watch, setValue, setError } = useForm<BookingFormValues>(
-    {
-      defaultValues: {
-        name: "",
-        checkIn: today,
-        checkOut: null,
-        guests: booking.defaultGuests,
-        email: "",
-        tel: "",
-        description: "",
-      },
+  const { control, register, handleSubmit, setValue, setError } = useForm<BookingFormValues>({
+    defaultValues: {
+      name: "",
+      checkIn: today,
+      checkOut: null,
+      guests: booking.defaultGuests,
+      email: "",
+      tel: "",
+      description: "",
     },
-  )
+  })
 
-  const checkIn = watch("checkIn")
-  const checkOut = watch("checkOut")
+  const checkIn = useWatch({ control, name: "checkIn" })
+  const checkOut = useWatch({ control, name: "checkOut" })
   // Where the stay ends for pricing and the calendar window: the arrival day
   // itself (zero nights) until a departure is picked.
   const stayEnd = checkOut ?? checkIn
-  const guests = watch("guests")
+  const guests = useWatch({ control, name: "guests" })
 
-  const [activeField, setActiveField] = useState<"in" | "out" | null>(null)
+  const [activeField, setActiveField] = useState<ActiveField>(null)
   // Day under the pointer while the departure is being picked, so the stay
   // can be previewed before the click that sets it.
   const [hoverDate, setHoverDate] = useState<Date | null>(null)
-  const [viewMonth, setViewMonth] = useState<Date>(
-    () => new Date(today.getFullYear(), today.getMonth(), 1),
-  )
-  const popRef = useRef<HTMLDivElement | null>(null)
-  const ciRef = useRef<HTMLButtonElement | null>(null)
-  const coRef = useRef<HTMLButtonElement | null>(null)
+  const [viewMonth, setViewMonth] = useState<Date>(() => firstOfMonth(today))
 
   const [submitted, setSubmitted] = useState(false)
   const [topLevelError, setTopLevelError] = useState<string | null>(null)
@@ -153,228 +143,63 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       onSuccess: () => {
         setSubmitted(true)
         setTopLevelError(null)
-        queryClient.invalidateQueries({ queryKey: ["/api/villas", villaSlug, "availability"] })
+        void queryClient.invalidateQueries({
+          queryKey: ["/api/villas", villaSlug, "availability"],
+        })
       },
       onError: (err) => {
-        if (err instanceof ApiError) {
-          if (err.code === "VALIDATION") {
-            const fieldMap: Record<string, keyof BookingFormValues> = {
-              GuestName: "name",
-              GuestEmail: "email",
-              GuestPhone: "tel",
-              CheckIn: "checkIn",
-              CheckOut: "checkOut",
-              Adults: "guests",
-            }
-            for (const part of err.message.split(";")) {
-              const [rawField, tag] = part.split(":").map((s) => s.trim())
-              const field = fieldMap[rawField ?? ""]
-              if (field) setError(field, { type: tag || "invalid", message: tag })
-            }
-            setTopLevelError(null)
-          } else if (err.code === "DATES_CONFLICT") {
-            setTopLevelError(m.villa_booking_error_dates_conflict())
-          } else if (err.code === "UNKNOWN_VILLA") {
-            setTopLevelError(m.villa_booking_error_unknown_villa())
-          } else {
-            setTopLevelError(m.villa_booking_error_generic())
+        const code = err instanceof ApiError ? err.code : undefined
+        if (err instanceof ApiError && code === "VALIDATION") {
+          for (const { field, type, message } of parseValidationMessage(err.message)) {
+            setError(field, { type, message })
           }
-        } else {
-          setTopLevelError(m.villa_booking_error_generic())
+          setTopLevelError(null)
+          return
         }
+        setTopLevelError(topLevelErrorMessage(code ?? ""))
       },
     },
   })
 
-  // Window covers both the visible calendar months AND the selected stay range
-  // (so the displayed total stays accurate even when checkout is outside the
-  // currently-viewed month).
-  const queryWindow = useMemo(() => {
-    const calFrom = startOfMonth(viewMonth)
-    // The API window is [from, to) — exclusive — so pricing the last visible
-    // day takes one extra day.
-    const calTo = addDays(endOfMonth(addMonths(viewMonth, 1)), 1)
-    let from = checkIn < calFrom ? checkIn : calFrom
-    let to = stayEnd > calTo ? stayEnd : calTo
-    // The API rejects a window wider than MAX_WINDOW_DAYS, which a guest can
-    // reach by browsing a year away from their own dates. The stay wins that
-    // budget — the sidebar total is the number that has to be right — and the
-    // calendar keeps whatever is left.
-    if (differenceInCalendarDays(to, from) > MAX_WINDOW_DAYS) {
-      if (calFrom < checkIn) from = addDays(to, -MAX_WINDOW_DAYS)
-      else to = addDays(from, MAX_WINDOW_DAYS)
-    }
-    return { from: format(from, "yyyy-MM-dd"), to: format(to, "yyyy-MM-dd") }
-  }, [viewMonth, checkIn, stayEnd])
-
-  const { data: availability } = useGetVillaAvailability(
+  const {
+    nightSets,
+    nightPricesByDate,
+    baseNightlyCents,
+    nights,
+    nightsSubtotal,
+    cleaningFee,
+    conciergeFee,
+    total,
+    priceBreakdown,
+  } = useVillaBookingPricing({
     villaSlug,
-    { from: queryWindow.from, to: queryWindow.to },
-    {
-      query: {
-        enabled: activeField !== null,
-        placeholderData: keepPreviousData,
-      },
-    },
-  )
-
-  // Pricing is always enabled (not gated on calendar visibility) so the sidebar
-  // total reflects the real back-office rates on first paint, before the user
-  // opens the calendar.
-  const { data: pricing } = useGetVillaPricing(
-    villaSlug,
-    { from: queryWindow.from, to: queryWindow.to },
-    {
-      query: {
-        placeholderData: keepPreviousData,
-      },
-    },
-  )
-
-  // Base rate and both fees live in the back-office, per villa.
-  // `GET .../pricing/settings` is public and reads back all-zero for a villa
-  // that has never been configured, so an unset base rate falls back to the
-  // hardcoded content value rather than showing €0, and an unset fee is simply
-  // not charged.
-  const { data: settings } = useGetVillaPricingSettings(villaSlug)
-  const baseNightlyCents = settings?.base_price_cents || booking.nightly * 100
-  const cleaningFeeCents = settings?.cleaning_fee_cents ?? 0
-  const conciergeFeeCents = settings?.concierge_fee_cents ?? 0
+    fallbackNightlyEuros: booking.nightly,
+    viewMonth,
+    checkIn,
+    stayEnd,
+    calendarOpen: activeField !== null,
+  })
 
   // Computed from approved reviews — the same figures the reviews section
   // further down the page shows. Null until a review is approved, in which case
   // the panel shows the rate alone rather than a rating no guest ever gave.
   const publishedRating = usePublishedRating(villaSlug)
 
-  function datesToSet(ranges: Array<{ check_in: string; check_out: string }>): Set<string> {
-    const set = new Set<string>()
-    for (const r of ranges) {
-      const start = parseISO(r.check_in)
-      const end = parseISO(r.check_out)
-      for (let d = start; d < end; d = addDays(d, 1)) {
-        set.add(format(d, "yyyy-MM-dd"))
-      }
-    }
-    return set
-  }
-
-  // Confirmed (approved/paid) nights are hard blocked. Pending nights are
-  // provisionally held by an unconfirmed request — not guaranteed, but a new
-  // booking on top of them would still conflict server-side, so they're shown
-  // (distinctly) and are not selectable either.
-  const blockedNights = useMemo(() => datesToSet(availability?.booked_ranges ?? []), [availability])
-  const pendingNights = useMemo(
-    () => datesToSet(availability?.pending_ranges ?? []),
-    [availability],
-  )
-
-  const isBlocked = (date: Date) => blockedNights.has(format(date, "yyyy-MM-dd"))
-  const isPendingDate = (date: Date) => pendingNights.has(format(date, "yyyy-MM-dd"))
-  const isUnavailable = (date: Date) => isBlocked(date) || isPendingDate(date)
-  const nightState = (date: Date): NightState =>
-    isBlocked(date) ? "booked" : isPendingDate(date) ? "pending" : "free"
-
-  // A stay only occupies its nights: arrival day up to the day before
-  // departure. The departure day is left out on purpose — check-out is in the
-  // morning and check-in in the afternoon, so one guest can leave on the day
-  // the next one arrives.
-  const isStayFree = (from: Date, to: Date) => {
-    for (let day = from; day < to; day = addDays(day, 1)) {
-      if (isUnavailable(day)) return false
-    }
-    return true
-  }
-
-  // `nights` is the API's own answer for every day in the window: a per-date
-  // override wins, then the highest matching season rule, then the villa's base
-  // rate. Resolving it server-side is what keeps the panel in step with the
-  // back-office — reading the raw `overrides` list alone missed every seasonal
-  // rule the admin had configured.
-  const nightPricesByDate = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const night of pricing?.nights ?? []) {
-      // A villa with no base rate configured resolves to 0; leaving it out
-      // falls the night back to the editorial figure rather than advertising
-      // a free night.
-      if (night.price_cents > 0) map.set(night.date, night.price_cents)
-    }
-    return map
-  }, [pricing])
-
   const priceCentsFor = (date: Date): number =>
-    nightPricesByDate.get(format(date, "yyyy-MM-dd")) ?? baseNightlyCents
+    nightPricesByDate.get(dayKey(date)) ?? baseNightlyCents
 
-  const nights = nightsBetween(checkIn, stayEnd)
-  // Inline the per-night lookup to keep the dep array honest (priceCentsFor is
-  // a plain function reference that React can't track).
-  const nightsCents = useMemo(() => {
-    let sum = 0
-    for (let day = new Date(checkIn); day < stayEnd; day = addDays(day, 1)) {
-      const key = format(day, "yyyy-MM-dd")
-      sum += nightPricesByDate.get(key) ?? baseNightlyCents
-    }
-    return sum
-  }, [checkIn, stayEnd, nightPricesByDate, baseNightlyCents])
-  const nightsSubtotal = nightsCents / 100
-  const cleaningFee = cleaningFeeCents / 100
-  const conciergeFee = conciergeFeeCents / 100
-  // Both back-office fees are charged once per stay, on top of the nights.
-  const total = (nightsCents + cleaningFeeCents + conciergeFeeCents) / 100
-
-  // Groups selected nights by their per-night price so the summary can show
-  // "5 nights at €95" / "2 nights at €120" instead of a single blended total
-  // whenever seasonal rates or overrides make the stay span more than one tier.
-  const priceBreakdown = useMemo(() => {
-    const counts = new Map<number, number>()
-    for (let day = new Date(checkIn); day < stayEnd; day = addDays(day, 1)) {
-      const key = format(day, "yyyy-MM-dd")
-      const priceCents = nightPricesByDate.get(key) ?? baseNightlyCents
-      counts.set(priceCents, (counts.get(priceCents) ?? 0) + 1)
-    }
-    return Array.from(counts.entries())
-      .map(([priceCents, count]) => ({ priceCents, count }))
-      .sort((a, b) => a.priceCents - b.priceCents)
-  }, [checkIn, stayEnd, nightPricesByDate, baseNightlyCents])
-
-  useEffect(() => {
-    if (!activeField) return
-    const handler = (e: MouseEvent) => {
-      const target = e.target as Node
-      if (
-        popRef.current?.contains(target) ||
-        ciRef.current?.contains(target) ||
-        coRef.current?.contains(target)
-      ) {
-        return
-      }
-      setActiveField(null)
-    }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
-  }, [activeField])
-
-  const cells = useMemo(() => {
-    const y = viewMonth.getFullYear()
-    const mo = viewMonth.getMonth()
-    const first = new Date(y, mo, 1)
-    const startDow = (first.getDay() + 6) % 7
-    const daysInMonth = new Date(y, mo + 1, 0).getDate()
-    const prevDays = new Date(y, mo, 0).getDate()
-
-    const out: Array<{ d: number; muted: boolean; date?: Date }> = []
-    for (let i = startDow; i > 0; i--) {
-      out.push({ d: prevDays - i + 1, muted: true })
-    }
-    for (let d = 1; d <= daysInMonth; d++) {
-      out.push({ d, muted: false, date: new Date(y, mo, d) })
-    }
-    return out
-  }, [viewMonth])
+  const fieldsRef = useMemo(
+    () =>
+      dismissOnOutsideMouseDown(() => {
+        setActiveField(null)
+      }),
+    [],
+  )
 
   // Whether `date` can end the stay being picked. Its own night may be held —
   // that is the next guest arriving the same afternoon.
   const canDepartOn = (date: Date) =>
-    activeField === "out" && date > checkIn && isStayFree(checkIn, date)
+    activeField === "out" && date > checkIn && isStayFree(nightSets, checkIn, date)
 
   const pickDate = (date: Date) => {
     if (canDepartOn(date)) {
@@ -385,7 +210,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     }
     // Anything else starts a new stay, which needs its first night free. The
     // departure is cleared: the guest picks it next, with a live preview.
-    if (isUnavailable(date) || date < today) return
+    if (isUnavailable(nightSets, date) || date < today) {
+      return
+    }
     setValue("checkIn", date, { shouldDirty: true })
     setValue("checkOut", null, { shouldDirty: true })
     setActiveField("out")
@@ -393,43 +220,31 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
   const openCal = (field: "in" | "out") => {
     setActiveField(field)
-    const target = field === "in" ? checkIn : stayEnd
-    setViewMonth(new Date(target.getFullYear(), target.getMonth(), 1))
+    setViewMonth(firstOfMonth(field === "in" ? checkIn : stayEnd))
   }
 
   // While the departure is being picked, the hovered day stands in for it.
-  const previewOut = activeField === "out" && hoverDate && canDepartOn(hoverDate) ? hoverDate : null
+  const previewOut =
+    activeField === "out" && hoverDate !== null && canDepartOn(hoverDate) ? hoverDate : null
   const shownOut = previewOut ?? checkOut
 
-  // First rule the request breaks, shown under the disabled button. Dates come
-  // first: they are the part a guest cannot fix by typing.
-  const name = watch("name")
-  const email = watch("email")
-  const tel = watch("tel")
-  const blockReason = !checkOut
-    ? m.villa_booking_reason_pick_departure()
-    : !isStayFree(checkIn, checkOut)
-      ? m.villa_booking_reason_dates_unavailable()
-      : !name.trim() || !email.trim() || !tel.trim()
-        ? m.villa_booking_reason_fill_contact()
-        : !EMAIL_PATTERN.test(email.trim())
-          ? m.villa_booking_reason_invalid_email()
-          : !PHONE_PATTERN.test(tel.trim())
-            ? m.villa_booking_reason_invalid_phone()
-            : null
-
-  const telField = register("tel", { required: true, pattern: PHONE_PATTERN })
+  const name = useWatch({ control, name: "name" })
+  const email = useWatch({ control, name: "email" })
+  const tel = useWatch({ control, name: "tel" })
+  const blockReason = getBlockReason(nightSets, { checkIn, checkOut, name, email, tel })
 
   const onSubmit = (values: BookingFormValues) => {
-    if (!values.checkOut || blockReason) return
+    if (values.checkOut === null || blockReason !== null) {
+      return
+    }
     createBooking({
       data: {
         villa_slug: villaSlug,
         guest_name: values.name,
         guest_email: values.email,
         guest_phone: values.tel,
-        check_in: format(values.checkIn, "yyyy-MM-dd"),
-        check_out: format(values.checkOut, "yyyy-MM-dd"),
+        check_in: dayKey(values.checkIn),
+        check_out: dayKey(values.checkOut),
         adults: values.guests,
         children: 0,
         message: values.description,
@@ -441,15 +256,9 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
     })
   }
 
-  const inputClassName =
-    "text-primary placeholder:text-on-surface-variant/50 mt-1 h-auto w-full rounded-none border-0 bg-transparent px-0 py-0 text-[15px] shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-[15px]"
-
   if (submitted) {
     return (
-      <aside
-        id="book"
-        className="bg-background border-outline-variant editorial-shadow border p-6 md:sticky md:top-28 md:p-8"
-      >
+      <aside id="book" className={PANEL_CLASS}>
         <div className="text-center">
           <h3 className="font-display text-primary text-[28px] italic">
             {m.villa_booking_success_title()}
@@ -463,312 +272,68 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   }
 
   return (
-    <aside
-      id="book"
-      className="bg-background border-outline-variant editorial-shadow border p-6 md:sticky md:top-28 md:p-8"
-    >
+    <aside id="book" className={PANEL_CLASS}>
       {/* No headline nightly rate here: a single "from" figure misread the
           stay whenever a season rule or an override applied, and the real
           per-night prices are on the calendar and in the summary below. The
           rating carries the header on its own, and the whole strip drops when
           no review is approved rather than leaving an empty rule. */}
-      {publishedRating && (
-        <div className="border-outline-variant mb-6 flex flex-col gap-1 border-b pb-6 font-mono text-[11px] tracking-[0.1em]">
-          <span className="text-secondary text-[13px] tracking-[2px]">
-            {"★".repeat(publishedRating.filledStars)}
-            {"☆".repeat(5 - publishedRating.filledStars)}
-          </span>
-          <span className="text-on-surface-variant">
-            {publishedRating.score.toFixed(2)} ·{" "}
-            {m.villa_booking_review_count({ count: publishedRating.count })}
-          </span>
-        </div>
+      {publishedRating !== null && (
+        <RatingStrip
+          filledStars={publishedRating.filledStars}
+          score={publishedRating.score}
+          count={publishedRating.count}
+        />
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="border-outline-variant relative grid grid-cols-2 border">
-          <button
-            ref={ciRef}
-            type="button"
-            onClick={() => openCal("in")}
-            className={cn(
-              "border-outline-variant hover:bg-surface-container-low block border-r bg-white px-4 py-3.5 text-left transition-colors",
-              activeField === "in" && "bg-surface-container-low",
-            )}
-          >
-            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              {m.villa_booking_check_in()}
-            </span>
-            <span className="font-display text-primary mt-1 block text-[17px] italic">
-              {fmt(checkIn)}
-            </span>
-          </button>
-          <button
-            ref={coRef}
-            type="button"
-            onClick={() => openCal("out")}
-            className={cn(
-              "hover:bg-surface-container-low block bg-white px-4 py-3.5 text-left transition-colors",
-              activeField === "out" && "bg-surface-container-low",
-            )}
-          >
-            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              {m.villa_booking_check_out()}
-            </span>
-            <span className="font-display text-primary mt-1 block text-[17px] italic">
-              {checkOut ? fmt(checkOut) : m.villa_booking_add_date()}
-            </span>
-          </button>
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e)
+        }}
+        noValidate
+      >
+        <div ref={fieldsRef} className="border-outline-variant relative grid grid-cols-2 border">
+          <DateTrigger
+            label={m.villa_booking_check_in()}
+            value={fmt(checkIn)}
+            active={activeField === "in"}
+            className="border-outline-variant border-r"
+            onOpen={() => {
+              openCal("in")
+            }}
+          />
+          <DateTrigger
+            label={m.villa_booking_check_out()}
+            value={checkOut === null ? m.villa_booking_add_date() : fmt(checkOut)}
+            active={activeField === "out"}
+            className=""
+            onOpen={() => {
+              openCal("out")
+            }}
+          />
 
           {activeField !== null && (
-            <div
-              ref={popRef}
-              className="border-outline-variant editorial-shadow absolute top-[calc(100%+8px)] right-0 left-0 z-30 border bg-white p-5"
-            >
-              <div className="mb-3 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
-                  }
-                  aria-label={m.villa_booking_prev_month()}
-                  className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
-                >
-                  <ChevronLeft size={14} />
-                </button>
-                <h4 className="font-display text-primary text-[17px] italic">
-                  {fmtMonth(viewMonth)}
-                </h4>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
-                  }
-                  aria-label={m.villa_booking_next_month()}
-                  className="border-outline-variant text-primary inline-flex h-7 w-7 items-center justify-center rounded-full border"
-                >
-                  <ChevronRight size={14} />
-                </button>
-              </div>
-              <div className="grid grid-cols-7 gap-0.5" onMouseLeave={() => setHoverDate(null)}>
-                {getDaysOfWeek().map((d) => (
-                  <div
-                    key={d}
-                    className="text-on-surface-variant py-2 text-center font-mono text-[9.5px] tracking-[0.15em] uppercase"
-                  >
-                    {d}
-                  </div>
-                ))}
-                {cells.map((cell, i) => {
-                  if (cell.muted || !cell.date || cell.date < today) {
-                    return (
-                      <span
-                        key={i}
-                        className="text-outline-variant flex min-h-[42px] cursor-default items-center justify-center text-[13px]"
-                      >
-                        {cell.d}
-                      </span>
-                    )
-                  }
-                  const isCI = sameDay(cell.date, checkIn)
-                  const isCO = shownOut !== null && sameDay(cell.date, shownOut)
-                  const morning = nightState(addDays(cell.date, -1))
-                  const afternoon = nightState(cell.date)
-                  const background = dayBackground(morning, afternoon)
-                  // A held night can still be picked as the departure day.
-                  const departureOnly = afternoon !== "free" && canDepartOn(cell.date)
-                  const selectable = isCI || isCO || departureOnly
-                  if (!selectable && afternoon !== "free") {
-                    return (
-                      <span
-                        key={i}
-                        aria-disabled="true"
-                        title={
-                          afternoon === "booked"
-                            ? m.villa_booking_night_booked()
-                            : m.villa_booking_night_pending()
-                        }
-                        style={{ backgroundImage: background }}
-                        className={cn(
-                          "flex min-h-[42px] cursor-not-allowed items-center justify-center text-[13px]",
-                          afternoon === "booked"
-                            ? "text-on-surface-variant/50 line-through"
-                            : "text-secondary decoration-secondary/60 underline decoration-dashed decoration-2 underline-offset-4",
-                        )}
-                      >
-                        {cell.d}
-                      </span>
-                    )
-                  }
-                  // Free afternoon after a held night: the previous guest
-                  // leaves that morning, the next one can arrive.
-                  const arrivalAfterDeparture = afternoon === "free" && morning !== "free"
-                  const inRange = shownOut !== null && cell.date > checkIn && cell.date < shownOut
-                  // No night is bought on a departure day, so it carries no price.
-                  const showPrice = !(isCI || isCO || departureOnly)
-                  const priceCents = priceCentsFor(cell.date)
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      title={
-                        departureOnly
-                          ? m.villa_booking_departure_only()
-                          : arrivalAfterDeparture
-                            ? m.villa_booking_arrival_after_departure()
-                            : undefined
-                      }
-                      onClick={() => pickDate(cell.date as Date)}
-                      onMouseEnter={() => setHoverDate(cell.date as Date)}
-                      style={{ backgroundImage: background }}
-                      className={cn(
-                        "text-on-surface flex min-h-[42px] items-center justify-center text-[13px] transition-colors",
-                        inRange &&
-                          (previewOut
-                            ? "bg-secondary-container/50 text-on-secondary-container"
-                            : "bg-secondary-container text-on-secondary-container"),
-                        !inRange && !isCI && !isCO && "hover:bg-surface-container-low",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "flex flex-col items-center justify-center gap-0.5",
-                          (isCI || isCO) && "bg-primary text-on-primary size-[42px] rounded-full",
-                          isCO && previewOut && "bg-primary/70",
-                        )}
-                      >
-                        <span>{cell.d}</span>
-                        {showPrice && (
-                          <span className="text-on-surface-variant font-mono text-[9px] leading-none">
-                            €{Math.round(priceCents / 100)}
-                          </span>
-                        )}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-              <ul className="text-on-surface-variant mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-[9.5px] tracking-[0.12em] uppercase">
-                <li className="inline-flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="size-3"
-                    style={{ backgroundImage: dayBackground("booked", "booked") }}
-                  />
-                  {m.villa_booking_night_booked()}
-                </li>
-                <li className="inline-flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="size-3"
-                    style={{ backgroundImage: dayBackground("pending", "pending") }}
-                  />
-                  {m.villa_booking_night_pending()}
-                </li>
-                <li className="inline-flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="border-outline-variant size-3 border"
-                    style={{ backgroundImage: dayBackground("booked", "free") }}
-                  />
-                  {m.villa_booking_legend_changeover()}
-                </li>
-              </ul>
-            </div>
+            <VillaBookingCalendar
+              viewMonth={viewMonth}
+              onViewMonthChange={setViewMonth}
+              onHoverChange={setHoverDate}
+              checkIn={checkIn}
+              shownOut={shownOut}
+              previewOut={previewOut}
+              today={today}
+              nightSets={nightSets}
+              canDepartOn={canDepartOn}
+              priceCentsFor={priceCentsFor}
+              onPick={pickDate}
+            />
           )}
         </div>
 
-        <Controller
-          control={control}
-          name="guests"
-          render={({ field }) => (
-            <div className="border-outline-variant flex items-center justify-between border border-t-0 bg-white px-4 py-3.5">
-              <span className="text-on-surface-variant font-mono text-[10px] tracking-[0.22em] uppercase">
-                {m.villa_booking_guests_label()}
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => field.onChange(Math.max(1, field.value - 1))}
-                  aria-label={m.villa_booking_aria_remove_guest()}
-                  className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
-                >
-                  <Minus size={12} />
-                </button>
-                <span className="font-display text-primary text-[17px] italic">
-                  {guests}{" "}
-                  {guests === 1 ? m.villa_booking_guest_singular() : m.villa_booking_guest_plural()}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => field.onChange(Math.min(booking.maxGuests, field.value + 1))}
-                  aria-label={m.villa_booking_aria_add_guest()}
-                  className="border-outline-variant text-primary hover:bg-surface-container-low inline-flex h-7 w-7 items-center justify-center rounded-full border"
-                >
-                  <Plus size={12} />
-                </button>
-              </span>
-            </div>
-          )}
-        />
+        <GuestsField control={control} guests={guests} maxGuests={booking.maxGuests} />
 
-        <div className="border-outline-variant mt-4 grid border border-b-0 bg-white">
-          <label className="border-outline-variant block border-b px-4 py-3">
-            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              {m.villa_booking_name_label()}
-            </span>
-            <Input
-              type="text"
-              autoComplete="name"
-              placeholder={m.villa_booking_name_placeholder()}
-              className={inputClassName}
-              {...register("name", { required: true })}
-            />
-          </label>
-          <label className="border-outline-variant block border-b px-4 py-3">
-            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              {m.villa_booking_email_label()}
-            </span>
-            <Input
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              placeholder={m.villa_booking_email_placeholder()}
-              className={inputClassName}
-              {...register("email", { required: true, pattern: EMAIL_PATTERN })}
-            />
-          </label>
-          <label className="border-outline-variant block border-b px-4 py-3">
-            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              {m.villa_booking_phone_label()}
-            </span>
-            <Input
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              placeholder={m.villa_booking_phone_placeholder()}
-              className={inputClassName}
-              {...telField}
-              onChange={(e) => {
-                e.target.value = e.target.value.replace(NOT_PHONE_CHAR, "")
-                return telField.onChange(e)
-              }}
-            />
-          </label>
-          <label className="border-outline-variant block border-b px-4 py-3">
-            <span className="text-on-surface-variant block font-mono text-[10px] tracking-[0.22em] uppercase">
-              {m.villa_booking_stay_about_label()}
-            </span>
-            <Textarea
-              placeholder={m.villa_booking_stay_about_placeholder()}
-              rows={3}
-              className="text-primary placeholder:text-on-surface-variant/50 mt-1 min-h-0 w-full resize-none rounded-none border-0 bg-transparent px-0 py-0 text-[15px] leading-relaxed shadow-none focus-visible:border-0 focus-visible:ring-0 md:text-[15px]"
-              {...register("description")}
-            />
-          </label>
-        </div>
+        <ContactFields register={register} />
 
-        {topLevelError && (
+        {topLevelError !== null && (
           <p className="border-error/30 bg-error-container/20 text-error mt-3 border px-3 py-2 text-[13px]">
             {topLevelError}
           </p>
@@ -782,10 +347,10 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
           {isPending ? m.villa_booking_request_sending() : m.villa_booking_request_book()}
           {!isPending && <ArrowRight size={12} />}
         </Button>
-        {blockReason && (
-          <p className="text-on-surface-variant mt-2 text-center text-[12.5px]" role="status">
+        {blockReason !== null && (
+          <output className="text-on-surface-variant mt-2 block text-center text-[12.5px]">
             {blockReason}
-          </p>
+          </output>
         )}
         <Button
           type="button"
@@ -798,50 +363,15 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
 
       {/* No total before a departure is picked: zero nights plus the fees
           would read as a price for the stay. */}
-      {checkOut && (
-        <div className="border-outline-variant mt-6 grid gap-3 border-t pt-5 text-[13.5px]">
-          {priceBreakdown.length > 1 ? (
-            priceBreakdown.map(({ priceCents, count }) => (
-              <div key={priceCents} className="text-on-surface-variant flex justify-between">
-                <span>
-                  {m.villa_booking_nights_at_price({
-                    count,
-                    nightsWord:
-                      count === 1
-                        ? m.villa_booking_night_singular()
-                        : m.villa_booking_night_plural(),
-                    price: Math.round(priceCents / 100),
-                  })}
-                </span>
-                <span>€{((priceCents * count) / 100).toLocaleString()}</span>
-              </div>
-            ))
-          ) : (
-            <div className="text-on-surface-variant flex justify-between">
-              <span>
-                {nights}{" "}
-                {nights === 1 ? m.villa_booking_night_singular() : m.villa_booking_night_plural()}
-              </span>
-              <span>€{nightsSubtotal.toLocaleString()}</span>
-            </div>
-          )}
-          {cleaningFee > 0 && (
-            <div className="text-on-surface-variant flex justify-between">
-              <span>{m.villa_booking_cleaning_fee()}</span>
-              <span>€{cleaningFee.toLocaleString()}</span>
-            </div>
-          )}
-          {conciergeFee > 0 && (
-            <div className="text-on-surface-variant flex justify-between">
-              <span>{m.villa_booking_concierge_fee()}</span>
-              <span>€{conciergeFee.toLocaleString()}</span>
-            </div>
-          )}
-          <div className="font-display text-primary border-outline-variant mt-1 flex justify-between border-t pt-3.5 text-[22px] italic">
-            <span>{m.villa_booking_total()}</span>
-            <span>€{total.toLocaleString()}</span>
-          </div>
-        </div>
+      {checkOut !== null && (
+        <VillaBookingSummary
+          priceBreakdown={priceBreakdown}
+          nights={nights}
+          nightsSubtotal={nightsSubtotal}
+          cleaningFee={cleaningFee}
+          conciergeFee={conciergeFee}
+          total={total}
+        />
       )}
       <p className="text-on-surface-variant mt-4 text-center text-xs italic">
         {m.villa_booking_no_charge_note()}

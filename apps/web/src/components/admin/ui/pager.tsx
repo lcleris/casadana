@@ -7,7 +7,9 @@ interface PagerProps {
 }
 
 export function Pager({ page, maxPage, onPageChange }: PagerProps) {
-  if (maxPage <= 1) return null
+  if (maxPage <= 1) {
+    return null
+  }
 
   return (
     <div className="border-outline-variant flex items-center justify-center gap-4 border-t px-5 py-3.5">
@@ -16,7 +18,9 @@ export function Pager({ page, maxPage, onPageChange }: PagerProps) {
         variant="outline"
         size="sm"
         disabled={page <= 1}
-        onClick={() => onPageChange(page - 1)}
+        onClick={() => {
+          onPageChange(page - 1)
+        }}
       >
         ‹ Précédent
       </Button>
@@ -28,7 +32,9 @@ export function Pager({ page, maxPage, onPageChange }: PagerProps) {
         variant="outline"
         size="sm"
         disabled={page >= maxPage}
-        onClick={() => onPageChange(page + 1)}
+        onClick={() => {
+          onPageChange(page + 1)
+        }}
       >
         Suivant ›
       </Button>

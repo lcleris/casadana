@@ -51,7 +51,7 @@ import CASAY_TERRACE_3 from "@/assets/casadessy/terrace3.jpeg"
 import CASAY_TERRACE_4 from "@/assets/casadessy/terrace4.jpeg"
 import { m } from "@/paraglide/messages"
 
-import { GalleryCategory } from "./gallery-categories.const"
+import type { GalleryCategory } from "./gallery-categories.const"
 
 export interface GalleryEntry {
   src: string
@@ -888,16 +888,11 @@ function buildCasacasay(): VillaData {
 }
 
 export function getVilla(id: string): VillaData | null {
-  if (id === "casadana") return buildCasadana()
-  if (id === "casacasay") return buildCasacasay()
+  if (id === "casadana") {
+    return buildCasadana()
+  }
+  if (id === "casacasay") {
+    return buildCasacasay()
+  }
   return null
 }
-
-export const VILLAS = {
-  get casadana() {
-    return buildCasadana()
-  },
-  get casacasay() {
-    return buildCasacasay()
-  },
-} as const

@@ -58,7 +58,7 @@ export default function AddReservationDialog({ property }: AddReservationDialogP
   const { mutate: createBooking, isPending } = useCreateBooking({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
+        void queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Réservation ajoutée")
         setOpen(false)
         reset()
@@ -85,7 +85,7 @@ export default function AddReservationDialog({ property }: AddReservationDialogP
         guest_phone: values.guestPhone,
         check_in: values.checkIn,
         check_out: values.checkOut,
-        adults: Number(values.adults),
+        adults: values.adults,
         children: 0,
         source: values.source,
       },
@@ -97,7 +97,12 @@ export default function AddReservationDialog({ property }: AddReservationDialogP
       <DialogTrigger render={<Button type="button" />}>Ajouter une réservation</DialogTrigger>
       <DialogContent>
         <DialogTitle>Ajouter une réservation</DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e)
+          }}
+          className="flex flex-col gap-3"
+        >
           <Field>
             <FieldLabel htmlFor="guestName">Nom du voyageur</FieldLabel>
             <Input id="guestName" {...register("guestName", { required: true })} />

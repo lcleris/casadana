@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { useCallback, useEffect, useRef } from "react"
+import { useRef } from "react"
+import { preload } from "react-dom"
 
 import {
   Dialog,
@@ -10,8 +11,10 @@ import {
 } from "@/components/ui/dialog"
 import { m } from "@/paraglide/messages"
 
+const ARROW_STEP: Record<string, number | undefined> = { ArrowLeft: -1, ArrowRight: 1 }
+
 /** Minimal shape the viewer needs — `GalleryEntry` and `BentoTile` both satisfy it. */
-export interface ViewerPhoto {
+interface ViewerPhoto {
   src: string
   label: string
 }
@@ -30,6 +33,19 @@ const SWIPE_THRESHOLD_PX = 48
 /** Wraps around so navigation keeps working whatever the set size is. */
 function wrap(index: number, total: number): number {
   return ((index % total) + total) % total
+}
+
+/** Warms the neighbours so stepping through a large gallery does not flash. */
+function preloadNeighbours(photos: Array<ViewerPhoto>, index: number | null) {
+  if (index === null) {
+    return
+  }
+  for (const offset of [-1, 1]) {
+    const neighbour = photos[wrap(index + offset, photos.length)]
+    if (neighbour) {
+      preload(neighbour.src, { as: "image" })
+    }
+  }
 }
 
 const CONTROL_CLASS =
@@ -52,40 +68,24 @@ export default function VillaPhotoViewer({
   const current = open ? photos[currentIndex] : undefined
   const hasSiblings = total > 1
 
-  const go = useCallback(
-    (delta: number) => {
-      if (index === null || total === 0) return
-      onIndexChange(wrap(index + delta, total))
-    },
-    [index, total, onIndexChange],
-  )
-
-  // Left/right arrows move through the set. Escape is handled by the Dialog.
-  useEffect(() => {
-    if (!open || !hasSiblings) return
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault()
-        go(-1)
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault()
-        go(1)
-      }
+  const go = (delta: number) => {
+    if (index === null || total === 0) {
+      return
     }
-    document.addEventListener("keydown", handler)
-    return () => document.removeEventListener("keydown", handler)
-  }, [open, hasSiblings, go])
+    onIndexChange(wrap(index + delta, total))
+  }
 
-  // Warm the neighbours so stepping through a large gallery does not flash.
-  useEffect(() => {
-    if (!open || !hasSiblings) return
-    for (const offset of [-1, 1]) {
-      const neighbour = photos[wrap(currentIndex + offset, total)]
-      if (!neighbour) continue
-      const preloader = new Image()
-      preloader.src = neighbour.src
+  // Left/right arrows move through the set. Escape is handled by the Dialog,
+  // which also keeps focus inside the popup, so its keydown sees every key.
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    const delta = ARROW_STEP[event.key]
+    if (delta !== undefined) {
+      event.preventDefault()
+      go(delta)
     }
-  }, [open, hasSiblings, photos, currentIndex, total])
+  }
+
+  preloadNeighbours(photos, index)
 
   const touchStartX = useRef<number | null>(null)
 
@@ -97,9 +97,13 @@ export default function VillaPhotoViewer({
     const startX = touchStartX.current
     touchStartX.current = null
     const endX = event.changedTouches[0]?.clientX
-    if (startX === null || endX === undefined) return
+    if (startX === null || endX === undefined) {
+      return
+    }
     const deltaX = endX - startX
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) {
+      return
+    }
     go(deltaX < 0 ? 1 : -1)
   }
 
@@ -107,7 +111,9 @@ export default function VillaPhotoViewer({
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose()
+        if (!nextOpen) {
+          onClose()
+        }
       }}
     >
       <DialogPortal>
@@ -118,6 +124,7 @@ export default function VillaPhotoViewer({
         <DialogPopup
           aria-modal="true"
           className="text-inverse-on-surface fixed inset-0 z-[200] flex flex-col opacity-100 transition-opacity duration-300 outline-none data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
+          onKeyDown={handleKeyDown}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -140,9 +147,12 @@ export default function VillaPhotoViewer({
 
           {/* Clicking the empty area around the photo closes the viewer. */}
           <div
+            role="presentation"
             className="relative flex flex-1 items-center justify-center overflow-hidden p-4 md:px-20 md:py-10"
             onClick={(event) => {
-              if (event.target === event.currentTarget) onClose()
+              if (event.target === event.currentTarget) {
+                onClose()
+              }
             }}
           >
             {current && (
@@ -158,7 +168,9 @@ export default function VillaPhotoViewer({
               <>
                 <button
                   type="button"
-                  onClick={() => go(-1)}
+                  onClick={() => {
+                    go(-1)
+                  }}
                   aria-label={m.villa_photo_viewer_previous()}
                   className={`${CONTROL_CLASS} bg-inverse-surface/50 absolute top-1/2 left-3 -translate-y-1/2 md:left-6`}
                 >
@@ -166,7 +178,9 @@ export default function VillaPhotoViewer({
                 </button>
                 <button
                   type="button"
-                  onClick={() => go(1)}
+                  onClick={() => {
+                    go(1)
+                  }}
                   aria-label={m.villa_photo_viewer_next()}
                   className={`${CONTROL_CLASS} bg-inverse-surface/50 absolute top-1/2 right-3 -translate-y-1/2 md:right-6`}
                 >

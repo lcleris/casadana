@@ -1,6 +1,5 @@
 import { useGetVillaReviewMeta, useListAdminReviews } from "@casa-dana/api"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
+import { Navigate, createFileRoute, useNavigate } from "@tanstack/react-router"
 
 import AddReviewDialog from "@/components/admin/reviews/add-review-dialog"
 import RatingBreakdownCard from "@/components/admin/reviews/rating-breakdown-card"
@@ -38,9 +37,28 @@ const PROPERTY_LABELS: Record<Property, string> = {
   casacasay: "Casa CasAy",
 }
 
+// Deleting the last row of the last page would otherwise strand the URL on a
+// page that no longer exists. Waiting for the fetch is the point: until it
+// lands there are no rows, so maxPage reads as 1 and a link straight to
+// ?page=3 would be rewritten to page 1 before the data ever arrived.
+function ClampPage({ loaded, page, maxPage }: { loaded: boolean; page: number; maxPage: number }) {
+  if (!loaded || page <= maxPage) {
+    return null
+  }
+  return <Navigate from={Route.fullPath} replace search={(prev) => ({ ...prev, page: maxPage })} />
+}
+
 function ReviewsPage() {
   const { property, page } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
+
+  const goToPage = (nextPage: number) => {
+    void navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
+  }
+
+  const switchProperty = (nextProperty: Property) => {
+    void navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
+  }
 
   // The admin endpoint returns every review for the villa in one go, so the
   // counts and the pagination below are both derived client-side.
@@ -61,26 +79,9 @@ function ReviewsPage() {
   const currentPage = Math.min(page, maxPage)
   const visible = reviews.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
-  // Deleting the last row of the last page would otherwise strand the URL on a
-  // page that no longer exists. Waiting for the fetch is the point: until it
-  // lands there are no rows, so maxPage reads as 1 and a link straight to
-  // ?page=3 would be rewritten to page 1 before the data ever arrived.
-  useEffect(() => {
-    if (data && page > maxPage) {
-      navigate({ replace: true, search: (prev) => ({ ...prev, page: maxPage }) })
-    }
-  }, [data, page, maxPage, navigate])
-
-  const goToPage = (nextPage: number) => {
-    navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
-  }
-
-  const switchProperty = (nextProperty: Property) => {
-    navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
-  }
-
   return (
     <div>
+      <ClampPage loaded={data !== undefined} page={page} maxPage={maxPage} />
       <div className="mb-7 flex flex-wrap items-baseline justify-between gap-4">
         <div>
           <h2 className="text-on-surface text-2xl font-bold">Avis</h2>
@@ -94,7 +95,9 @@ function ReviewsPage() {
               <button
                 key={p}
                 type="button"
-                onClick={() => switchProperty(p)}
+                onClick={() => {
+                  switchProperty(p)
+                }}
                 className={
                   p === property
                     ? "bg-primary text-on-primary rounded-md px-3 py-1.5 text-[13px] font-medium"
