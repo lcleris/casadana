@@ -2,17 +2,3 @@
 # Strict node_modules: a workspace only resolves what its own package.json
 # declares, instead of borrowing a hoisted transitive dependency.
 linker = "isolated"
-
-# Supply-chain delay: only resolve versions public for at least 24h, so a
-# compromised release yanked within the day never lands. Applies to resolution
-# only; `--frozen-lockfile` installs reuse bun.lock.
-minimumReleaseAge = 86400
-# Lint and type tooling cannot change runtime behaviour, so it stays same-day.
-minimumReleaseAgeExcludes = [
-  "fallow",
-  "oxfmt",
-  "oxlint",
-  "oxlint-tsgolint",
-  "typescript",
-  "ultracite",
-]
