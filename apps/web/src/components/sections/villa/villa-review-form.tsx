@@ -2,7 +2,7 @@ import { ApiError, useSubmitVillaReview } from "@casa-dana/api"
 import type { ReviewCategoryRatings } from "@casa-dana/api"
 import { ArrowRight } from "lucide-react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -114,15 +114,15 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
   const [topLevelError, setTopLevelError] = useState<string | null>(null)
 
   const {
+    control,
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<ReviewFormValues>({ defaultValues: DEFAULT_VALUES })
 
-  const rating = watch("rating")
-  const categories = watch("categories")
+  const rating = useWatch({ control, name: "rating" })
+  const categories = useWatch({ control, name: "categories" })
 
   const { mutate: submitReview, isPending } = useSubmitVillaReview({
     mutation: {
@@ -192,7 +192,13 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
         {m.villa_reviews_form_intro()}
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-7">
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e)
+        }}
+        noValidate
+        className="mt-7"
+      >
         <div className="border-outline-variant border-b pb-5">
           <span className={fieldLabelClassName}>{m.villa_reviews_form_rating_label()}</span>
           <div className="mt-2">
@@ -264,13 +270,13 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
           </div>
         </fieldset>
 
-        {(errors.authorName || errors.body) && (
+        {(errors.authorName !== undefined || errors.body !== undefined) && (
           <p role="alert" className="text-error mt-4 text-[13px]">
             {m.villa_reviews_form_required()}
           </p>
         )}
 
-        {topLevelError && (
+        {topLevelError !== null && (
           <p
             role="alert"
             className="border-error/30 bg-error-container/20 text-error mt-4 border px-3 py-2 text-[13px]"
