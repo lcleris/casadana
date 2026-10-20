@@ -10,8 +10,6 @@ import CASACASAY_TERRACE from "@/assets/casadessy/terrace1.jpeg"
 import type { PropertyCardProps } from "@/components/sections/property-card"
 import { m } from "@/paraglide/messages"
 
-import type { GalleryCategory } from "./gallery-categories.const"
-
 export const properties = [
   {
     id: "casadana",

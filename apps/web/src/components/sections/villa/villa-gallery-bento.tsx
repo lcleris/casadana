@@ -88,27 +88,27 @@ export default function VillaGalleryBento({ data, onOpenAll }: VillaGalleryBento
         </div>
 
         <div className="grid auto-rows-[220px] grid-cols-1 gap-3 md:grid-cols-12">
-          {data.tiles.map((tile, i) => {
+          {data.tiles.map((tile) => {
             const canOpen = photosFor(tile.category).length > 0
-            const visual = tile.placeholder ? (
-              <PlaceholderArt label={tile.placeholderLabel ?? tile.caption} />
-            ) : (
-              <>
-                <img
-                  src={tile.src}
-                  alt={tile.caption}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06] group-focus-visible:scale-[1.06]"
-                  style={{ willChange: "transform" }}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, transparent 45%, oklch(23.6% 0.108 253 / 0.7) 100%)",
-                  }}
-                />
-              </>
-            )
+            const visual =
+              tile.placeholder === true ? (
+                <PlaceholderArt label={tile.placeholderLabel ?? tile.caption} />
+              ) : (
+                <>
+                  <img
+                    src={tile.src}
+                    alt={tile.caption}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06] group-hover:will-change-transform group-focus-visible:scale-[1.06] group-focus-visible:will-change-transform"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, transparent 45%, oklch(23.6% 0.108 253 / 0.7) 100%)",
+                    }}
+                  />
+                </>
+              )
 
             const caption = (
               <div className="relative z-10 flex h-full flex-col justify-end p-5 text-white">
@@ -137,7 +137,7 @@ export default function VillaGalleryBento({ data, onOpenAll }: VillaGalleryBento
             if (!canOpen) {
               return (
                 <div
-                  key={`${tile.label}-${i}`}
+                  key={tile.label}
                   className={cn("group relative overflow-hidden text-left", spanClass)}
                 >
                   {visual}
@@ -148,7 +148,7 @@ export default function VillaGalleryBento({ data, onOpenAll }: VillaGalleryBento
 
             return (
               <button
-                key={`${tile.label}-${i}`}
+                key={tile.label}
                 type="button"
                 onClick={() => {
                   openTile(tile)

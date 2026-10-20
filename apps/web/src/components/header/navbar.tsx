@@ -23,6 +23,13 @@ function NavBrand() {
   )
 }
 
+const getNavLinks = (): Array<NavLink> => [
+  { href: "/#collection", label: m.nav_link_collection() },
+  { href: "/villa/casadana", label: m.nav_link_dana() },
+  { href: "/villa/casacasay", label: m.nav_link_casay() },
+  { href: "/#story", label: m.nav_link_story() },
+]
+
 function NavLinks({ links }: { links: Array<NavLink> }) {
   return (
     <nav className="hidden items-center justify-center gap-7 lg:flex">
@@ -54,13 +61,6 @@ export default function Navbar() {
     }
   }, [])
 
-  const links: Array<NavLink> = [
-    { href: "/#collection", label: m.nav_link_collection() },
-    { href: "/villa/casadana", label: m.nav_link_dana() },
-    { href: "/villa/casacasay", label: m.nav_link_casay() },
-    { href: "/#story", label: m.nav_link_story() },
-  ]
-
   return (
     <header
       className={cn(
@@ -78,7 +78,7 @@ export default function Navbar() {
         )}
       >
         <NavBrand />
-        <NavLinks links={links} />
+        <NavLinks links={getNavLinks()} />
         <div className="flex items-center justify-end gap-4">
           <div className="hidden md:block">
             <LangSelector />

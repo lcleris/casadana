@@ -1,3 +1,5 @@
+import { useMemo } from "react"
+
 import bgHome from "@/assets/shared/bg-home.jpeg"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import type { PublishedRating } from "@/lib/use-published-rating"
@@ -21,15 +23,17 @@ function useCollectionRatingValue(): string {
   const rated = [usePublishedRating("casadana"), usePublishedRating("casacasay")].filter(
     (rating): rating is PublishedRating => rating !== null,
   )
+  const scoreFormat = useMemo(
+    () => new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 1 }),
+    [],
+  )
   const reviewCount = rated.reduce((total, rating) => total + rating.count, 0)
   const score =
     reviewCount === 0
       ? 0
       : rated.reduce((total, rating) => total + rating.score * rating.count, 0) / reviewCount
 
-  return m.home_hero_stat_rating_value({
-    score: new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 1 }).format(score),
-  })
+  return m.home_hero_stat_rating_value({ score: scoreFormat.format(score) })
 }
 
 function HeroStats({ stats }: { stats: Array<VitalStat> }) {

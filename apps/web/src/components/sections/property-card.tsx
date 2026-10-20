@@ -1,10 +1,10 @@
-import { useGetVillaPricingSettings } from "@casa-dana/api"
 import { Link } from "@tanstack/react-router"
 import { ArrowRight } from "lucide-react"
 import { DynamicIcon } from "lucide-react/dynamic"
 import type { IconName } from "lucide-react/dynamic"
 
 import type { GalleryCategory } from "@/constants/gallery-categories.const"
+import { useBaseNightlyEuros } from "@/lib/use-base-nightly-euros"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -83,10 +83,7 @@ function PropertyMeta({ villaId, price }: Pick<PropertyCardProps, "price"> & { v
   // The nightly rate is edited per villa in the back-office (same source as the
   // villa page's booking panel). `price.amount` is only a fallback: settings
   // read back all-zero for a villa that has never been configured.
-  const { data: settings } = useGetVillaPricingSettings(villaId)
-  const amount = settings?.base_price_cents
-    ? Math.round(settings.base_price_cents / 100)
-    : price.amount
+  const amount = useBaseNightlyEuros(villaId, price.amount)
 
   // Computed from the villa's approved reviews, so this card agrees with the
   // reviews section on the villa page it links to. Null until a review is

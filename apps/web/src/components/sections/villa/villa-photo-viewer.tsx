@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { useCallback, useEffect, useRef } from "react"
+import { useEffect, useEffectEvent, useRef } from "react"
 
 import {
   Dialog,
@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/dialog"
 import { m } from "@/paraglide/messages"
 
+const ARROW_STEP: Record<string, number | undefined> = { ArrowLeft: -1, ArrowRight: 1 }
+
 /** Minimal shape the viewer needs — `GalleryEntry` and `BentoTile` both satisfy it. */
-export interface ViewerPhoto {
+interface ViewerPhoto {
   src: string
   label: string
 }
@@ -52,35 +54,34 @@ export default function VillaPhotoViewer({
   const current = open ? photos[currentIndex] : undefined
   const hasSiblings = total > 1
 
-  const go = useCallback(
-    (delta: number) => {
-      if (index === null || total === 0) {
-        return
-      }
-      onIndexChange(wrap(index + delta, total))
-    },
-    [index, total, onIndexChange],
-  )
+  const go = (delta: number) => {
+    if (index === null || total === 0) {
+      return
+    }
+    onIndexChange(wrap(index + delta, total))
+  }
 
   // Left/right arrows move through the set. Escape is handled by the Dialog.
-  useEffect(() => {
+  const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
     if (!open || !hasSiblings) {
       return
     }
+    const delta = ARROW_STEP[event.key]
+    if (delta !== undefined) {
+      event.preventDefault()
+      go(delta)
+    }
+  })
+
+  useEffect(() => {
     const handler = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault()
-        go(-1)
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault()
-        go(1)
-      }
+      onKeyDown(event)
     }
     document.addEventListener("keydown", handler)
     return () => {
       document.removeEventListener("keydown", handler)
     }
-  }, [open, hasSiblings, go])
+  }, [])
 
   // Warm the neighbours so stepping through a large gallery does not flash.
   useEffect(() => {
@@ -156,6 +157,7 @@ export default function VillaPhotoViewer({
 
           {/* Clicking the empty area around the photo closes the viewer. */}
           <div
+            role="presentation"
             className="relative flex flex-1 items-center justify-center overflow-hidden p-4 md:px-20 md:py-10"
             onClick={(event) => {
               if (event.target === event.currentTarget) {

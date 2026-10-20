@@ -43,7 +43,7 @@ export default function VillaFaq({ data }: VillaFaqProps) {
                 <span className="font-display text-primary text-[20px] font-normal italic md:text-[22px]">
                   {entry.question}
                 </span>
-                <span className="border-outline-variant text-primary group-open:bg-primary group-open:text-on-primary group-open:border-primary inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-all duration-300 group-open:rotate-45">
+                <span className="border-outline-variant text-primary group-open:bg-primary group-open:text-on-primary group-open:border-primary inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-[background-color,color,border-color,rotate] duration-300 group-open:rotate-45">
                   <Plus size={14} />
                 </span>
               </summary>

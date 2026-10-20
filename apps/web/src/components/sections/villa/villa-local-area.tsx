@@ -13,7 +13,7 @@ export default function VillaLocalArea({ data }: VillaLocalAreaProps) {
           <div className="aspect-[4/5] overflow-hidden">
             <img src={data.mainImage} alt={data.titleLead} className="h-full w-full object-cover" />
           </div>
-          {data.overlapImage && (
+          {data.overlapImage !== undefined && data.overlapImage !== "" && (
             <div className="border-background editorial-shadow absolute right-0 bottom-0 hidden h-48 w-48 overflow-hidden border-[10px] md:block md:h-60 md:w-60">
               <img
                 src={data.overlapImage}
@@ -30,8 +30,8 @@ export default function VillaLocalArea({ data }: VillaLocalAreaProps) {
               {data.stampBig}
             </span>
             <span className="mt-1 max-w-[7ch] font-mono text-[8.5px] leading-tight tracking-[0.22em] uppercase">
-              {data.stampSmall.split("\n").map((line, i) => (
-                <span key={i} className="block">
+              {data.stampSmall.split("\n").map((line) => (
+                <span key={line} className="block">
                   {line}
                 </span>
               ))}

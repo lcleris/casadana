@@ -1,5 +1,6 @@
-import { useGetVillaPricingSettings } from "@casa-dana/api"
+import { useMemo } from "react"
 
+import { useBaseNightlyEuros } from "@/lib/use-base-nightly-euros"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import { m } from "@/paraglide/messages"
 import { getLocale } from "@/paraglide/runtime"
@@ -50,13 +51,61 @@ const BAND_COLUMNS: Record<number, string> = {
 function useRatingStat(villaSlug: string): Stat {
   const rating = usePublishedRating(villaSlug)
   const score = rating?.score ?? 0
+  const scoreFormat = useMemo(
+    () => new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }),
+    [],
+  )
 
   return {
     label: m.villa_hero_stat_rating_label(),
     value: m.villa_hero_stat_rating_value({
-      score: new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }).format(score),
+      score: scoreFormat.format(score),
     }),
   }
+}
+
+// Rating and licence close the band together: they are the two cells that
+// vouch for the villa rather than sell it. A villa with no registration
+// number on file drops the cell instead of showing a blank one.
+function buildBandCells(stats: Array<Stat>, ratingStat: Stat, licence: string | undefined) {
+  const licenceCells: Array<BandCell> =
+    licence !== undefined && licence !== ""
+      ? [{ label: m.villa_hero_stat_licence_label(), value: licence, kind: "licence" }]
+      : []
+  return [
+    ...stats.map((stat) => ({ ...stat, kind: "editorial" as const })),
+    { ...ratingStat, kind: "editorial" as const },
+    ...licenceCells,
+  ]
+}
+
+// Only the first cell has no left rule; every cell but the last row gets a
+// bottom rule on mobile, where the band wraps to two columns.
+function bandCellClass(index: number, count: number): string {
+  const leftRule = index === 0 ? "" : "md:border-l md:border-white/20"
+  const lastRowStart = count - (count % 2 === 0 ? 2 : 1)
+  const bottomRule =
+    index < lastRowStart ? "border-b border-white/20 pb-3 md:border-b-0 md:pb-0" : ""
+  return `px-4 md:px-7 ${leftRule} ${bottomRule}`
+}
+
+function HeroBand({ cells }: { cells: Array<BandCell> }) {
+  return (
+    <div
+      className={`grid grid-cols-2 border-y border-white/25 py-5 md:py-6 ${
+        BAND_COLUMNS[cells.length] ?? BAND_COLUMNS[5]
+      }`}
+    >
+      {cells.map((cell, i) => (
+        <div key={cell.label} className={bandCellClass(i, cells.length)}>
+          <div className="font-mono text-[10px] tracking-[0.22em] text-white/70 uppercase">
+            {cell.label}
+          </div>
+          <div className={BAND_VALUE_CLASS[cell.kind]}>{cell.value}</div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 interface VillaHeroProps {
@@ -84,27 +133,11 @@ export default function VillaHero({
   priceLabel,
   licence,
 }: VillaHeroProps) {
-  // Same back-office base rate the booking panel below uses, so the two prices
-  // on this page can't drift apart. `price` is only a fallback for a villa that
-  // has never been configured (settings read back all-zero then).
-  const { data: settings } = useGetVillaPricingSettings(villaSlug)
-  const amount = settings?.base_price_cents ? Math.round(settings.base_price_cents / 100) : price
-
+  const amount = useBaseNightlyEuros(villaSlug, price)
   // The villa's own stats are static facts (sleeps, bedrooms, surface…); the
   // rating is the one figure that has to be read from the approved reviews.
   const ratingStat = useRatingStat(villaSlug)
-
-  // Rating and licence close the band together: they are the two cells that
-  // vouch for the villa rather than sell it. A villa with no registration
-  // number on file drops the cell instead of showing a blank one.
-  const licenceCells: Array<BandCell> = licence
-    ? [{ label: m.villa_hero_stat_licence_label(), value: licence, kind: "licence" }]
-    : []
-  const cells: Array<BandCell> = [
-    ...stats.map((stat) => ({ ...stat, kind: "editorial" as const })),
-    { ...ratingStat, kind: "editorial" as const },
-    ...licenceCells,
-  ]
+  const cells = buildBandCells(stats, ratingStat, licence)
 
   return (
     <section className="relative h-screen min-h-[600px] overflow-hidden text-white md:min-h-[720px]">
@@ -150,27 +183,7 @@ export default function VillaHero({
           </h1>
         </div>
 
-        <div
-          className={`grid grid-cols-2 border-y border-white/25 py-5 md:py-6 ${
-            BAND_COLUMNS[cells.length] ?? BAND_COLUMNS[5]
-          }`}
-        >
-          {cells.map((cell, i) => (
-            <div
-              key={cell.label}
-              className={`px-4 md:px-7 ${i === 0 ? "" : "md:border-l md:border-white/20"} ${
-                i < cells.length - (cells.length % 2 === 0 ? 2 : 1)
-                  ? "border-b border-white/20 pb-3 md:border-b-0 md:pb-0"
-                  : ""
-              }`}
-            >
-              <div className="font-mono text-[10px] tracking-[0.22em] text-white/70 uppercase">
-                {cell.label}
-              </div>
-              <div className={BAND_VALUE_CLASS[cell.kind]}>{cell.value}</div>
-            </div>
-          ))}
-        </div>
+        <HeroBand cells={cells} />
 
         <div className="flex flex-col items-start justify-between gap-4 py-7 md:flex-row md:items-center md:py-8">
           <div className="font-display text-[26px] italic md:text-[28px]">

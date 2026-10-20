@@ -896,12 +896,3 @@ export function getVilla(id: string): VillaData | null {
   }
   return null
 }
-
-export const VILLAS = {
-  get casadana() {
-    return buildCasadana()
-  },
-  get casacasay() {
-    return buildCasacasay()
-  },
-} as const

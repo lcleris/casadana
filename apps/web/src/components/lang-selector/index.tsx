@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getLocale, setLocale } from "@/paraglide/runtime"
+import { getLocale, isLocale, setLocale } from "@/paraglide/runtime"
 import type { Locale } from "@/paraglide/runtime"
 
 const LANGUAGES = {
@@ -24,11 +24,20 @@ const availableLanguages = {
   fr: FrenchFlag,
 } satisfies Record<Locale, string>
 
+const LOCALES = Object.keys(availableLanguages).filter(isLocale)
+
 export function LangSelector() {
   const language = getLocale()
 
   return (
-    <Select value={language} onValueChange={(lang) => setLocale(lang!)}>
+    <Select
+      value={language}
+      onValueChange={(lang) => {
+        if (isLocale(lang)) {
+          void setLocale(lang)
+        }
+      }}
+    >
       <SelectTrigger className="w-fit border-none">
         <SelectValue>
           <img src={availableLanguages[language]} alt={language} className="h-6 w-8" />
@@ -36,7 +45,7 @@ export function LangSelector() {
       </SelectTrigger>
       <SelectContent align="end" className="border-none bg-white/30 backdrop-blur-2xl">
         <SelectGroup>
-          {(Object.keys(availableLanguages) as Array<Locale>).map((lang) => (
+          {LOCALES.map((lang) => (
             <SelectItem key={lang} className="flex items-center space-x-2" value={lang}>
               <img src={availableLanguages[lang]} alt={LANGUAGES[lang]} className="h-6 w-8" />
               <span>{LANGUAGES[lang]}</span>
