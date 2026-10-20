@@ -1,0 +1,852 @@
+{
+  "apps/web/src/App.tsx": {
+    "unicorn/filename-case": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/add-reservation-dialog.tsx": {
+    "typescript/no-floating-promises": {
+      "count": 1
+    },
+    "typescript/no-misused-promises": {
+      "count": 1
+    },
+    "typescript/no-unnecessary-type-conversion": {
+      "count": 1
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/admin-sidebar.tsx": {
+    "typescript/no-confusing-void-expression": {
+      "count": 1
+    },
+    "typescript/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/admin-users-table.tsx": {
+    "jsx-a11y/control-has-associated-label": {
+      "count": 1
+    },
+    "no-alert": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 2
+    },
+    "typescript/no-floating-promises": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 2
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/create-admin-user-dialog.tsx": {
+    "typescript/no-floating-promises": {
+      "count": 1
+    },
+    "typescript/no-misused-promises": {
+      "count": 1
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/history/history-table.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/pricing/base-pricing-card.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "import/consistent-type-specifier-style": {
+      "count": 2
+    },
+    "react/set-state-in-effect": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 5
+    },
+    "typescript/no-floating-promises": {
+      "count": 1
+    },
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/pricing/money.ts": {
+    "unicorn/prefer-number-coercion": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/pricing/rule-row.tsx": {
+    "curly": {
+      "count": 6
+    },
+    "react/memo-dependencies": {
+      "count": 1
+    },
+    "react/refs": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 6
+    }
+  },
+  "apps/web/src/components/admin/pricing/season-rules-card.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 2
+    },
+    "no-nested-ternary": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 5
+    },
+    "typescript/no-floating-promises": {
+      "count": 3
+    },
+    "typescript/prefer-nullish-coalescing": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/reservation-table.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 3
+    },
+    "jsx-a11y/control-has-associated-label": {
+      "count": 1
+    },
+    "no-alert": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 2
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 4
+    },
+    "typescript/no-floating-promises": {
+      "count": 2
+    }
+  },
+  "apps/web/src/components/admin/reviews/add-review-dialog.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "react/incompatible-library": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 2
+    },
+    "typescript/no-floating-promises": {
+      "count": 3
+    },
+    "typescript/no-misused-promises": {
+      "count": 1
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/reviews/rating-breakdown-card.tsx": {
+    "no-negated-condition": {
+      "count": 1
+    },
+    "no-use-before-define": {
+      "count": 1
+    },
+    "unicorn/no-negated-condition": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/reviews/review-status.ts": {
+    "typescript/array-type": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/reviews/review-table.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 2
+    },
+    "jsx-a11y/control-has-associated-label": {
+      "count": 1
+    },
+    "no-alert": {
+      "count": 1
+    },
+    "no-use-before-define": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 7
+    },
+    "typescript/no-floating-promises": {
+      "count": 3
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/ui/admin-card.tsx": {
+    "typescript/strict-boolean-expressions": {
+      "count": 2
+    }
+  },
+  "apps/web/src/components/admin/ui/admin-field.tsx": {
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/admin/ui/pager.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 2
+    }
+  },
+  "apps/web/src/components/admin/ui/toggle.tsx": {
+    "typescript/no-confusing-void-expression": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/common/icon.tsx": {
+    "import/namespace": {
+      "count": 1
+    },
+    "react/function-component-definition": {
+      "count": 1
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/footer/footer.tsx": {
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "react-doctor/prefer-module-scope-static-value": {
+      "count": 3
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 2
+    }
+  },
+  "apps/web/src/components/header/navbar.tsx": {
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "react-doctor/prefer-module-scope-static-value": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 2
+    }
+  },
+  "apps/web/src/components/lang-selector/index.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/no-misused-promises": {
+      "count": 1
+    },
+    "typescript/no-non-null-assertion": {
+      "count": 1
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 1
+    },
+    "typescript/promise-function-async": {
+      "count": 1
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/home/home-hero.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "no-negated-condition": {
+      "count": 1
+    },
+    "react-doctor/js-hoist-intl": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "unicorn/no-negated-condition": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/home/marquee-ribbon.tsx": {
+    "react-doctor/prefer-module-scope-static-value": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/property-card.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 2
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa-hero.tsx": {
+    "no-negated-condition": {
+      "count": 1
+    },
+    "react-doctor/js-hoist-intl": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 4
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 2
+    },
+    "unicorn/no-negated-condition": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-about.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-booking.tsx": {
+    "complexity": {
+      "count": 2
+    },
+    "curly": {
+      "count": 9
+    },
+    "jsx-a11y/prefer-tag-over-role": {
+      "count": 1
+    },
+    "no-negated-condition": {
+      "count": 4
+    },
+    "no-nested-ternary": {
+      "count": 6
+    },
+    "no-plusplus": {
+      "count": 2
+    },
+    "react-doctor/no-array-index-as-key": {
+      "count": 1
+    },
+    "react-doctor/no-giant-component": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 2
+    },
+    "react-doctor/prefer-module-scope-pure-function": {
+      "count": 1
+    },
+    "react/incompatible-library": {
+      "count": 1
+    },
+    "require-unicode-regexp": {
+      "count": 3
+    },
+    "typescript/array-type": {
+      "count": 2
+    },
+    "typescript/consistent-return": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 10
+    },
+    "typescript/no-floating-promises": {
+      "count": 1
+    },
+    "typescript/no-misused-promises": {
+      "count": 2
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 3
+    },
+    "typescript/non-nullable-type-assertion-style": {
+      "count": 2
+    },
+    "typescript/prefer-nullish-coalescing": {
+      "count": 2
+    },
+    "typescript/promise-function-async": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 6
+    },
+    "typescript/strict-void-return": {
+      "count": 2
+    },
+    "unicorn/consistent-function-scoping": {
+      "count": 1
+    },
+    "unicorn/no-array-sort": {
+      "count": 1
+    },
+    "unicorn/no-negated-condition": {
+      "count": 4
+    },
+    "unicorn/prefer-spread": {
+      "count": 1
+    },
+    "unicorn/prefer-string-replace-all": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-cta-strip.tsx": {
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-experiences.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "default-case": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/consistent-return": {
+      "count": 1
+    },
+    "unicorn/switch-case-braces": {
+      "count": 8
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-faq.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "react-doctor/no-transition-all": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-gallery-bento.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "react-doctor/no-array-index-as-key": {
+      "count": 2
+    },
+    "react-doctor/no-permanent-will-change": {
+      "count": 1
+    },
+    "react-doctor/no-tiny-text": {
+      "count": 1
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 3
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-lightbox.tsx": {
+    "curly": {
+      "count": 3
+    },
+    "react-doctor/no-adjust-state-on-prop-change": {
+      "count": 1
+    },
+    "react-doctor/no-array-index-as-key": {
+      "count": 1
+    },
+    "react-doctor/no-reset-all-state-on-prop-change": {
+      "count": 1
+    },
+    "react/set-state-in-effect": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 2
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 3
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-local-area.tsx": {
+    "react-doctor/no-array-index-as-key": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-photo-viewer.tsx": {
+    "curly": {
+      "count": 8
+    },
+    "jsx-a11y/click-events-have-key-events": {
+      "count": 1
+    },
+    "jsx-a11y/no-static-element-interactions": {
+      "count": 1
+    },
+    "react-doctor/prefer-use-effect-event": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/consistent-return": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 3
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-review-form.tsx": {
+    "curly": {
+      "count": 1
+    },
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "react/incompatible-library": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 2
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 3
+    },
+    "typescript/no-misused-promises": {
+      "count": 1
+    },
+    "typescript/prefer-nullish-coalescing": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-reviews.tsx": {
+    "curly": {
+      "count": 2
+    },
+    "import/consistent-type-specifier-style": {
+      "count": 3
+    },
+    "typescript/array-type": {
+      "count": 4
+    }
+  },
+  "apps/web/src/components/sections/villa/villa-ribbon.tsx": {
+    "typescript/array-type": {
+      "count": 1
+    }
+  },
+  "apps/web/src/constants/collection.const.ts": {
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    },
+    "typescript/no-unnecessary-type-assertion": {
+      "count": 9
+    }
+  },
+  "apps/web/src/constants/gallery-categories.const.ts": {
+    "arrow-body-style": {
+      "count": 2
+    },
+    "typescript/array-type": {
+      "count": 1
+    }
+  },
+  "apps/web/src/constants/villas.const.ts": {
+    "curly": {
+      "count": 2
+    },
+    "typescript/array-type": {
+      "count": 12
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    }
+  },
+  "apps/web/src/lib/query-client.ts": {
+    "curly": {
+      "count": 1
+    }
+  },
+  "apps/web/src/lib/use-published-rating.ts": {
+    "curly": {
+      "count": 1
+    }
+  },
+  "apps/web/src/lib/utils.ts": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    }
+  },
+  "apps/web/src/main.tsx": {
+    "typescript/no-non-null-assertion": {
+      "count": 1
+    },
+    "unicorn/prefer-query-selector": {
+      "count": 1
+    }
+  },
+  "apps/web/src/pages/villa-detail-page.tsx": {
+    "react/exhaustive-effect-dependencies": {
+      "count": 1
+    },
+    "react/set-state-in-effect": {
+      "count": 1
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 1
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 1
+    }
+  },
+  "apps/web/src/routes/admin/_authed.tsx": {
+    "typescript/no-deprecated": {
+      "count": 1
+    },
+    "typescript/only-throw-error": {
+      "count": 1
+    }
+  },
+  "apps/web/src/routes/admin/_authed/history.tsx": {
+    "no-nested-ternary": {
+      "count": 2
+    },
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 1
+    },
+    "typescript/no-floating-promises": {
+      "count": 2
+    }
+  },
+  "apps/web/src/routes/admin/_authed/index.tsx": {
+    "typescript/only-throw-error": {
+      "count": 1
+    }
+  },
+  "apps/web/src/routes/admin/_authed/owner.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "apps/web/src/routes/admin/_authed/pricing.tsx": {
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 1
+    },
+    "typescript/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "apps/web/src/routes/admin/_authed/reservations.tsx": {
+    "import/consistent-type-specifier-style": {
+      "count": 1
+    },
+    "typescript/array-type": {
+      "count": 3
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 3
+    },
+    "typescript/no-floating-promises": {
+      "count": 2
+    }
+  },
+  "apps/web/src/routes/admin/_authed/reviews.tsx": {
+    "typescript/array-type": {
+      "count": 1
+    },
+    "typescript/no-confusing-void-expression": {
+      "count": 1
+    },
+    "typescript/no-floating-promises": {
+      "count": 3
+    }
+  },
+  "apps/web/src/routes/admin/login.tsx": {
+    "typescript/no-deprecated": {
+      "count": 1
+    },
+    "typescript/no-floating-promises": {
+      "count": 1
+    },
+    "typescript/no-misused-promises": {
+      "count": 1
+    },
+    "typescript/only-throw-error": {
+      "count": 1
+    },
+    "typescript/strict-void-return": {
+      "count": 1
+    }
+  },
+  "apps/web/src/types/index.ts": {
+    "typescript/array-type": {
+      "count": 3
+    }
+  },
+  "apps/web/vite.config.ts": {
+    "typescript/no-unsafe-assignment": {
+      "count": 3
+    },
+    "typescript/no-unsafe-call": {
+      "count": 3
+    },
+    "typescript/no-unsafe-member-access": {
+      "count": 1
+    },
+    "unicorn/import-style": {
+      "count": 1
+    },
+    "unicorn/prefer-import-meta-properties": {
+      "count": 2
+    },
+    "unicorn/prefer-node-protocol": {
+      "count": 2
+    }
+  },
+  "packages/api/src/client.ts": {
+    "arrow-body-style": {
+      "count": 1
+    },
+    "import/no-named-as-default": {
+      "count": 1
+    },
+    "import/no-named-as-default-member": {
+      "count": 1
+    },
+    "promise/prefer-await-to-then": {
+      "count": 1
+    },
+    "typescript/consistent-type-definitions": {
+      "count": 1
+    },
+    "typescript/consistent-type-imports": {
+      "count": 1
+    },
+    "typescript/no-explicit-any": {
+      "count": 1
+    },
+    "typescript/no-unsafe-assignment": {
+      "count": 1
+    },
+    "typescript/no-unsafe-member-access": {
+      "count": 1
+    },
+    "typescript/no-unsafe-type-assertion": {
+      "count": 2
+    },
+    "typescript/prefer-nullish-coalescing": {
+      "count": 1
+    },
+    "typescript/promise-function-async": {
+      "count": 1
+    },
+    "typescript/strict-boolean-expressions": {
+      "count": 1
+    },
+    "typescript/use-unknown-in-catch-callback-variable": {
+      "count": 1
+    },
+    "unicorn/catch-error-name": {
+      "count": 1
+    },
+    "unicorn/no-typeof-undefined": {
+      "count": 1
+    }
+  },
+  "packages/api/src/index.ts": {
+    "oxc/no-barrel-file": {
+      "count": 1
+    }
+  }
+}
