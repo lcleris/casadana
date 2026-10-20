@@ -10,7 +10,7 @@
     "check": "bun run fmt:check && bun run lint && bun run typecheck",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "lint": "oxlint",
+    "lint": "bun run --cwd apps/web paraglide && oxlint",
     "lint:fix": "oxlint --fix",
     "lint:suppress": "oxlint --suppress-all",
     "lint:prune": "oxlint --prune-suppressions",
