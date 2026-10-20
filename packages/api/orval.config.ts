@@ -20,8 +20,6 @@ export default defineConfig({
         },
         useTypeOverInterface: true,
         query: {
-          useQuery: true,
-          useMutation: true,
           signal: true,
         },
       },
