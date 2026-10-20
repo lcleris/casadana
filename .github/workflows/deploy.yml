@@ -42,6 +42,9 @@ jobs:
       - name: Format, lint and types
         run: bun run check
 
+      - name: Unit tests
+        run: bun run test
+
       # Only fails on dead code that is NOT already in fallow-suppressions.json.
       # Regenerate that baseline with `bun run dead-code:suppress` after a cleanup.
       - name: Dead code

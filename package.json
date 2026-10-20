@@ -5,22 +5,31 @@
     "apps/web",
     "packages/*"
   ],
+  "type": "module",
   "scripts": {
     "check": "bun run fmt:check && bun run lint && bun run typecheck",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "lint": "oxlint",
+    "lint": "bun run --cwd apps/web paraglide && oxlint",
     "lint:fix": "oxlint --fix",
+    "lint:suppress": "oxlint --suppress-all",
+    "lint:prune": "oxlint --prune-suppressions",
+    "doctor": "cd apps/web && bunx react-doctor@latest --yes --no-supply-chain .",
     "typecheck": "bun run --cwd apps/web paraglide && tsc -p apps/web/tsconfig.json && tsc -p packages/api/tsconfig.json",
+    "test": "bun test",
     "dead-code": "fallow dead-code --baseline fallow-suppressions.json",
     "dead-code:ci": "fallow dead-code --baseline fallow-suppressions.json --fail-on-issues",
     "dead-code:all": "fallow dead-code",
-    "dead-code:suppress": "fallow dead-code --save-baseline fallow-suppressions.json"
+    "dead-code:suppress": "fallow dead-code --save-baseline fallow-suppressions.json",
+    "fallow:audit": "fallow audit"
   },
   "devDependencies": {
-    "fallow": "^3.15.0",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
-    "typescript": "^7.0.2"
+    "fallow": "^3.34.1",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "oxlint-plugin-react-doctor": "^0.9.18",
+    "oxlint-tsgolint": "^7.0.2004",
+    "typescript": "^7.0.2",
+    "ultracite": "^8.0.1"
   }
 }
