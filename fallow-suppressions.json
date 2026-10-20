@@ -9,19 +9,9 @@
     "completeness": "complete"
   },
   "identity": "dc1",
-  "unused_files": [
-    "unused-file:apps/web/src/components/common/icon.tsx",
-    "unused-file:apps/web/src/types/index.ts"
-  ],
-  "unused_exports": [
-    "unused-export:apps/web/src/constants/gallery-categories.const.ts:GALLERY_CATEGORIES",
-    "unused-export:apps/web/src/constants/gallery-categories.const.ts:getAllCategories",
-    "unused-export:apps/web/src/constants/villas.const.ts:VILLAS"
-  ],
-  "unused_types": [
-    "unused-type:apps/web/src/components/sections/villa/villa-photo-viewer.tsx:ViewerPhoto",
-    "unused-type:apps/web/src/routes/__root.tsx:RouterContext"
-  ],
+  "unused_files": [],
+  "unused_exports": [],
+  "unused_types": [],
   "private_type_leaks": [],
   "deprecated_exports_in_use": [],
   "unused_dependencies": [],

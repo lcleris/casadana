@@ -1,14 +1,14 @@
 import {
-  type ReviewCategoryRatings,
   getGetVillaReviewMetaQueryKey,
   getListAdminReviewsQueryKey,
   getListVillaReviewsQueryKey,
   useCreateAdminReview,
 } from "@casa-dana/api"
+import type { ReviewCategoryRatings } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -61,7 +61,9 @@ function toCategoryRatings(values: Record<CategoryKey, string>): ReviewCategoryR
   const scored: ReviewCategoryRatings = {}
   for (const { key } of CATEGORY_FIELDS) {
     const score = Number(values[key])
-    if (values[key].trim() !== "" && Number.isFinite(score)) scored[key] = score
+    if (values[key].trim() !== "" && Number.isFinite(score)) {
+      scored[key] = score
+    }
   }
   return Object.keys(scored).length > 0 ? scored : undefined
 }
@@ -74,31 +76,33 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { register, handleSubmit, reset, watch, setValue } = useForm<AddReviewFormValues>({
+  const { register, handleSubmit, reset, control, setValue } = useForm<AddReviewFormValues>({
     defaultValues: DEFAULT_VALUES,
   })
-  const rating = watch("rating")
+  const rating = useWatch({ control, name: "rating" })
 
   const { mutate: createReview, isPending } = useCreateAdminReview({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListAdminReviewsQueryKey() })
-        queryClient.invalidateQueries({ queryKey: getListVillaReviewsQueryKey(property) })
+        void queryClient.invalidateQueries({ queryKey: getListAdminReviewsQueryKey() })
+        void queryClient.invalidateQueries({ queryKey: getListVillaReviewsQueryKey(property) })
         // An approved review shifts the computed figures, so the breakdown card
         // has to refetch alongside the lists.
-        queryClient.invalidateQueries({ queryKey: getGetVillaReviewMetaQueryKey(property) })
+        void queryClient.invalidateQueries({ queryKey: getGetVillaReviewMetaQueryKey(property) })
         toast("Avis ajouté")
         setOpen(false)
         reset(DEFAULT_VALUES)
       },
-      onError: () => toast("Impossible d'ajouter l'avis"),
+      onError: () => {
+        toast("Impossible d'ajouter l'avis")
+      },
     },
   })
 
   const onSubmit = (values: AddReviewFormValues) => {
     const authorName = values.authorName.trim()
     const body = values.body.trim()
-    if (!authorName || !body) {
+    if (authorName === "" || body === "") {
       toast("Renseignez le nom et le commentaire")
       return
     }
@@ -125,7 +129,12 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Ajouter un avis</DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e)
+          }}
+          className="flex flex-col gap-3"
+        >
           <Field>
             <FieldLabel htmlFor="reviewAuthorName">Nom du voyageur</FieldLabel>
             <Input id="reviewAuthorName" {...register("authorName")} />
@@ -147,7 +156,9 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
                   type="button"
                   aria-label={n === 1 ? "Noter 1 étoile" : `Noter ${n} étoiles`}
                   aria-pressed={n === rating}
-                  onClick={() => setValue("rating", n)}
+                  onClick={() => {
+                    setValue("rating", n)
+                  }}
                   className={cn(
                     "rounded-md px-1 py-0.5 text-lg leading-none",
                     n <= rating ? "text-on-surface" : "text-on-surface-variant/50",

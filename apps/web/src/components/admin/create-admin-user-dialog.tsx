@@ -37,7 +37,7 @@ export default function CreateAdminUserDialog() {
   const { mutate: createUser, isPending } = useCreateAdminUser({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListAdminUsersQueryKey() })
+        void queryClient.invalidateQueries({ queryKey: getListAdminUsersQueryKey() })
         toast("Administrateur ajouté")
         setOpen(false)
         reset()
@@ -64,7 +64,12 @@ export default function CreateAdminUserDialog() {
       <DialogTrigger render={<Button type="button" />}>Ajouter un administrateur</DialogTrigger>
       <DialogContent>
         <DialogTitle>Ajouter un administrateur</DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e)
+          }}
+          className="flex flex-col gap-3"
+        >
           <Field>
             <FieldLabel htmlFor="newAdminEmail">E-mail</FieldLabel>
             <Input id="newAdminEmail" type="email" {...register("email", { required: true })} />

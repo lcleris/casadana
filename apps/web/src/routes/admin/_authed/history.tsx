@@ -1,6 +1,7 @@
 import { useListAdminHistory } from "@casa-dana/api"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import type { ComponentProps } from "react"
 
 import HistoryTable from "@/components/admin/history/history-table"
 import { AdminCard } from "@/components/admin/ui/admin-card"
@@ -39,6 +40,25 @@ const PROPERTY_LABELS: Record<Property, string> = {
   casacasay: "Casa CasAy",
 }
 
+interface HistoryBodyProps {
+  isError: boolean
+  isPending: boolean
+  events: ComponentProps<typeof HistoryTable>["events"]
+}
+
+function HistoryBody({ isError, isPending, events }: HistoryBodyProps) {
+  if (isError) {
+    return <EmptyState message="Impossible de charger le journal d'activité." />
+  }
+  if (isPending) {
+    return <EmptyState message="Chargement de l'activité…" />
+  }
+  if (events.length === 0) {
+    return <EmptyState message="Aucune activité pour le moment." />
+  }
+  return <HistoryTable events={events} />
+}
+
 function HistoryPage() {
   const { property, page } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
@@ -51,11 +71,11 @@ function HistoryPage() {
   const maxPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
 
   const goToPage = (nextPage: number) => {
-    navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
+    void navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
   }
 
   const switchProperty = (nextProperty: Property) => {
-    navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
+    void navigate({ search: (prev) => ({ ...prev, property: nextProperty, page: 1 }) })
   }
 
   return (
@@ -72,7 +92,9 @@ function HistoryPage() {
             <button
               key={p}
               type="button"
-              onClick={() => switchProperty(p)}
+              onClick={() => {
+                switchProperty(p)
+              }}
               className={
                 p === property
                   ? "bg-primary text-on-primary rounded-md px-3 py-1.5 text-[13px] font-medium"
@@ -94,15 +116,7 @@ function HistoryPage() {
         sub="Du plus récent au plus ancien — chaque changement de réservation, tarif, avis ou propriétaire."
         flush
       >
-        {isError ? (
-          <EmptyState message="Impossible de charger le journal d'activité." />
-        ) : isPending ? (
-          <EmptyState message="Chargement de l'activité…" />
-        ) : events.length === 0 ? (
-          <EmptyState message="Aucune activité pour le moment." />
-        ) : (
-          <HistoryTable events={events} />
-        )}
+        <HistoryBody isError={isError} isPending={isPending} events={events} />
         <Pager page={page} maxPage={maxPage} onPageChange={goToPage} />
       </AdminCard>
     </div>

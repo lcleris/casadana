@@ -1,10 +1,5 @@
-import {
-  type Review,
-  type ReviewBreakdown,
-  type ReviewMeta,
-  useGetVillaReviewMeta,
-  useListVillaReviews,
-} from "@casa-dana/api"
+import { useGetVillaReviewMeta, useListVillaReviews } from "@casa-dana/api"
+import type { Review, ReviewBreakdown, ReviewMeta } from "@casa-dana/api"
 
 import VillaReviewForm from "@/components/sections/villa/villa-review-form"
 import type { VillaData } from "@/constants/villas.const"
@@ -49,7 +44,9 @@ function ReviewsSummary({ meta, barLabels }: { meta: ReviewMeta; barLabels: Arra
     const label = barLabels[i]
     // A null score means no approved review rated that category — drop the
     // bar rather than drawing it at zero.
-    if (score === null || label === undefined) return []
+    if (score === null || label === undefined) {
+      return []
+    }
     return [{ label, pct: (score / 5) * 100, value: score.toFixed(1) }]
   })
 
@@ -167,7 +164,9 @@ export default function VillaReviews({ villaSlug, data }: VillaReviewsProps) {
   // unreachable API drops the section too: we cannot claim there are no
   // reviews when we simply failed to ask, and a form that cannot submit is
   // worse than no form.
-  if (metaPending || listPending || metaError || listError) return null
+  if (metaPending || listPending || metaError || listError) {
+    return null
+  }
 
   // The villa's own description talks about the reviews below it, so it can
   // only run once there are some. With none approved yet the section still

@@ -7,7 +7,9 @@ export const queryClient = new QueryClient({
       staleTime: 30_000,
       gcTime: 5 * 60_000,
       retry: (failureCount, err) => {
-        if (err instanceof ApiError && err.status >= 400 && err.status < 500) return false
+        if (err instanceof ApiError && err.status >= 400 && err.status < 500) {
+          return false
+        }
         return failureCount < 2
       },
       refetchOnWindowFocus: false,

@@ -8,7 +8,9 @@ interface VillaFaqProps {
 }
 
 export default function VillaFaq({ data }: VillaFaqProps) {
-  if (!data) return null
+  if (!data) {
+    return null
+  }
   return (
     <section className="mx-auto max-w-[1440px] px-6 py-20 md:px-10 md:py-[140px]">
       <div className="grid items-start gap-12 md:grid-cols-[1fr_1.4fr] md:gap-24">
@@ -41,7 +43,7 @@ export default function VillaFaq({ data }: VillaFaqProps) {
                 <span className="font-display text-primary text-[20px] font-normal italic md:text-[22px]">
                   {entry.question}
                 </span>
-                <span className="border-outline-variant text-primary group-open:bg-primary group-open:text-on-primary group-open:border-primary inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-all duration-300 group-open:rotate-45">
+                <span className="border-outline-variant text-primary group-open:bg-primary group-open:text-on-primary group-open:border-primary inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-[background-color,color,border-color,rotate] duration-300 group-open:rotate-45">
                   <Plus size={14} />
                 </span>
               </summary>

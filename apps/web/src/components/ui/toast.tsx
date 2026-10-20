@@ -1,12 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react"
+import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -26,12 +18,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setMessage(next)
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => setMessage(null), TOAST_DURATION_MS)
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
   }, [])
 
   return (

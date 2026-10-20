@@ -14,8 +14,8 @@ function OwnerPage() {
         <div>
           <h2 className="text-on-surface text-2xl font-bold">Propriétaire et accès</h2>
           <p className="text-on-surface-variant mt-1 text-[13.5px]">
-            Comptes administrateurs ayant accès aux deux propriétés. Les coordonnées de l'hôte et
-            les informations de paiement ne sont pas encore gérées ici.
+            Comptes administrateurs ayant accès aux deux propriétés. Les coordonnées de l&apos;hôte
+            et les informations de paiement ne sont pas encore gérées ici.
           </p>
         </div>
         <CreateAdminUserDialog />
