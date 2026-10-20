@@ -28,6 +28,9 @@ jobs:
       - name: Format, lint and types
         run: bun run check
 
+      - name: Unit tests
+        run: bun run test
+
       - name: Dead code
         run: bun run dead-code:ci
 

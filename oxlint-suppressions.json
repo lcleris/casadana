@@ -775,15 +775,6 @@
     }
   },
   "apps/web/vite.config.ts": {
-    "typescript/no-unsafe-assignment": {
-      "count": 3
-    },
-    "typescript/no-unsafe-call": {
-      "count": 3
-    },
-    "typescript/no-unsafe-member-access": {
-      "count": 1
-    },
     "unicorn/import-style": {
       "count": 1
     },

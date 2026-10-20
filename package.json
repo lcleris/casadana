@@ -16,6 +16,7 @@
     "lint:prune": "oxlint --prune-suppressions",
     "doctor": "cd apps/web && bunx react-doctor@latest --yes --no-supply-chain .",
     "typecheck": "bun run --cwd apps/web paraglide && tsc -p apps/web/tsconfig.json && tsc -p packages/api/tsconfig.json",
+    "test": "bun test",
     "dead-code": "fallow dead-code --baseline fallow-suppressions.json",
     "dead-code:ci": "fallow dead-code --baseline fallow-suppressions.json --fail-on-issues",
     "dead-code:all": "fallow dead-code",
