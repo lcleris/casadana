@@ -22,10 +22,5 @@ const CATEGORY_LABEL_FNS: Record<GalleryCategory, () => string> = {
   UTILITY: m.gallery_category_utility,
 }
 
-export const getCategoryLabel = (category: GalleryCategory): string => {
-  return CATEGORY_LABEL_FNS[category]()
-}
-
-export const getAllCategories = (): Array<GalleryCategory> => {
-  return [...GALLERY_CATEGORIES]
-}
+export const getCategoryLabel = (category: GalleryCategory): string =>
+  CATEGORY_LABEL_FNS[category]()

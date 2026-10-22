@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { ArrowRight } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -23,7 +23,14 @@ function NavBrand() {
   )
 }
 
-function NavLinks({ links }: { links: NavLink[] }) {
+const getNavLinks = (): Array<NavLink> => [
+  { href: "/#collection", label: m.nav_link_collection() },
+  { href: "/villa/casadana", label: m.nav_link_dana() },
+  { href: "/villa/casacasay", label: m.nav_link_casay() },
+  { href: "/#story", label: m.nav_link_story() },
+]
+
+function NavLinks({ links }: { links: Array<NavLink> }) {
   return (
     <nav className="hidden items-center justify-center gap-7 lg:flex">
       {links.map((link) => (
@@ -40,22 +47,19 @@ function NavLinks({ links }: { links: NavLink[] }) {
   )
 }
 
+function subscribeToScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true })
+  return () => {
+    window.removeEventListener("scroll", onChange)
+  }
+}
+
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
-    handleScroll()
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  const links: NavLink[] = [
-    { href: "/#collection", label: m.nav_link_collection() },
-    { href: "/villa/casadana", label: m.nav_link_dana() },
-    { href: "/villa/casacasay", label: m.nav_link_casay() },
-    { href: "/#story", label: m.nav_link_story() },
-  ]
+  const isScrolled = useSyncExternalStore(
+    subscribeToScroll,
+    () => window.scrollY > 50,
+    () => false,
+  )
 
   return (
     <header
@@ -74,7 +78,7 @@ export default function Navbar() {
         )}
       >
         <NavBrand />
-        <NavLinks links={links} />
+        <NavLinks links={getNavLinks()} />
         <div className="flex items-center justify-end gap-4">
           <div className="hidden md:block">
             <LangSelector />

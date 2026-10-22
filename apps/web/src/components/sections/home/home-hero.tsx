@@ -1,5 +1,8 @@
+import { useMemo } from "react"
+
 import bgHome from "@/assets/shared/bg-home.jpeg"
-import { type PublishedRating, usePublishedRating } from "@/lib/use-published-rating"
+import { usePublishedRating } from "@/lib/use-published-rating"
+import type { PublishedRating } from "@/lib/use-published-rating"
 import { m } from "@/paraglide/messages"
 import { getLocale } from "@/paraglide/runtime"
 
@@ -20,24 +23,26 @@ function useCollectionRatingValue(): string {
   const rated = [usePublishedRating("casadana"), usePublishedRating("casacasay")].filter(
     (rating): rating is PublishedRating => rating !== null,
   )
+  const scoreFormat = useMemo(
+    () => new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 1 }),
+    [],
+  )
   const reviewCount = rated.reduce((total, rating) => total + rating.count, 0)
   const score =
     reviewCount === 0
       ? 0
       : rated.reduce((total, rating) => total + rating.score * rating.count, 0) / reviewCount
 
-  return m.home_hero_stat_rating_value({
-    score: new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 1 }).format(score),
-  })
+  return m.home_hero_stat_rating_value({ score: scoreFormat.format(score) })
 }
 
-function HeroStats({ stats }: { stats: VitalStat[] }) {
+function HeroStats({ stats }: { stats: Array<VitalStat> }) {
   return (
     <div className="grid grid-cols-2 border-y border-white/25 py-6 md:grid-cols-4 md:py-7">
       {stats.map((stat, index) => (
         <div
           key={stat.label}
-          className={`px-4 md:px-7 ${index !== 0 ? "md:border-l md:border-white/20" : ""} ${
+          className={`px-4 md:px-7 ${index === 0 ? "" : "md:border-l md:border-white/20"} ${
             index < stats.length - 2 ? "border-b border-white/20 pb-3 md:border-b-0 md:pb-0" : ""
           }`}
         >
@@ -54,7 +59,7 @@ function HeroStats({ stats }: { stats: VitalStat[] }) {
 export default function HomeHero() {
   const ratingValue = useCollectionRatingValue()
 
-  const stats: VitalStat[] = [
+  const stats: Array<VitalStat> = [
     { label: m.home_hero_stat_properties_label(), value: m.home_hero_stat_properties_value() },
     { label: m.home_hero_stat_sleeps_label(), value: m.home_hero_stat_sleeps_value() },
     { label: m.home_hero_stat_region_label(), value: m.home_hero_stat_region_value() },

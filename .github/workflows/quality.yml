@@ -1,0 +1,60 @@
+name: Quality
+
+# Pull-request gate. deploy.yml re-runs `check` and dead-code on push before
+# building images; this workflow adds what only makes sense against a PR base
+# (fallow audit) and the Go suites, which nothing else runs in CI.
+on:
+  pull_request:
+
+concurrency:
+  group: quality-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # fallow audit diffs against the merge-base with the PR base branch.
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1"
+
+      - run: bun install --frozen-lockfile
+
+      - name: Format, lint and types
+        run: bun run check
+
+      - name: Unit tests
+        run: bun run test
+
+      - name: Dead code
+        run: bun run dead-code:ci
+
+      # Fails only on complexity, duplication or dead code the PR introduces.
+      - name: Fallow audit
+        run: bun run fallow:audit
+        env:
+          FALLOW_AUDIT_BASE: origin/${{ github.base_ref }}
+
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: apps/api/go.mod
+          cache-dependency-path: apps/api/go.sum
+
+      - run: go vet -tags integration ./...
+
+      # The integration tag pulls in the Postgres suites (testcontainers); the
+      # runner's Docker daemon starts the containers.
+      - run: go test -tags integration ./...

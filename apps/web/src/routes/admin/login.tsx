@@ -1,20 +1,25 @@
-import { ApiError, getAdminMeQueryOptions, useAdminLogin } from "@casa-dana/api"
+import { ORPCError } from "@orpc/client"
+import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { orpc } from "@/lib/orpc"
 
 export const Route = createFileRoute("/admin/login")({
   beforeLoad: async ({ context }) => {
-    const alreadyAuthed = await context.queryClient
-      .fetchQuery(getAdminMeQueryOptions())
-      .then(() => true)
-      .catch(() => false)
-    if (alreadyAuthed) {
-      throw redirect({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
+    try {
+      await context.queryClient.query(orpc.admin.me.queryOptions())
+    } catch {
+      return
     }
+    redirect({
+      to: "/admin/reservations",
+      search: { property: "casadana", page: 1 },
+      throw: true,
+    })
   },
   component: AdminLoginPage,
 })
@@ -35,29 +40,31 @@ function AdminLoginPage() {
     defaultValues: { email: "", password: "" },
   })
 
-  const { mutate: login, isPending } = useAdminLogin({
-    mutation: {
+  const { mutate: login, isPending } = useMutation(
+    orpc.admin.login.mutationOptions({
       onSuccess: () => {
-        navigate({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
+        void navigate({ to: "/admin/reservations", search: { property: "casadana", page: 1 } })
       },
       onError: (err) => {
         const message =
-          err instanceof ApiError && err.code === "INVALID_CREDENTIALS"
+          err instanceof ORPCError && err.code === "INVALID_CREDENTIALS"
             ? "E-mail ou mot de passe incorrect."
             : "Une erreur est survenue. Réessayez."
         setError("password", { type: "invalid", message })
       },
-    },
-  })
+    }),
+  )
 
   const onSubmit = (values: LoginFormValues) => {
-    login({ data: values })
+    login(values)
   }
 
   return (
     <div className="bg-primary flex min-h-screen items-center justify-center px-4">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={(event) => {
+          void handleSubmit(onSubmit)(event)
+        }}
         className="bg-surface shadow-editorial w-full max-w-sm rounded-xl p-10"
       >
         <p className="text-on-surface-variant mb-1.5 font-mono text-[11px] tracking-[0.22em] uppercase">

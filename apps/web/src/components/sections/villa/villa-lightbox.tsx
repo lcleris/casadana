@@ -1,5 +1,5 @@
 import { X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import {
   Dialog,
@@ -8,11 +8,13 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { GalleryCategory, getCategoryLabel } from "@/constants/gallery-categories.const"
+import type { GalleryCategory } from "@/constants/gallery-categories.const"
+import { getCategoryLabel } from "@/constants/gallery-categories.const"
 import type { GalleryEntry } from "@/constants/villas.const"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
 
+import { nonEmptyCategories } from "./non-empty-categories"
 import VillaPhotoViewer from "./villa-photo-viewer"
 
 interface VillaLightboxProps {
@@ -28,8 +30,60 @@ interface VillaLightboxProps {
 // (8 + 4 = 12 columns, so every row fills edge-to-edge). A trailing odd tile
 // takes the full row instead of leaving a half-filled gap.
 function spanClassFor(index: number, total: number): string {
-  if (index === total - 1 && total % 2 === 1) return "md:col-span-12"
+  if (index === total - 1 && total % 2 === 1) {
+    return "md:col-span-12"
+  }
   return index % 2 === 0 ? "md:col-span-8" : "md:col-span-4"
+}
+
+// Mounted only while the dialog is open and keyed by category, so the opened
+// photo resets on close and on every category change.
+function LightboxGrid({ tiles }: { tiles: Array<GalleryEntry> }) {
+  // Position of the photo opened full screen from this grid, `null` when none is.
+  const [photoIndex, setPhotoIndex] = useState<number | null>(null)
+
+  return (
+    <>
+      <div className="flex-1 overflow-auto px-6 py-8 pb-16 md:px-10">
+        <div className="mx-auto grid max-w-[1440px] auto-rows-[200px] grid-cols-1 gap-2.5 md:auto-rows-[240px] md:grid-cols-12">
+          {tiles.map((img, i) => (
+            <button
+              key={`${img.src}-${img.label}`}
+              type="button"
+              onClick={() => {
+                setPhotoIndex(i)
+              }}
+              className={cn(
+                "group relative cursor-zoom-in overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
+                spanClassFor(i, tiles.length),
+              )}
+            >
+              <img
+                src={img.src}
+                alt={img.label}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
+              />
+              <span
+                className="absolute bottom-3.5 left-4 font-mono text-[10.5px] tracking-[0.18em] text-white uppercase"
+                style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
+              >
+                {img.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <VillaPhotoViewer
+        photos={tiles}
+        index={photoIndex}
+        onIndexChange={setPhotoIndex}
+        onClose={() => {
+          setPhotoIndex(null)
+        }}
+      />
+    </>
+  )
 }
 
 export default function VillaLightbox({
@@ -40,28 +94,16 @@ export default function VillaLightbox({
   onCategory,
   onClose,
 }: VillaLightboxProps) {
-  // Position of the photo opened full screen from this grid, `null` when none is.
-  const [photoIndex, setPhotoIndex] = useState<number | null>(null)
-
-  useEffect(() => {
-    if (!open) setPhotoIndex(null)
-  }, [open])
-
-  const categories = (Object.keys(images) as Array<GalleryCategory>).filter(
-    (c) => images[c].length > 0,
-  )
+  const categories = nonEmptyCategories(images)
   const tiles = images[category] ?? []
-
-  const selectCategory = (next: GalleryCategory) => {
-    setPhotoIndex(null)
-    onCategory(next)
-  }
 
   return (
     <Dialog
       open={open}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose()
+        if (!nextOpen) {
+          onClose()
+        }
       }}
     >
       <DialogPortal>
@@ -79,7 +121,9 @@ export default function VillaLightbox({
                 <button
                   key={c}
                   type="button"
-                  onClick={() => selectCategory(c)}
+                  onClick={() => {
+                    onCategory(c)
+                  }}
                   className={cn(
                     "rounded-full border px-3.5 py-2 font-mono text-[10.5px] tracking-[0.18em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
                     c === category
@@ -101,40 +145,7 @@ export default function VillaLightbox({
             </button>
           </div>
 
-          <div className="flex-1 overflow-auto px-6 py-8 pb-16 md:px-10">
-            <div className="mx-auto grid max-w-[1440px] auto-rows-[200px] grid-cols-1 gap-2.5 md:auto-rows-[240px] md:grid-cols-12">
-              {tiles.map((img, i) => (
-                <button
-                  key={`${img.src}-${i}`}
-                  type="button"
-                  onClick={() => setPhotoIndex(i)}
-                  className={cn(
-                    "group relative cursor-zoom-in overflow-hidden text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
-                    spanClassFor(i, tiles.length),
-                  )}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.label}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
-                  />
-                  <span
-                    className="absolute bottom-3.5 left-4 font-mono text-[10.5px] tracking-[0.18em] text-white uppercase"
-                    style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
-                  >
-                    {img.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <VillaPhotoViewer
-            photos={tiles}
-            index={photoIndex}
-            onIndexChange={setPhotoIndex}
-            onClose={() => setPhotoIndex(null)}
-          />
+          <LightboxGrid key={category} tiles={tiles} />
         </DialogPopup>
       </DialogPortal>
     </Dialog>

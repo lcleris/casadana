@@ -1,13 +1,20 @@
-import Axios, { AxiosError, AxiosRequestConfig } from "axios"
+import type { AxiosError, AxiosRequestConfig } from "axios"
+import { create, isAxiosError } from "axios"
 
-export const AXIOS_INSTANCE = Axios.create({
-  baseURL:
-    (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE_URL) || "",
+interface ViteImportMeta {
+  url?: string
+  env?: { VITE_API_BASE_URL?: string }
+}
+
+export const AXIOS_INSTANCE = create({
+  baseURL: (import.meta as ViteImportMeta).env?.VITE_API_BASE_URL ?? "",
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 })
 
-export type ApiErrorBody = { error: { code: string; message: string } }
+export interface ApiErrorBody {
+  error: { code: string; message: string }
+}
 
 export class ApiError extends Error {
   public code: string
@@ -18,17 +25,21 @@ export class ApiError extends Error {
     this.code = code
     this.status = status
   }
-  static fromAxios(e: AxiosError<ApiErrorBody>): ApiError {
-    const status = e.response?.status ?? 0
-    const body = e.response?.data?.error
-    return new ApiError(body?.code ?? "NETWORK", status, body?.message ?? e.message)
+  static fromAxios(error: AxiosError<ApiErrorBody>): ApiError {
+    const status = error.response?.status ?? 0
+    const body = error.response?.data?.error
+    return new ApiError(body?.code ?? "NETWORK", status, body?.message ?? error.message)
   }
 }
 
-export const customAxios = <T>(config: AxiosRequestConfig): Promise<T> => {
-  return AXIOS_INSTANCE({ ...config })
-    .then((res) => res.data as T)
-    .catch((e: AxiosError<ApiErrorBody>) => {
-      throw ApiError.fromAxios(e)
-    })
+export const customAxios = async <T>(config: AxiosRequestConfig): Promise<T> => {
+  try {
+    const res = await AXIOS_INSTANCE<T>({ ...config })
+    return res.data
+  } catch (error: unknown) {
+    if (isAxiosError<ApiErrorBody>(error)) {
+      throw ApiError.fromAxios(error)
+    }
+    throw new ApiError("NETWORK", 0, error instanceof Error ? error.message : String(error))
+  }
 }

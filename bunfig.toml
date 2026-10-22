@@ -1,0 +1,4 @@
+[install]
+# Strict node_modules: a workspace only resolves what its own package.json
+# declares, instead of borrowing a hoisted transitive dependency.
+linker = "isolated"

@@ -1,7 +1,8 @@
-import { ApiError, type ReviewCategoryRatings, useSubmitVillaReview } from "@casa-dana/api"
+import { ApiError, useSubmitVillaReview } from "@casa-dana/api"
+import type { ReviewCategoryRatings } from "@casa-dana/api"
 import { ArrowRight } from "lucide-react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -51,7 +52,9 @@ const DEFAULT_VALUES: ReviewFormValues = {
 function toCategoryRatings(scores: Record<CategoryKey, number>): ReviewCategoryRatings | undefined {
   const scored: ReviewCategoryRatings = {}
   for (const key of CATEGORY_KEYS) {
-    if (scores[key] > 0) scored[key] = scores[key]
+    if (scores[key] > 0) {
+      scored[key] = scores[key]
+    }
   }
   return Object.keys(scored).length > 0 ? scored : undefined
 }
@@ -83,7 +86,9 @@ function StarPicker({ value, describeStar, size, onChange }: StarPickerProps) {
           type="button"
           aria-label={describeStar(n)}
           aria-pressed={n === value}
-          onClick={() => onChange(n)}
+          onClick={() => {
+            onChange(n)
+          }}
           className={cn(
             "leading-none transition-colors",
             glyphSize,
@@ -109,15 +114,15 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
   const [topLevelError, setTopLevelError] = useState<string | null>(null)
 
   const {
+    control,
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<ReviewFormValues>({ defaultValues: DEFAULT_VALUES })
 
-  const rating = watch("rating")
-  const categories = watch("categories")
+  const rating = useWatch({ control, name: "rating" })
+  const categories = useWatch({ control, name: "categories" })
 
   const { mutate: submitReview, isPending } = useSubmitVillaReview({
     mutation: {
@@ -136,7 +141,9 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
     },
   })
 
-  const handleRating = (next: number) => setValue("rating", next, { shouldDirty: true })
+  const handleRating = (next: number) => {
+    setValue("rating", next, { shouldDirty: true })
+  }
 
   const handleCategory = (key: CategoryKey, next: number) => {
     // Clicking the score already set clears it: a visitor who tapped a
@@ -185,7 +192,13 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
         {m.villa_reviews_form_intro()}
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-7">
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e)
+        }}
+        noValidate
+        className="mt-7"
+      >
         <div className="border-outline-variant border-b pb-5">
           <span className={fieldLabelClassName}>{m.villa_reviews_form_rating_label()}</span>
           <div className="mt-2">
@@ -247,7 +260,9 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
                     describeStar={(count) =>
                       m.villa_reviews_form_aria_rate({ category: label, count })
                     }
-                    onChange={(next) => handleCategory(key, next)}
+                    onChange={(next) => {
+                      handleCategory(key, next)
+                    }}
                   />
                 </div>
               )
@@ -255,13 +270,13 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
           </div>
         </fieldset>
 
-        {(errors.authorName || errors.body) && (
+        {(errors.authorName !== undefined || errors.body !== undefined) && (
           <p role="alert" className="text-error mt-4 text-[13px]">
             {m.villa_reviews_form_required()}
           </p>
         )}
 
-        {topLevelError && (
+        {topLevelError !== null && (
           <p
             role="alert"
             className="border-error/30 bg-error-container/20 text-error mt-4 border px-3 py-2 text-[13px]"

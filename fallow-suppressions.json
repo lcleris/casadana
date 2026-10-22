@@ -1,4 +1,5 @@
 {
+  "kind": "dead-code",
   "analysis_identity": {
     "mode": "syntactic",
     "semantic_schema_version": 1,
@@ -7,30 +8,17 @@
     "backend_family": "",
     "completeness": "complete"
   },
-  "unused_files": [
-    "apps/web/src/components/common/icon.tsx",
-    "apps/web/src/types/index.ts"
-  ],
-  "unused_exports": [
-    "apps/web/src/constants/gallery-categories.const.ts:GALLERY_CATEGORIES",
-    "apps/web/src/constants/gallery-categories.const.ts:getAllCategories",
-    "apps/web/src/constants/villas.const.ts:VILLAS"
-  ],
-  "unused_types": [
-    "apps/web/src/components/sections/villa/villa-photo-viewer.tsx:ViewerPhoto",
-    "apps/web/src/routes/__root.tsx:RouterContext"
-  ],
+  "identity": "dc1",
+  "unused_files": [],
+  "unused_exports": [],
+  "unused_types": [],
   "private_type_leaks": [],
-  "unused_dependencies": [
-    "packages/api/package.json:zod"
-  ],
-  "unused_dev_dependencies": [
-    "apps/web/package.json:autoprefixer",
-    "apps/web/package.json:prettier-plugin-tailwindcss",
-    "apps/web/package.json:tailwindcss-animate"
-  ],
+  "deprecated_exports_in_use": [],
+  "unused_dependencies": [],
+  "unused_dev_dependencies": [],
   "circular_dependencies": [],
   "re_export_cycles": [],
+  "package_cycles": [],
   "unused_optional_dependencies": [],
   "unused_enum_members": [],
   "unused_class_members": [],
@@ -38,10 +26,14 @@
   "unprovided_injects": [],
   "unrendered_components": [],
   "unused_component_props": [],
+  "absent_component_props": [],
   "unused_component_emits": [],
   "unused_component_inputs": [],
   "unused_component_outputs": [],
   "unused_svelte_events": [],
+  "unused_effect_layers": [],
+  "unused_tagged_errors": [],
+  "unproduced_catch_tags": [],
   "unused_server_actions": [],
   "unused_load_data_keys": [],
   "unresolved_imports": [],
@@ -64,5 +56,6 @@
   "mixed_client_server_barrels": [],
   "misplaced_directives": [],
   "route_collisions": [],
-  "dynamic_segment_name_conflicts": []
+  "dynamic_segment_name_conflicts": [],
+  "prop_drilling_chains": []
 }

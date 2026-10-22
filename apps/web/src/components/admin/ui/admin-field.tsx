@@ -17,7 +17,7 @@ interface AdminFieldProps {
 
 export function AdminField({ label, htmlFor, span2, children }: AdminFieldProps) {
   return (
-    <div className={cn("flex flex-col gap-1.5", span2 && "sm:col-span-2")}>
+    <div className={cn("flex flex-col gap-1.5", span2 === true && "sm:col-span-2")}>
       <label htmlFor={htmlFor} className="text-on-surface-variant text-xs font-semibold">
         {label}
       </label>

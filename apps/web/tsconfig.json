@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowJs": true,
@@ -9,6 +9,8 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
+    // TS 7 loads no @types package unless listed; bun:test needs these.
+    "types": ["bun"],
     // Matches packages/api/tsconfig.json. Without it, `tsc` type-checks every
     // dependency's .d.ts and the build fails on upstream issues we cannot fix
     // (@tanstack/router-core, lucide-react, vite/client).

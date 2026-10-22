@@ -18,7 +18,9 @@ export interface PublishedRating {
  */
 export function usePublishedRating(villaSlug: string): PublishedRating | null {
   const { data: meta } = useGetVillaReviewMeta(villaSlug)
-  if (!meta || meta.display_count === 0) return null
+  if (!meta || meta.display_count === 0) {
+    return null
+  }
 
   return {
     score: meta.display_avg,

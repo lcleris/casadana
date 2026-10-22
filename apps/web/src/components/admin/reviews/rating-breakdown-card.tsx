@@ -11,6 +11,27 @@ const BREAKDOWN_FIELDS = [
   { key: "value", label: "Rapport qualité-prix" },
 ] as const
 
+function CategoryBar({ label, score }: { label: string; score: number | null }) {
+  return (
+    <div className="grid grid-cols-[100px_1fr_auto] items-center gap-3 text-[12.5px]">
+      <span className="text-on-surface-variant font-semibold">{label}</span>
+      {score === null ? (
+        <span className="text-on-surface-variant/70 col-span-2 italic">Pas encore noté</span>
+      ) : (
+        <>
+          <div className="bg-outline-variant h-1.5 overflow-hidden rounded-full" aria-hidden>
+            <span
+              className="bg-secondary block h-full rounded-full"
+              style={{ width: `${(score / 5) * 100}%` }}
+            />
+          </div>
+          <span className="text-on-surface w-9 text-right font-mono">{score.toFixed(2)}</span>
+        </>
+      )}
+    </div>
+  )
+}
+
 interface RatingBreakdownCardProps {
   property: "casadana" | "casacasay"
 }
@@ -24,9 +45,7 @@ export default function RatingBreakdownCard({ property }: RatingBreakdownCardPro
       sub="Calculé à partir des avis publiés — publier ou masquer un avis fait bouger ces chiffres."
       flush={!meta}
     >
-      {!meta ? (
-        <EmptyState message={isPending ? "Chargement…" : "Notes indisponibles."} />
-      ) : (
+      {meta ? (
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
           <div className="sm:w-44 sm:shrink-0">
             {/* display_avg reads 0 with nothing approved, so the count is what tells
@@ -54,28 +73,9 @@ export default function RatingBreakdownCard({ property }: RatingBreakdownCardPro
             ))}
           </div>
         </div>
+      ) : (
+        <EmptyState message={isPending ? "Chargement…" : "Notes indisponibles."} />
       )}
     </AdminCard>
-  )
-}
-
-function CategoryBar({ label, score }: { label: string; score: number | null }) {
-  return (
-    <div className="grid grid-cols-[100px_1fr_auto] items-center gap-3 text-[12.5px]">
-      <span className="text-on-surface-variant font-semibold">{label}</span>
-      {score === null ? (
-        <span className="text-on-surface-variant/70 col-span-2 italic">Pas encore noté</span>
-      ) : (
-        <>
-          <div className="bg-outline-variant h-1.5 overflow-hidden rounded-full" aria-hidden>
-            <span
-              className="bg-secondary block h-full rounded-full"
-              style={{ width: `${(score / 5) * 100}%` }}
-            />
-          </div>
-          <span className="text-on-surface w-9 text-right font-mono">{score.toFixed(2)}</span>
-        </>
-      )}
-    </div>
   )
 }

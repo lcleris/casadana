@@ -1,5 +1,4 @@
 import {
-  type PatchSeasonRuleRequest,
   getListVillaSeasonRulesQueryKey,
   useCreateVillaSeasonRule,
   useDeleteSeasonRule,
@@ -7,6 +6,7 @@ import {
   useListVillaSeasonRules,
   usePatchSeasonRule,
 } from "@casa-dana/api"
+import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/api"
 import { useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { Plus } from "lucide-react"
@@ -16,8 +16,56 @@ import { EmptyState } from "@/components/admin/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
 
-import { type Property, defaultBasePriceCents } from "./defaults"
+import { defaultBasePriceCents } from "./defaults"
+import type { Property } from "./defaults"
 import { RuleRow } from "./rule-row"
+
+// Same default as the base-rate card, so a villa nobody has configured yet
+// still starts its first rule on a real price instead of €0.
+function newRulePriceCents(configuredBasePrice: number | undefined, property: Property): number {
+  return configuredBasePrice !== undefined && configuredBasePrice !== 0
+    ? configuredBasePrice
+    : defaultBasePriceCents(property)
+}
+
+const NO_RULES: Array<SeasonRule> = []
+
+interface SeasonRulesContentProps {
+  rules: Array<SeasonRule> | undefined
+  isPending: boolean
+  onSave: (id: string, patch: PatchSeasonRuleRequest) => void
+  onDelete: (id: string) => void
+}
+
+function SeasonRulesContent({
+  rules = NO_RULES,
+  isPending,
+  onSave,
+  onDelete,
+}: SeasonRulesContentProps) {
+  if (isPending) {
+    return <EmptyState message="Chargement…" />
+  }
+  if (rules.length === 0) {
+    return <EmptyState message="Aucune règle saisonnière pour le moment." />
+  }
+  return (
+    <div className="flex flex-col gap-3 p-5">
+      {rules.map((rule) => (
+        <RuleRow
+          key={rule.id}
+          rule={rule}
+          onSave={(patch) => {
+            onSave(rule.id, patch)
+          }}
+          onDelete={() => {
+            onDelete(rule.id)
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 interface SeasonRulesCardProps {
   property: Property
@@ -38,30 +86,36 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
   const { mutate: createRule } = useCreateVillaSeasonRule({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: rulesQueryKey })
+        void queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle ajoutée")
       },
-      onError: () => toast("Impossible d'ajouter la règle"),
+      onError: () => {
+        toast("Impossible d'ajouter la règle")
+      },
     },
   })
 
   const { mutate: patchRule } = usePatchSeasonRule({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: rulesQueryKey })
+        void queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle mise à jour")
       },
-      onError: () => toast("Impossible de mettre à jour la règle"),
+      onError: () => {
+        toast("Impossible de mettre à jour la règle")
+      },
     },
   })
 
   const { mutate: deleteRule } = useDeleteSeasonRule({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: rulesQueryKey })
+        void queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle supprimée")
       },
-      onError: () => toast("Impossible de supprimer la règle"),
+      onError: () => {
+        toast("Impossible de supprimer la règle")
+      },
     },
   })
 
@@ -73,9 +127,7 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
         label: "Nouvelle règle",
         start_date: today,
         end_date: today,
-        // Same default as the base-rate card, so a villa nobody has configured
-        // yet still starts its first rule on a real price instead of €0.
-        price_cents: settings?.base_price_cents || defaultBasePriceCents(property),
+        price_cents: newRulePriceCents(settings?.base_price_cents, property),
       },
     })
   }
@@ -83,8 +135,6 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
   const handleSave = (id: string, patch: PatchSeasonRuleRequest) => {
     patchRule({ id, data: patch })
   }
-
-  const rules = data?.rules ?? []
 
   return (
     <AdminCard
@@ -98,22 +148,14 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
         </Button>
       }
     >
-      {isPending ? (
-        <EmptyState message="Chargement…" />
-      ) : rules.length === 0 ? (
-        <EmptyState message="Aucune règle saisonnière pour le moment." />
-      ) : (
-        <div className="flex flex-col gap-3 p-5">
-          {rules.map((rule) => (
-            <RuleRow
-              key={rule.id}
-              rule={rule}
-              onSave={(patch) => handleSave(rule.id, patch)}
-              onDelete={() => deleteRule({ id: rule.id })}
-            />
-          ))}
-        </div>
-      )}
+      <SeasonRulesContent
+        rules={data?.rules}
+        isPending={isPending}
+        onSave={handleSave}
+        onDelete={(id) => {
+          deleteRule({ id })
+        }}
+      />
     </AdminCard>
   )
 }
