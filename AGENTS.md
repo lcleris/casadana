@@ -41,8 +41,8 @@ agent (Codex, Cursor, Copilot, Gemini, …) opens it directly.
 
 - After every file you write, run `bunx ultracite fix <file>` from the repo
   root. Claude Code does it from a hook (`scripts/ultracite-fix-edited.sh`).
-- Existing findings are frozen in `oxlint-suppressions.json` and
-  `fallow-suppressions.json`. New code adds no rows: fix the finding.
+- Existing oxlint findings are frozen in `oxlint-suppressions.json`. New
+  code adds no rows: fix the finding. fallow has no baseline.
 
 ## Branches and environments
 
