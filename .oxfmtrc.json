@@ -9,7 +9,6 @@
     "packages/api/src/generated/**",
     "apps/web/src/routeTree.gen.ts",
     ".fallowrc.json",
-    "fallow-suppressions.json",
     "oxlint-suppressions.json"
   ],
   "semi": false,
