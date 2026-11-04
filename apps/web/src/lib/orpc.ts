@@ -1,4 +1,5 @@
-import { contract, ErrorResponseSchema } from "@casa-dana/contract"
+import { contract } from "@casa-dana/contract"
+import { ErrorResponseSchema } from "@casa-dana/contract/shared"
 import { createORPCClient, ORPCError } from "@orpc/client"
 import type { ContractRouterClient } from "@orpc/contract"
 import type { JsonifiedClient } from "@orpc/openapi-client"

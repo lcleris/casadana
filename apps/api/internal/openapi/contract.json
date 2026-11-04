@@ -2670,7 +2670,7 @@
             }
           },
           "404": {
-            "description": "ReviewSchema not found",
+            "description": "Review not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -2774,7 +2774,7 @@
             }
           },
           "404": {
-            "description": "ReviewSchema not found",
+            "description": "Review not found",
             "content": {
               "application/json": {
                 "schema": {

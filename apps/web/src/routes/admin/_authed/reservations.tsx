@@ -1,4 +1,4 @@
-import type { BookingStatus } from "@casa-dana/contract"
+import type { BookingStatus } from "@casa-dana/contract/bookings"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 

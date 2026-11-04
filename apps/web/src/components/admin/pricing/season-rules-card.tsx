@@ -1,4 +1,4 @@
-import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/contract"
+import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/contract/pricing"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { Plus } from "lucide-react"

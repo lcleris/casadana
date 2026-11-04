@@ -1,4 +1,4 @@
-import type { BookingSource, BookingStatus } from "@casa-dana/contract"
+import type { BookingSource, BookingStatus } from "@casa-dana/contract/bookings"
 
 // The API enums stay on the wire in English (pending / approved / …); these
 // maps are display-only, for the French dashboard.

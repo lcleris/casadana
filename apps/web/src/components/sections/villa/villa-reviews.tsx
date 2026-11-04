@@ -1,4 +1,4 @@
-import type { Review, ReviewBreakdown, ReviewMeta } from "@casa-dana/contract"
+import type { Review, ReviewBreakdown, ReviewMeta } from "@casa-dana/contract/reviews"
 import { useQuery } from "@tanstack/react-query"
 
 import VillaReviewForm from "@/components/sections/villa/villa-review-form"

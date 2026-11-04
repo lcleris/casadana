@@ -2,18 +2,27 @@ import { OpenAPIGenerator } from "@orpc/openapi"
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4"
 import * as z from "zod"
 
-import * as exports from "./index"
+import * as admin from "./admin"
+import * as bookings from "./bookings"
+import * as health from "./health"
+import * as history from "./history"
+import { contract } from "./index"
+import * as pricing from "./pricing"
+import * as reviews from "./reviews"
+import * as shared from "./shared"
 
 const generator = new OpenAPIGenerator({ schemaConverters: [new ZodToJsonSchemaConverter()] })
 
+const modules = [admin, bookings, health, history, pricing, reviews, shared]
 const commonSchemas: Record<string, { schema: z.ZodType }> = {}
-for (const [name, value] of Object.entries(exports)) {
+const exports = modules.flatMap((module) => Object.entries(module))
+for (const [name, value] of exports.toSorted(([a], [b]) => (a < b ? -1 : 1))) {
   if (name.endsWith("Schema") && value instanceof z.ZodType) {
     commonSchemas[name.slice(0, -"Schema".length)] = { schema: value }
   }
 }
 
-const spec = await generator.generate(exports.contract, {
+const spec = await generator.generate(contract, {
   commonSchemas,
   components: {
     securitySchemes: {

@@ -1,4 +1,8 @@
-import type { BookingResponse, BookingStatus, PatchBookingRequest } from "@casa-dana/contract"
+import type {
+  BookingResponse,
+  BookingStatus,
+  PatchBookingRequest,
+} from "@casa-dana/contract/bookings"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"

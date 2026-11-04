@@ -1,4 +1,4 @@
-import type { PricingSettings } from "@casa-dana/contract"
+import type { PricingSettings } from "@casa-dana/contract/pricing"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 

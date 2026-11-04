@@ -1,4 +1,4 @@
-import type { ReviewCategoryRatings } from "@casa-dana/contract"
+import type { ReviewCategoryRatings } from "@casa-dana/contract/reviews"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
