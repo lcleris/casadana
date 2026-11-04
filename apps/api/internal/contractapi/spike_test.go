@@ -11,20 +11,11 @@ import (
 )
 
 type fake struct {
-	Unimplemented
+	StrictServerInterface
 	gotList   ListBookingsRequestObject
 	gotCreate CreateBookingRequestObject
 }
 
-func (f *fake) GetHealth(context.Context, GetHealthRequestObject) (GetHealthResponseObject, error) {
-	return GetHealth200JSONResponse{Status: "ok"}, nil
-}
-func (f *fake) AdminLogin(context.Context, AdminLoginRequestObject) (AdminLoginResponseObject, error) {
-	return AdminLogin200JSONResponse{}, nil
-}
-func (f *fake) AdminMe(context.Context, AdminMeRequestObject) (AdminMeResponseObject, error) {
-	return AdminMe200JSONResponse{}, nil
-}
 func (f *fake) ListBookings(_ context.Context, r ListBookingsRequestObject) (ListBookingsResponseObject, error) {
 	f.gotList = r
 	return ListBookings200JSONResponse{Bookings: []BookingResponse{}, Page: 2, Limit: 20}, nil

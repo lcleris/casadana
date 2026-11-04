@@ -1,16 +1,11 @@
-import {
-  getListAdminUsersQueryKey,
-  useAdminMe,
-  useDeleteAdminUser,
-  useListAdminUsers,
-} from "@casa-dana/api"
-import type { AdminUser } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import type { AdminUser } from "@casa-dana/contract/admin"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 
 import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog"
 import { useToast } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 
 function formatCreatedAt(createdAt: string | undefined): string {
   return createdAt !== undefined && createdAt !== ""
@@ -57,22 +52,22 @@ function UserRow({ user, isSelf, onDelete }: UserRowProps) {
 export default function AdminUsersTable() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { data: me } = useAdminMe()
-  const { data } = useListAdminUsers()
+  const { data: me } = useQuery(orpc.admin.me.queryOptions())
+  const { data } = useQuery(orpc.admin.listUsers.queryOptions())
   const users = data?.users ?? []
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
-  const { mutate: deleteUser } = useDeleteAdminUser({
-    mutation: {
+  const { mutate: deleteUser } = useMutation(
+    orpc.admin.deleteUser.mutationOptions({
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: getListAdminUsersQueryKey() })
+        void queryClient.invalidateQueries({ queryKey: orpc.admin.listUsers.key() })
         toast("Administrateur supprimé")
       },
       onError: () => {
         toast("Impossible de supprimer l'administrateur")
       },
-    },
-  })
+    }),
+  )
 
   const handleDelete = (id: string) => {
     setPendingDeleteId(id)

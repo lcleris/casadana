@@ -1,10 +1,5 @@
-import {
-  getGetVillaPricingSettingsQueryKey,
-  useGetVillaPricingSettings,
-  usePutVillaPricingSettings,
-} from "@casa-dana/api"
-import type { PricingSettings } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import type { PricingSettings } from "@casa-dana/contract/pricing"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 import { AdminCard } from "@/components/admin/ui/admin-card"
@@ -13,6 +8,7 @@ import { EmptyState } from "@/components/admin/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 
 import { DEFAULT_MIN_NIGHTS, defaultBasePriceCents } from "./defaults"
 import type { Property } from "./defaults"
@@ -111,39 +107,39 @@ interface BasePricingCardProps {
 export default function BasePricingCard({ property }: BasePricingCardProps) {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { data: settings, isPending } = useGetVillaPricingSettings(property)
+  const { data: settings, isPending } = useQuery(
+    orpc.pricing.getSettings.queryOptions({ input: { slug: property } }),
+  )
   const { form, setField } = useBasePricingForm(property, settings)
 
-  const { mutate: saveSettings, isPending: isSaving } = usePutVillaPricingSettings({
-    mutation: {
+  const { mutate: saveSettings, isPending: isSaving } = useMutation(
+    orpc.pricing.putSettings.mutationOptions({
       onSuccess: () => {
         // The slug is baked into the URL-shaped query key, so it has to be
         // passed here — a no-arg call would build a key matching nothing.
         void queryClient.invalidateQueries({
-          queryKey: getGetVillaPricingSettingsQueryKey(property),
+          queryKey: orpc.pricing.getSettings.key({ input: { slug: property } }),
         })
         toast("Tarifs enregistrés")
       },
       onError: () => {
         toast("Impossible d'enregistrer les tarifs")
       },
-    },
-  })
+    }),
+  )
 
   const handleSave = () => {
     const minNights = Math.trunc(Number(form.minNights))
     saveSettings({
       slug: property,
-      data: {
-        base_price_cents: euroInputToCents(form.basePrice),
-        // The field opens pre-filled, but it can still be cleared by hand and
-        // the PUT schema rejects anything below 1 — floor it here.
-        min_nights: Number.isFinite(minNights)
-          ? Math.max(DEFAULT_MIN_NIGHTS, minNights)
-          : DEFAULT_MIN_NIGHTS,
-        cleaning_fee_cents: euroInputToCents(form.cleaningFee),
-        concierge_fee_cents: euroInputToCents(form.conciergeFee),
-      },
+      base_price_cents: euroInputToCents(form.basePrice),
+      // The field opens pre-filled, but it can still be cleared by hand and
+      // the PUT schema rejects anything below 1 — floor it here.
+      min_nights: Number.isFinite(minNights)
+        ? Math.max(DEFAULT_MIN_NIGHTS, minNights)
+        : DEFAULT_MIN_NIGHTS,
+      cleaning_fee_cents: euroInputToCents(form.cleaningFee),
+      concierge_fee_cents: euroInputToCents(form.conciergeFee),
     })
   }
 

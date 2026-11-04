@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -16,6 +17,72 @@ import (
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
+
+// Defines values for ApiErrorCode.
+const (
+	ADMINNOTFOUND      ApiErrorCode = "ADMIN_NOT_FOUND"
+	ALREADYREVIEWED    ApiErrorCode = "ALREADY_REVIEWED"
+	BOOKINGNOTFOUND    ApiErrorCode = "BOOKING_NOT_FOUND"
+	CANNOTDELETESELF   ApiErrorCode = "CANNOT_DELETE_SELF"
+	DATESCONFLICT      ApiErrorCode = "DATES_CONFLICT"
+	EMAILTAKEN         ApiErrorCode = "EMAIL_TAKEN"
+	INTERNAL           ApiErrorCode = "INTERNAL"
+	INVALIDCREDENTIALS ApiErrorCode = "INVALID_CREDENTIALS"
+	INVALIDPAYLOAD     ApiErrorCode = "INVALID_PAYLOAD"
+	INVALIDRANGE       ApiErrorCode = "INVALID_RANGE"
+	INVALIDSTATUS      ApiErrorCode = "INVALID_STATUS"
+	RANGETOOLARGE      ApiErrorCode = "RANGE_TOO_LARGE"
+	RATELIMITED        ApiErrorCode = "RATE_LIMITED"
+	REVIEWNOTFOUND     ApiErrorCode = "REVIEW_NOT_FOUND"
+	SEASONRULENOTFOUND ApiErrorCode = "SEASON_RULE_NOT_FOUND"
+	UNAUTHORIZED       ApiErrorCode = "UNAUTHORIZED"
+	UNKNOWNVILLA       ApiErrorCode = "UNKNOWN_VILLA"
+	VALIDATION         ApiErrorCode = "VALIDATION"
+)
+
+// Valid indicates whether the value is a known member of the ApiErrorCode enum.
+func (e ApiErrorCode) Valid() bool {
+	switch e {
+	case ADMINNOTFOUND:
+		return true
+	case ALREADYREVIEWED:
+		return true
+	case BOOKINGNOTFOUND:
+		return true
+	case CANNOTDELETESELF:
+		return true
+	case DATESCONFLICT:
+		return true
+	case EMAILTAKEN:
+		return true
+	case INTERNAL:
+		return true
+	case INVALIDCREDENTIALS:
+		return true
+	case INVALIDPAYLOAD:
+		return true
+	case INVALIDRANGE:
+		return true
+	case INVALIDSTATUS:
+		return true
+	case RANGETOOLARGE:
+		return true
+	case RATELIMITED:
+		return true
+	case REVIEWNOTFOUND:
+		return true
+	case SEASONRULENOTFOUND:
+		return true
+	case UNAUTHORIZED:
+		return true
+	case UNKNOWNVILLA:
+		return true
+	case VALIDATION:
+		return true
+	default:
+		return false
+	}
+}
 
 // Defines values for BookingSource.
 const (
@@ -86,6 +153,75 @@ func (e CreateBookingRequestLocale) Valid() bool {
 	}
 }
 
+// Defines values for HistoryEventType.
+const (
+	HistoryEventTypeOwner       HistoryEventType = "owner"
+	HistoryEventTypePricing     HistoryEventType = "pricing"
+	HistoryEventTypeReservation HistoryEventType = "reservation"
+	HistoryEventTypeReview      HistoryEventType = "review"
+	HistoryEventTypeSystem      HistoryEventType = "system"
+)
+
+// Valid indicates whether the value is a known member of the HistoryEventType enum.
+func (e HistoryEventType) Valid() bool {
+	switch e {
+	case HistoryEventTypeOwner:
+		return true
+	case HistoryEventTypePricing:
+		return true
+	case HistoryEventTypeReservation:
+		return true
+	case HistoryEventTypeReview:
+		return true
+	case HistoryEventTypeSystem:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReviewStatus.
+const (
+	ReviewStatusApproved ReviewStatus = "approved"
+	ReviewStatusPending  ReviewStatus = "pending"
+	ReviewStatusRejected ReviewStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the ReviewStatus enum.
+func (e ReviewStatus) Valid() bool {
+	switch e {
+	case ReviewStatusApproved:
+		return true
+	case ReviewStatusPending:
+		return true
+	case ReviewStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListAdminReviewsParamsStatus.
+const (
+	ListAdminReviewsParamsStatusApproved ListAdminReviewsParamsStatus = "approved"
+	ListAdminReviewsParamsStatusPending  ListAdminReviewsParamsStatus = "pending"
+	ListAdminReviewsParamsStatusRejected ListAdminReviewsParamsStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the ListAdminReviewsParamsStatus enum.
+func (e ListAdminReviewsParamsStatus) Valid() bool {
+	switch e {
+	case ListAdminReviewsParamsStatusApproved:
+		return true
+	case ListAdminReviewsParamsStatusPending:
+		return true
+	case ListAdminReviewsParamsStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ListBookingsParamsStatus.
 const (
 	ListBookingsParamsStatusApproved  ListBookingsParamsStatus = "approved"
@@ -113,6 +249,30 @@ func (e ListBookingsParamsStatus) Valid() bool {
 	}
 }
 
+// Defines values for PatchBookingJSONBodyStatus.
+const (
+	PatchBookingJSONBodyStatusApproved  PatchBookingJSONBodyStatus = "approved"
+	PatchBookingJSONBodyStatusCancelled PatchBookingJSONBodyStatus = "cancelled"
+	PatchBookingJSONBodyStatusPaid      PatchBookingJSONBodyStatus = "paid"
+	PatchBookingJSONBodyStatusRejected  PatchBookingJSONBodyStatus = "rejected"
+)
+
+// Valid indicates whether the value is a known member of the PatchBookingJSONBodyStatus enum.
+func (e PatchBookingJSONBodyStatus) Valid() bool {
+	switch e {
+	case PatchBookingJSONBodyStatusApproved:
+		return true
+	case PatchBookingJSONBodyStatusCancelled:
+		return true
+	case PatchBookingJSONBodyStatusPaid:
+		return true
+	case PatchBookingJSONBodyStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
 // AdminLoginRequest defines model for AdminLoginRequest.
 type AdminLoginRequest struct {
 	Email    openapi_types.Email `json:"email"`
@@ -124,6 +284,21 @@ type AdminUser struct {
 	CreatedAt *time.Time           `json:"created_at,omitempty"`
 	Email     *openapi_types.Email `json:"email,omitempty"`
 	Id        *openapi_types.UUID  `json:"id,omitempty"`
+}
+
+// ApiErrorCode Every code the Go API sends: the httpserver.Register calls, plus VALIDATION and INTERNAL from httpserver.WriteError.
+type ApiErrorCode string
+
+// AvailabilityResponse defines model for AvailabilityResponse.
+type AvailabilityResponse struct {
+	BookedRanges  []BookedRange `json:"booked_ranges"`
+	PendingRanges []BookedRange `json:"pending_ranges"`
+}
+
+// BookedRange defines model for BookedRange.
+type BookedRange struct {
+	CheckIn  openapi_types.Date `json:"check_in"`
+	CheckOut openapi_types.Date `json:"check_out"`
 }
 
 // BookingResponse defines model for BookingResponse.
@@ -147,6 +322,27 @@ type BookingSource string
 // BookingStatus defines model for BookingStatus.
 type BookingStatus string
 
+// CreateAdminReviewRequest defines model for CreateAdminReviewRequest.
+type CreateAdminReviewRequest struct {
+	AuthorName string  `json:"author_name"`
+	Body       *string `json:"body,omitempty"`
+
+	// Categories Per-category scores for one review. A null means the reviewer did not score that category, which keeps it out of the villa's average rather than pulling it down with a zero.
+	Categories *ReviewCategoryRatings `json:"categories,omitempty"`
+	Featured   *bool                  `json:"featured,omitempty"`
+	Meta       *string                `json:"meta,omitempty"`
+	Rating     int                    `json:"rating"`
+	Source     *string                `json:"source,omitempty"`
+	Status     *ReviewStatus          `json:"status,omitempty"`
+	VillaSlug  string                 `json:"villa_slug"`
+}
+
+// CreateAdminUserRequest defines model for CreateAdminUserRequest.
+type CreateAdminUserRequest struct {
+	Email    openapi_types.Email `json:"email"`
+	Password string              `json:"password"`
+}
+
 // CreateBookingRequest defines model for CreateBookingRequest.
 type CreateBookingRequest struct {
 	Adults  int                `json:"adults"`
@@ -159,19 +355,47 @@ type CreateBookingRequest struct {
 	GuestName  string              `json:"guest_name"`
 	GuestPhone string              `json:"guest_phone"`
 
-	// Locale Language of every email about this booking. Falls back to fr.
+	// Locale Language of every email about this booking, including later ones (approval, refusal, cancellation). Falls back to fr.
 	Locale    *CreateBookingRequestLocale `json:"locale,omitempty"`
 	Message   *string                     `json:"message,omitempty"`
 	Source    *BookingSource              `json:"source,omitempty"`
 	VillaSlug string                      `json:"villa_slug"`
 }
 
-// CreateBookingRequestLocale Language of every email about this booking. Falls back to fr.
+// CreateBookingRequestLocale Language of every email about this booking, including later ones (approval, refusal, cancellation). Falls back to fr.
 type CreateBookingRequestLocale string
+
+// ErrorResponse defines model for ErrorResponse.
+type ErrorResponse struct {
+	Error struct {
+		// Code Every code the Go API sends: the httpserver.Register calls, plus VALIDATION and INTERNAL from httpserver.WriteError.
+		Code    ApiErrorCode `json:"code"`
+		Message string       `json:"message"`
+	} `json:"error"`
+}
 
 // HealthResponse defines model for HealthResponse.
 type HealthResponse struct {
 	Status interface{} `json:"status"`
+}
+
+// HistoryEvent defines model for HistoryEvent.
+type HistoryEvent struct {
+	// ActorEmail Email of the admin who made the change; empty when unattributed.
+	ActorEmail string             `json:"actor_email"`
+	CreatedAt  time.Time          `json:"created_at"`
+	Id         openapi_types.UUID `json:"id"`
+	Message    string             `json:"message"`
+	Type       HistoryEventType   `json:"type"`
+	VillaSlug  string             `json:"villa_slug"`
+}
+
+// HistoryEventType defines model for HistoryEventType.
+type HistoryEventType string
+
+// ListAdminUsersResponse defines model for ListAdminUsersResponse.
+type ListAdminUsersResponse struct {
+	Users *[]AdminUser `json:"users,omitempty"`
 }
 
 // ListBookingsResponse defines model for ListBookingsResponse.
@@ -181,6 +405,152 @@ type ListBookingsResponse struct {
 	Page     int               `json:"page"`
 	Total    int               `json:"total"`
 }
+
+// ListHistoryResponse defines model for ListHistoryResponse.
+type ListHistoryResponse struct {
+	Events []HistoryEvent `json:"events"`
+	Limit  int            `json:"limit"`
+	Page   int            `json:"page"`
+	Total  int            `json:"total"`
+}
+
+// ListReviewsResponse defines model for ListReviewsResponse.
+type ListReviewsResponse struct {
+	Reviews []Review `json:"reviews"`
+}
+
+// ListSeasonRulesResponse defines model for ListSeasonRulesResponse.
+type ListSeasonRulesResponse struct {
+	Rules []SeasonRule `json:"rules"`
+}
+
+// NightlyPrice defines model for NightlyPrice.
+type NightlyPrice struct {
+	Date openapi_types.Date `json:"date"`
+
+	// Label Where the price came from: a season rule's own name, `Custom` for a per-date override, or `Standard` for the villa's base rate.
+	Label string `json:"label"`
+
+	// PriceCents Effective price in EUR cents for that night.
+	PriceCents int `json:"price_cents"`
+}
+
+// PriceOverride defines model for PriceOverride.
+type PriceOverride struct {
+	Date openapi_types.Date `json:"date"`
+
+	// PriceCents Price in EUR cents (e.g. 9500 = 95.00€).
+	PriceCents int `json:"price_cents"`
+}
+
+// PricingResponse defines model for PricingResponse.
+type PricingResponse struct {
+	// Nights One entry per day in the requested window, in date order.
+	Nights    []NightlyPrice  `json:"nights"`
+	Overrides []PriceOverride `json:"overrides"`
+}
+
+// PricingSettings Base rate and fees, applied whenever no season rule or per-date override matches. A villa never configured reads back as all-zero rather than 404.
+type PricingSettings struct {
+	BasePriceCents    int `json:"base_price_cents"`
+	CleaningFeeCents  int `json:"cleaning_fee_cents"`
+	ConciergeFeeCents int `json:"concierge_fee_cents"`
+	MinNights         int `json:"min_nights"`
+}
+
+// Review defines model for Review.
+type Review struct {
+	AuthorName string `json:"author_name"`
+	Body       string `json:"body"`
+
+	// BookingId Null for admin-authored reviews, which have no booking behind them.
+	BookingId *openapi_types.UUID `json:"booking_id"`
+
+	// Categories Per-category scores for one review. A null means the reviewer did not score that category, which keeps it out of the villa's average rather than pulling it down with a zero.
+	Categories *ReviewCategoryRatings `json:"categories,omitempty"`
+	CreatedAt  time.Time              `json:"created_at"`
+
+	// Featured Pinned to the top of the public reviews section.
+	Featured bool               `json:"featured"`
+	Id       openapi_types.UUID `json:"id"`
+
+	// Meta Free-text context line shown under the author name.
+	Meta   string `json:"meta"`
+	Rating int    `json:"rating"`
+
+	// Source Where the review came from.
+	Source    string       `json:"source"`
+	Status    ReviewStatus `json:"status"`
+	VillaSlug string       `json:"villa_slug"`
+}
+
+// ReviewBreakdown Per-category averages over the villa's approved reviews. A null means no approved review has scored that category yet.
+type ReviewBreakdown struct {
+	Cleanliness *float32 `json:"cleanliness"`
+	Comfort     *float32 `json:"comfort"`
+	Host        *float32 `json:"host"`
+	Location    *float32 `json:"location"`
+	Value       *float32 `json:"value"`
+}
+
+// ReviewCategoryRatings Per-category scores for one review. A null means the reviewer did not score that category, which keeps it out of the villa's average rather than pulling it down with a zero.
+type ReviewCategoryRatings struct {
+	Cleanliness *float32 `json:"cleanliness,omitempty"`
+	Comfort     *float32 `json:"comfort,omitempty"`
+	Host        *float32 `json:"host,omitempty"`
+	Location    *float32 `json:"location,omitempty"`
+	Value       *float32 `json:"value,omitempty"`
+}
+
+// ReviewMeta The villa's published rating, computed from its approved reviews; nothing here is hand-entered. `display_avg` is 0 when there is no approved review: read `display_count` to tell that apart from a genuine average.
+type ReviewMeta struct {
+	// Breakdown Per-category averages over the villa's approved reviews. A null means no approved review has scored that category yet.
+	Breakdown    ReviewBreakdown `json:"breakdown"`
+	DisplayAvg   float32         `json:"display_avg"`
+	DisplayCount int             `json:"display_count"`
+}
+
+// ReviewStatus defines model for ReviewStatus.
+type ReviewStatus string
+
+// SeasonRule A named, inclusive date range with its own nightly price. When several rules cover the same night the highest-priced one wins.
+type SeasonRule struct {
+	EndDate    openapi_types.Date `json:"end_date"`
+	Id         openapi_types.UUID `json:"id"`
+	Label      string             `json:"label"`
+	PriceCents int                `json:"price_cents"`
+	StartDate  openapi_types.Date `json:"start_date"`
+	VillaSlug  string             `json:"villa_slug"`
+}
+
+// SubmitReviewRequest defines model for SubmitReviewRequest.
+type SubmitReviewRequest struct {
+	AuthorName string             `json:"author_name"`
+	Body       *string            `json:"body,omitempty"`
+	BookingId  openapi_types.UUID `json:"booking_id"`
+	Rating     int                `json:"rating"`
+}
+
+// UpsertPricingResponse defines model for UpsertPricingResponse.
+type UpsertPricingResponse struct {
+	Count int `json:"count"`
+}
+
+// ListAdminHistoryParams defines parameters for ListAdminHistory.
+type ListAdminHistoryParams struct {
+	Limit     *int   `form:"limit,omitempty" json:"limit,omitempty"`
+	Page      *int   `form:"page,omitempty" json:"page,omitempty"`
+	VillaSlug string `form:"villa_slug" json:"villa_slug"`
+}
+
+// ListAdminReviewsParams defines parameters for ListAdminReviews.
+type ListAdminReviewsParams struct {
+	Status    *ListAdminReviewsParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+	VillaSlug string                        `form:"villa_slug" json:"villa_slug"`
+}
+
+// ListAdminReviewsParamsStatus defines parameters for ListAdminReviews.
+type ListAdminReviewsParamsStatus string
 
 // ListBookingsParams defines parameters for ListBookings.
 type ListBookingsParams struct {
@@ -193,57 +563,382 @@ type ListBookingsParams struct {
 // ListBookingsParamsStatus defines parameters for ListBookings.
 type ListBookingsParamsStatus string
 
+// PatchBookingJSONBody defines parameters for PatchBooking.
+type PatchBookingJSONBody struct {
+	// Status Target status for the transition.
+	Status PatchBookingJSONBodyStatus `json:"status"`
+}
+
+// PatchBookingJSONBodyStatus defines parameters for PatchBooking.
+type PatchBookingJSONBodyStatus string
+
+// PatchSeasonRuleJSONBody defines parameters for PatchSeasonRule.
+type PatchSeasonRuleJSONBody struct {
+	EndDate    *openapi_types.Date `json:"end_date,omitempty"`
+	Label      *string             `json:"label,omitempty"`
+	PriceCents *int                `json:"price_cents,omitempty"`
+	StartDate  *openapi_types.Date `json:"start_date,omitempty"`
+}
+
+// PatchReviewJSONBody defines parameters for PatchReview.
+type PatchReviewJSONBody struct {
+	Body *string `json:"body,omitempty"`
+
+	// Categories Per-category scores for one review. A null means the reviewer did not score that category, which keeps it out of the villa's average rather than pulling it down with a zero.
+	Categories *ReviewCategoryRatings `json:"categories,omitempty"`
+	Featured   *bool                  `json:"featured,omitempty"`
+	Meta       *string                `json:"meta,omitempty"`
+	Rating     *int                   `json:"rating,omitempty"`
+	Source     *string                `json:"source,omitempty"`
+	Status     *ReviewStatus          `json:"status,omitempty"`
+}
+
+// GetVillaAvailabilityParams defines parameters for GetVillaAvailability.
+type GetVillaAvailabilityParams struct {
+	From openapi_types.Date `form:"from" json:"from"`
+	To   openapi_types.Date `form:"to" json:"to"`
+}
+
+// GetVillaPricingParams defines parameters for GetVillaPricing.
+type GetVillaPricingParams struct {
+	From openapi_types.Date `form:"from" json:"from"`
+	To   openapi_types.Date `form:"to" json:"to"`
+}
+
+// UpsertVillaPricingJSONBody defines parameters for UpsertVillaPricing.
+type UpsertVillaPricingJSONBody struct {
+	Dates      []openapi_types.Date `json:"dates"`
+	PriceCents int                  `json:"price_cents"`
+}
+
+// CreateVillaSeasonRuleJSONBody defines parameters for CreateVillaSeasonRule.
+type CreateVillaSeasonRuleJSONBody struct {
+	EndDate    openapi_types.Date `json:"end_date"`
+	Label      string             `json:"label"`
+	PriceCents int                `json:"price_cents"`
+	StartDate  openapi_types.Date `json:"start_date"`
+}
+
+// PutVillaPricingSettingsJSONBody defines parameters for PutVillaPricingSettings.
+type PutVillaPricingSettingsJSONBody struct {
+	BasePriceCents    int `json:"base_price_cents"`
+	CleaningFeeCents  int `json:"cleaning_fee_cents"`
+	ConciergeFeeCents int `json:"concierge_fee_cents"`
+	MinNights         int `json:"min_nights"`
+}
+
+// SubmitVillaReviewJSONBody defines parameters for SubmitVillaReview.
+type SubmitVillaReviewJSONBody struct {
+	AuthorName string `json:"author_name"`
+	Body       string `json:"body"`
+
+	// Categories Per-category scores for one review. A null means the reviewer did not score that category, which keeps it out of the villa's average rather than pulling it down with a zero.
+	Categories *ReviewCategoryRatings `json:"categories,omitempty"`
+	Rating     int                    `json:"rating"`
+}
+
 // AdminLoginJSONRequestBody defines body for AdminLogin for application/json ContentType.
 type AdminLoginJSONRequestBody = AdminLoginRequest
+
+// CreateAdminReviewJSONRequestBody defines body for CreateAdminReview for application/json ContentType.
+type CreateAdminReviewJSONRequestBody = CreateAdminReviewRequest
+
+// CreateAdminUserJSONRequestBody defines body for CreateAdminUser for application/json ContentType.
+type CreateAdminUserJSONRequestBody = CreateAdminUserRequest
 
 // CreateBookingJSONRequestBody defines body for CreateBooking for application/json ContentType.
 type CreateBookingJSONRequestBody = CreateBookingRequest
 
+// PatchBookingJSONRequestBody defines body for PatchBooking for application/json ContentType.
+type PatchBookingJSONRequestBody PatchBookingJSONBody
+
+// PatchSeasonRuleJSONRequestBody defines body for PatchSeasonRule for application/json ContentType.
+type PatchSeasonRuleJSONRequestBody PatchSeasonRuleJSONBody
+
+// SubmitReviewJSONRequestBody defines body for SubmitReview for application/json ContentType.
+type SubmitReviewJSONRequestBody = SubmitReviewRequest
+
+// PatchReviewJSONRequestBody defines body for PatchReview for application/json ContentType.
+type PatchReviewJSONRequestBody PatchReviewJSONBody
+
+// UpsertVillaPricingJSONRequestBody defines body for UpsertVillaPricing for application/json ContentType.
+type UpsertVillaPricingJSONRequestBody UpsertVillaPricingJSONBody
+
+// CreateVillaSeasonRuleJSONRequestBody defines body for CreateVillaSeasonRule for application/json ContentType.
+type CreateVillaSeasonRuleJSONRequestBody CreateVillaSeasonRuleJSONBody
+
+// PutVillaPricingSettingsJSONRequestBody defines body for PutVillaPricingSettings for application/json ContentType.
+type PutVillaPricingSettingsJSONRequestBody PutVillaPricingSettingsJSONBody
+
+// SubmitVillaReviewJSONRequestBody defines body for SubmitVillaReview for application/json ContentType.
+type SubmitVillaReviewJSONRequestBody SubmitVillaReviewJSONBody
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
+	// ListAdminHistory Paginated activity log for a villa
+	// (GET /api/admin/history)
+	ListAdminHistory(w http.ResponseWriter, r *http.Request, params ListAdminHistoryParams)
+	// AdminLogin Admin login
 	// (POST /api/admin/login)
 	AdminLogin(w http.ResponseWriter, r *http.Request)
-
+	// AdminLogout Admin logout
+	// (POST /api/admin/logout)
+	AdminLogout(w http.ResponseWriter, r *http.Request)
+	// AdminMe Get the current admin user
 	// (GET /api/admin/me)
 	AdminMe(w http.ResponseWriter, r *http.Request)
-
+	// ListAdminReviews List reviews for moderation
+	// (GET /api/admin/reviews)
+	ListAdminReviews(w http.ResponseWriter, r *http.Request, params ListAdminReviewsParams)
+	// CreateAdminReview Create a review without a booking
+	// (POST /api/admin/reviews)
+	CreateAdminReview(w http.ResponseWriter, r *http.Request)
+	// ListAdminUsers List all admin users
+	// (GET /api/admin/users)
+	ListAdminUsers(w http.ResponseWriter, r *http.Request)
+	// CreateAdminUser Create a new admin user
+	// (POST /api/admin/users)
+	CreateAdminUser(w http.ResponseWriter, r *http.Request)
+	// DeleteAdminUser Delete an admin user
+	// (DELETE /api/admin/users/{id})
+	DeleteAdminUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// ListBookings List bookings (paginated, optional status filter)
 	// (GET /api/bookings)
 	ListBookings(w http.ResponseWriter, r *http.Request, params ListBookingsParams)
-
+	// CreateBooking Submit a booking request
 	// (POST /api/bookings)
 	CreateBooking(w http.ResponseWriter, r *http.Request)
-
+	// DeleteBooking Hard delete a booking (cascades to its review)
+	// (DELETE /api/bookings/{id})
+	DeleteBooking(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// PatchBooking Transition a booking's status
+	// (PATCH /api/bookings/{id})
+	PatchBooking(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// GetHealth Liveness probe
 	// (GET /api/health)
 	GetHealth(w http.ResponseWriter, r *http.Request)
+	// DeleteSeasonRule Remove a season rule
+	// (DELETE /api/pricing/season-rules/{id})
+	DeleteSeasonRule(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// PatchSeasonRule Update a season rule
+	// (PATCH /api/pricing/season-rules/{id})
+	PatchSeasonRule(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// SubmitReview Submit a review for a booking
+	// (POST /api/reviews)
+	SubmitReview(w http.ResponseWriter, r *http.Request)
+	// DeleteReview Hard delete a review
+	// (DELETE /api/reviews/{id})
+	DeleteReview(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// PatchReview Moderate a review
+	// (PATCH /api/reviews/{id})
+	PatchReview(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// GetVillaAvailability Get booked date ranges for a villa
+	// (GET /api/villas/{slug}/availability)
+	GetVillaAvailability(w http.ResponseWriter, r *http.Request, slug string, params GetVillaAvailabilityParams)
+	// GetVillaPricing Get the resolved nightly prices for a villa within a date window
+	// (GET /api/villas/{slug}/pricing)
+	GetVillaPricing(w http.ResponseWriter, r *http.Request, slug string, params GetVillaPricingParams)
+	// UpsertVillaPricing Bulk upsert price overrides for a villa
+	// (POST /api/villas/{slug}/pricing)
+	UpsertVillaPricing(w http.ResponseWriter, r *http.Request, slug string)
+	// ListVillaSeasonRules List season rules for a villa, earliest start first
+	// (GET /api/villas/{slug}/pricing/season-rules)
+	ListVillaSeasonRules(w http.ResponseWriter, r *http.Request, slug string)
+	// CreateVillaSeasonRule Add a season rule
+	// (POST /api/villas/{slug}/pricing/season-rules)
+	CreateVillaSeasonRule(w http.ResponseWriter, r *http.Request, slug string)
+	// GetVillaPricingSettings Base rate and fees for a villa
+	// (GET /api/villas/{slug}/pricing/settings)
+	GetVillaPricingSettings(w http.ResponseWriter, r *http.Request, slug string)
+	// PutVillaPricingSettings Replace base rate and fees
+	// (PUT /api/villas/{slug}/pricing/settings)
+	PutVillaPricingSettings(w http.ResponseWriter, r *http.Request, slug string)
+	// ListVillaReviews List published reviews for a villa
+	// (GET /api/villas/{slug}/reviews)
+	ListVillaReviews(w http.ResponseWriter, r *http.Request, slug string)
+	// SubmitVillaReview Leave a review on a villa from its public page
+	// (POST /api/villas/{slug}/reviews)
+	SubmitVillaReview(w http.ResponseWriter, r *http.Request, slug string)
+	// GetVillaReviewMeta Published rating figures for a villa
+	// (GET /api/villas/{slug}/reviews/meta)
+	GetVillaReviewMeta(w http.ResponseWriter, r *http.Request, slug string)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
 
+// ListAdminHistory Paginated activity log for a villa
+// (GET /api/admin/history)
+func (_ Unimplemented) ListAdminHistory(w http.ResponseWriter, r *http.Request, params ListAdminHistoryParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// AdminLogin Admin login
 // (POST /api/admin/login)
 func (_ Unimplemented) AdminLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// AdminLogout Admin logout
+// (POST /api/admin/logout)
+func (_ Unimplemented) AdminLogout(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// AdminMe Get the current admin user
 // (GET /api/admin/me)
 func (_ Unimplemented) AdminMe(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// ListAdminReviews List reviews for moderation
+// (GET /api/admin/reviews)
+func (_ Unimplemented) ListAdminReviews(w http.ResponseWriter, r *http.Request, params ListAdminReviewsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateAdminReview Create a review without a booking
+// (POST /api/admin/reviews)
+func (_ Unimplemented) CreateAdminReview(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListAdminUsers List all admin users
+// (GET /api/admin/users)
+func (_ Unimplemented) ListAdminUsers(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateAdminUser Create a new admin user
+// (POST /api/admin/users)
+func (_ Unimplemented) CreateAdminUser(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteAdminUser Delete an admin user
+// (DELETE /api/admin/users/{id})
+func (_ Unimplemented) DeleteAdminUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListBookings List bookings (paginated, optional status filter)
 // (GET /api/bookings)
 func (_ Unimplemented) ListBookings(w http.ResponseWriter, r *http.Request, params ListBookingsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// CreateBooking Submit a booking request
 // (POST /api/bookings)
 func (_ Unimplemented) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// DeleteBooking Hard delete a booking (cascades to its review)
+// (DELETE /api/bookings/{id})
+func (_ Unimplemented) DeleteBooking(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PatchBooking Transition a booking's status
+// (PATCH /api/bookings/{id})
+func (_ Unimplemented) PatchBooking(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetHealth Liveness probe
 // (GET /api/health)
 func (_ Unimplemented) GetHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteSeasonRule Remove a season rule
+// (DELETE /api/pricing/season-rules/{id})
+func (_ Unimplemented) DeleteSeasonRule(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PatchSeasonRule Update a season rule
+// (PATCH /api/pricing/season-rules/{id})
+func (_ Unimplemented) PatchSeasonRule(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SubmitReview Submit a review for a booking
+// (POST /api/reviews)
+func (_ Unimplemented) SubmitReview(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// DeleteReview Hard delete a review
+// (DELETE /api/reviews/{id})
+func (_ Unimplemented) DeleteReview(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PatchReview Moderate a review
+// (PATCH /api/reviews/{id})
+func (_ Unimplemented) PatchReview(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetVillaAvailability Get booked date ranges for a villa
+// (GET /api/villas/{slug}/availability)
+func (_ Unimplemented) GetVillaAvailability(w http.ResponseWriter, r *http.Request, slug string, params GetVillaAvailabilityParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetVillaPricing Get the resolved nightly prices for a villa within a date window
+// (GET /api/villas/{slug}/pricing)
+func (_ Unimplemented) GetVillaPricing(w http.ResponseWriter, r *http.Request, slug string, params GetVillaPricingParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// UpsertVillaPricing Bulk upsert price overrides for a villa
+// (POST /api/villas/{slug}/pricing)
+func (_ Unimplemented) UpsertVillaPricing(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListVillaSeasonRules List season rules for a villa, earliest start first
+// (GET /api/villas/{slug}/pricing/season-rules)
+func (_ Unimplemented) ListVillaSeasonRules(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// CreateVillaSeasonRule Add a season rule
+// (POST /api/villas/{slug}/pricing/season-rules)
+func (_ Unimplemented) CreateVillaSeasonRule(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetVillaPricingSettings Base rate and fees for a villa
+// (GET /api/villas/{slug}/pricing/settings)
+func (_ Unimplemented) GetVillaPricingSettings(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// PutVillaPricingSettings Replace base rate and fees
+// (PUT /api/villas/{slug}/pricing/settings)
+func (_ Unimplemented) PutVillaPricingSettings(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// ListVillaReviews List published reviews for a villa
+// (GET /api/villas/{slug}/reviews)
+func (_ Unimplemented) ListVillaReviews(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// SubmitVillaReview Leave a review on a villa from its public page
+// (POST /api/villas/{slug}/reviews)
+func (_ Unimplemented) SubmitVillaReview(w http.ResponseWriter, r *http.Request, slug string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// GetVillaReviewMeta Published rating figures for a villa
+// (GET /api/villas/{slug}/reviews/meta)
+func (_ Unimplemented) GetVillaReviewMeta(w http.ResponseWriter, r *http.Request, slug string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -255,6 +950,65 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListAdminHistory operation middleware
+func (siw *ServerInterfaceWrapper) ListAdminHistory(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAdminHistoryParams
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", r.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "villa_slug" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "villa_slug", r.URL.Query(), &params.VillaSlug, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "villa_slug"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "villa_slug", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAdminHistory(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // AdminLogin operation middleware
 func (siw *ServerInterfaceWrapper) AdminLogin(w http.ResponseWriter, r *http.Request) {
@@ -270,11 +1024,139 @@ func (siw *ServerInterfaceWrapper) AdminLogin(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
+// AdminLogout operation middleware
+func (siw *ServerInterfaceWrapper) AdminLogout(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AdminLogout(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // AdminMe operation middleware
 func (siw *ServerInterfaceWrapper) AdminMe(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.AdminMe(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAdminReviews operation middleware
+func (siw *ServerInterfaceWrapper) ListAdminReviews(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAdminReviewsParams
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", r.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "villa_slug" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "villa_slug", r.URL.Query(), &params.VillaSlug, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "villa_slug"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "villa_slug", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAdminReviews(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateAdminReview operation middleware
+func (siw *ServerInterfaceWrapper) CreateAdminReview(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateAdminReview(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAdminUsers operation middleware
+func (siw *ServerInterfaceWrapper) ListAdminUsers(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAdminUsers(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateAdminUser operation middleware
+func (siw *ServerInterfaceWrapper) CreateAdminUser(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateAdminUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteAdminUser operation middleware
+func (siw *ServerInterfaceWrapper) DeleteAdminUser(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteAdminUser(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -370,11 +1252,499 @@ func (siw *ServerInterfaceWrapper) CreateBooking(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// DeleteBooking operation middleware
+func (siw *ServerInterfaceWrapper) DeleteBooking(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteBooking(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PatchBooking operation middleware
+func (siw *ServerInterfaceWrapper) PatchBooking(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchBooking(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetHealth operation middleware
 func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetHealth(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteSeasonRule operation middleware
+func (siw *ServerInterfaceWrapper) DeleteSeasonRule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteSeasonRule(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PatchSeasonRule operation middleware
+func (siw *ServerInterfaceWrapper) PatchSeasonRule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchSeasonRule(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SubmitReview operation middleware
+func (siw *ServerInterfaceWrapper) SubmitReview(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SubmitReview(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteReview operation middleware
+func (siw *ServerInterfaceWrapper) DeleteReview(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteReview(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PatchReview operation middleware
+func (siw *ServerInterfaceWrapper) PatchReview(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", chi.URLParam(r, "id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchReview(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetVillaAvailability operation middleware
+func (siw *ServerInterfaceWrapper) GetVillaAvailability(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetVillaAvailabilityParams
+
+	// ------------- Required query parameter "from" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "from", r.URL.Query(), &params.From, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "from"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "from", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "to" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "to", r.URL.Query(), &params.To, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "to"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "to", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetVillaAvailability(w, r, slug, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetVillaPricing operation middleware
+func (siw *ServerInterfaceWrapper) GetVillaPricing(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetVillaPricingParams
+
+	// ------------- Required query parameter "from" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "from", r.URL.Query(), &params.From, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "from"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "from", Err: err})
+		}
+		return
+	}
+
+	// ------------- Required query parameter "to" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "to", r.URL.Query(), &params.To, runtime.BindQueryParameterOptions{Type: "string", Format: "date"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "to"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "to", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetVillaPricing(w, r, slug, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpsertVillaPricing operation middleware
+func (siw *ServerInterfaceWrapper) UpsertVillaPricing(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpsertVillaPricing(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListVillaSeasonRules operation middleware
+func (siw *ServerInterfaceWrapper) ListVillaSeasonRules(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListVillaSeasonRules(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateVillaSeasonRule operation middleware
+func (siw *ServerInterfaceWrapper) CreateVillaSeasonRule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateVillaSeasonRule(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetVillaPricingSettings operation middleware
+func (siw *ServerInterfaceWrapper) GetVillaPricingSettings(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetVillaPricingSettings(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PutVillaPricingSettings operation middleware
+func (siw *ServerInterfaceWrapper) PutVillaPricingSettings(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutVillaPricingSettings(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListVillaReviews operation middleware
+func (siw *ServerInterfaceWrapper) ListVillaReviews(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListVillaReviews(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SubmitVillaReview operation middleware
+func (siw *ServerInterfaceWrapper) SubmitVillaReview(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SubmitVillaReview(w, r, slug)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetVillaReviewMeta operation middleware
+func (siw *ServerInterfaceWrapper) GetVillaReviewMeta(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", chi.URLParam(r, "slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: r.URL.RawPath == ""})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "slug", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetVillaReviewMeta(w, r, slug)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -498,10 +1868,31 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/admin/history", wrapper.ListAdminHistory)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/admin/login", wrapper.AdminLogin)
 	})
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/admin/logout", wrapper.AdminLogout)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/admin/me", wrapper.AdminMe)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/admin/reviews", wrapper.ListAdminReviews)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/admin/reviews", wrapper.CreateAdminReview)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/admin/users", wrapper.ListAdminUsers)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/admin/users", wrapper.CreateAdminUser)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/admin/users/{id}", wrapper.DeleteAdminUser)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/bookings", wrapper.ListBookings)
@@ -510,10 +1901,125 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/api/bookings", wrapper.CreateBooking)
 	})
 	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/bookings/{id}", wrapper.DeleteBooking)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/bookings/{id}", wrapper.PatchBooking)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/health", wrapper.GetHealth)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/pricing/season-rules/{id}", wrapper.DeleteSeasonRule)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/pricing/season-rules/{id}", wrapper.PatchSeasonRule)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/reviews", wrapper.SubmitReview)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/reviews/{id}", wrapper.DeleteReview)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/reviews/{id}", wrapper.PatchReview)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/villas/{slug}/availability", wrapper.GetVillaAvailability)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/villas/{slug}/pricing", wrapper.GetVillaPricing)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/villas/{slug}/pricing", wrapper.UpsertVillaPricing)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/villas/{slug}/pricing/season-rules", wrapper.ListVillaSeasonRules)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/villas/{slug}/pricing/season-rules", wrapper.CreateVillaSeasonRule)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/villas/{slug}/pricing/settings", wrapper.GetVillaPricingSettings)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/villas/{slug}/pricing/settings", wrapper.PutVillaPricingSettings)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/villas/{slug}/reviews", wrapper.ListVillaReviews)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/villas/{slug}/reviews", wrapper.SubmitVillaReview)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/villas/{slug}/reviews/meta", wrapper.GetVillaReviewMeta)
 	})
 
 	return r
+}
+
+type ListAdminHistoryRequestObject struct {
+	Params ListAdminHistoryParams
+}
+
+type ListAdminHistoryResponseObject interface {
+	VisitListAdminHistoryResponse(w http.ResponseWriter) error
+}
+
+type ListAdminHistory200JSONResponse ListHistoryResponse
+
+func (response ListAdminHistory200JSONResponse) VisitListAdminHistoryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminHistory401JSONResponse ErrorResponse
+
+func (response ListAdminHistory401JSONResponse) VisitListAdminHistoryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminHistory422JSONResponse ErrorResponse
+
+func (response ListAdminHistory422JSONResponse) VisitListAdminHistoryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminHistory500JSONResponse ErrorResponse
+
+func (response ListAdminHistory500JSONResponse) VisitListAdminHistoryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 type AdminLoginRequestObject struct {
@@ -538,6 +2044,49 @@ func (response AdminLogin200JSONResponse) VisitAdminLoginResponse(w http.Respons
 	return err
 }
 
+type AdminLogin401JSONResponse ErrorResponse
+
+func (response AdminLogin401JSONResponse) VisitAdminLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AdminLogin500JSONResponse ErrorResponse
+
+func (response AdminLogin500JSONResponse) VisitAdminLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AdminLogoutRequestObject struct {
+}
+
+type AdminLogoutResponseObject interface {
+	VisitAdminLogoutResponse(w http.ResponseWriter) error
+}
+
+type AdminLogout204Response struct {
+}
+
+func (response AdminLogout204Response) VisitAdminLogoutResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
 type AdminMeRequestObject struct {
 }
 
@@ -555,6 +2104,319 @@ func (response AdminMe200JSONResponse) VisitAdminMeResponse(w http.ResponseWrite
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AdminMe401JSONResponse ErrorResponse
+
+func (response AdminMe401JSONResponse) VisitAdminMeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AdminMe500JSONResponse ErrorResponse
+
+func (response AdminMe500JSONResponse) VisitAdminMeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminReviewsRequestObject struct {
+	Params ListAdminReviewsParams
+}
+
+type ListAdminReviewsResponseObject interface {
+	VisitListAdminReviewsResponse(w http.ResponseWriter) error
+}
+
+type ListAdminReviews200JSONResponse ListReviewsResponse
+
+func (response ListAdminReviews200JSONResponse) VisitListAdminReviewsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminReviews401JSONResponse ErrorResponse
+
+func (response ListAdminReviews401JSONResponse) VisitListAdminReviewsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminReviews422JSONResponse ErrorResponse
+
+func (response ListAdminReviews422JSONResponse) VisitListAdminReviewsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminReviews500JSONResponse ErrorResponse
+
+func (response ListAdminReviews500JSONResponse) VisitListAdminReviewsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminReviewRequestObject struct {
+	Body *CreateAdminReviewJSONRequestBody
+}
+
+type CreateAdminReviewResponseObject interface {
+	VisitCreateAdminReviewResponse(w http.ResponseWriter) error
+}
+
+type CreateAdminReview201JSONResponse Review
+
+func (response CreateAdminReview201JSONResponse) VisitCreateAdminReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminReview401JSONResponse ErrorResponse
+
+func (response CreateAdminReview401JSONResponse) VisitCreateAdminReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminReview422JSONResponse ErrorResponse
+
+func (response CreateAdminReview422JSONResponse) VisitCreateAdminReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminReview500JSONResponse ErrorResponse
+
+func (response CreateAdminReview500JSONResponse) VisitCreateAdminReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminUsersRequestObject struct {
+}
+
+type ListAdminUsersResponseObject interface {
+	VisitListAdminUsersResponse(w http.ResponseWriter) error
+}
+
+type ListAdminUsers200JSONResponse ListAdminUsersResponse
+
+func (response ListAdminUsers200JSONResponse) VisitListAdminUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminUsers401JSONResponse ErrorResponse
+
+func (response ListAdminUsers401JSONResponse) VisitListAdminUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAdminUsers500JSONResponse ErrorResponse
+
+func (response ListAdminUsers500JSONResponse) VisitListAdminUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminUserRequestObject struct {
+	Body *CreateAdminUserJSONRequestBody
+}
+
+type CreateAdminUserResponseObject interface {
+	VisitCreateAdminUserResponse(w http.ResponseWriter) error
+}
+
+type CreateAdminUser201JSONResponse AdminUser
+
+func (response CreateAdminUser201JSONResponse) VisitCreateAdminUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminUser409JSONResponse ErrorResponse
+
+func (response CreateAdminUser409JSONResponse) VisitCreateAdminUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAdminUser500JSONResponse ErrorResponse
+
+func (response CreateAdminUser500JSONResponse) VisitCreateAdminUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAdminUserRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type DeleteAdminUserResponseObject interface {
+	VisitDeleteAdminUserResponse(w http.ResponseWriter) error
+}
+
+type DeleteAdminUser204Response struct {
+}
+
+func (response DeleteAdminUser204Response) VisitDeleteAdminUserResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteAdminUser404JSONResponse ErrorResponse
+
+func (response DeleteAdminUser404JSONResponse) VisitDeleteAdminUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAdminUser409JSONResponse ErrorResponse
+
+func (response DeleteAdminUser409JSONResponse) VisitDeleteAdminUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAdminUser500JSONResponse ErrorResponse
+
+func (response DeleteAdminUser500JSONResponse) VisitDeleteAdminUserResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -581,6 +2443,34 @@ func (response ListBookings200JSONResponse) VisitListBookingsResponse(w http.Res
 	return err
 }
 
+type ListBookings422JSONResponse ErrorResponse
+
+func (response ListBookings422JSONResponse) VisitListBookingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListBookings500JSONResponse ErrorResponse
+
+func (response ListBookings500JSONResponse) VisitListBookingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type CreateBookingRequestObject struct {
 	Body *CreateBookingJSONRequestBody
 }
@@ -599,6 +2489,185 @@ func (response CreateBooking201JSONResponse) VisitCreateBookingResponse(w http.R
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateBooking404JSONResponse ErrorResponse
+
+func (response CreateBooking404JSONResponse) VisitCreateBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateBooking409JSONResponse ErrorResponse
+
+func (response CreateBooking409JSONResponse) VisitCreateBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateBooking422JSONResponse ErrorResponse
+
+func (response CreateBooking422JSONResponse) VisitCreateBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateBooking500JSONResponse ErrorResponse
+
+func (response CreateBooking500JSONResponse) VisitCreateBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteBookingRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type DeleteBookingResponseObject interface {
+	VisitDeleteBookingResponse(w http.ResponseWriter) error
+}
+
+type DeleteBooking204Response struct {
+}
+
+func (response DeleteBooking204Response) VisitDeleteBookingResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteBooking404JSONResponse ErrorResponse
+
+func (response DeleteBooking404JSONResponse) VisitDeleteBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteBooking500JSONResponse ErrorResponse
+
+func (response DeleteBooking500JSONResponse) VisitDeleteBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchBookingRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PatchBookingJSONRequestBody
+}
+
+type PatchBookingResponseObject interface {
+	VisitPatchBookingResponse(w http.ResponseWriter) error
+}
+
+type PatchBooking200JSONResponse BookingResponse
+
+func (response PatchBooking200JSONResponse) VisitPatchBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchBooking404JSONResponse ErrorResponse
+
+func (response PatchBooking404JSONResponse) VisitPatchBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchBooking409JSONResponse ErrorResponse
+
+func (response PatchBooking409JSONResponse) VisitPatchBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchBooking422JSONResponse ErrorResponse
+
+func (response PatchBooking422JSONResponse) VisitPatchBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchBooking500JSONResponse ErrorResponse
+
+func (response PatchBooking500JSONResponse) VisitPatchBookingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -624,23 +2693,1065 @@ func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseW
 	return err
 }
 
+type DeleteSeasonRuleRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type DeleteSeasonRuleResponseObject interface {
+	VisitDeleteSeasonRuleResponse(w http.ResponseWriter) error
+}
+
+type DeleteSeasonRule204Response struct {
+}
+
+func (response DeleteSeasonRule204Response) VisitDeleteSeasonRuleResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteSeasonRule401JSONResponse ErrorResponse
+
+func (response DeleteSeasonRule401JSONResponse) VisitDeleteSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteSeasonRule404JSONResponse ErrorResponse
+
+func (response DeleteSeasonRule404JSONResponse) VisitDeleteSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteSeasonRule500JSONResponse ErrorResponse
+
+func (response DeleteSeasonRule500JSONResponse) VisitDeleteSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchSeasonRuleRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PatchSeasonRuleJSONRequestBody
+}
+
+type PatchSeasonRuleResponseObject interface {
+	VisitPatchSeasonRuleResponse(w http.ResponseWriter) error
+}
+
+type PatchSeasonRule200JSONResponse SeasonRule
+
+func (response PatchSeasonRule200JSONResponse) VisitPatchSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchSeasonRule401JSONResponse ErrorResponse
+
+func (response PatchSeasonRule401JSONResponse) VisitPatchSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchSeasonRule404JSONResponse ErrorResponse
+
+func (response PatchSeasonRule404JSONResponse) VisitPatchSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchSeasonRule422JSONResponse ErrorResponse
+
+func (response PatchSeasonRule422JSONResponse) VisitPatchSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchSeasonRule500JSONResponse ErrorResponse
+
+func (response PatchSeasonRule500JSONResponse) VisitPatchSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitReviewRequestObject struct {
+	Body *SubmitReviewJSONRequestBody
+}
+
+type SubmitReviewResponseObject interface {
+	VisitSubmitReviewResponse(w http.ResponseWriter) error
+}
+
+type SubmitReview201JSONResponse Review
+
+func (response SubmitReview201JSONResponse) VisitSubmitReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitReview404JSONResponse ErrorResponse
+
+func (response SubmitReview404JSONResponse) VisitSubmitReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitReview409JSONResponse ErrorResponse
+
+func (response SubmitReview409JSONResponse) VisitSubmitReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitReview422JSONResponse ErrorResponse
+
+func (response SubmitReview422JSONResponse) VisitSubmitReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitReview500JSONResponse ErrorResponse
+
+func (response SubmitReview500JSONResponse) VisitSubmitReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteReviewRequestObject struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
+type DeleteReviewResponseObject interface {
+	VisitDeleteReviewResponse(w http.ResponseWriter) error
+}
+
+type DeleteReview204Response struct {
+}
+
+func (response DeleteReview204Response) VisitDeleteReviewResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteReview401JSONResponse ErrorResponse
+
+func (response DeleteReview401JSONResponse) VisitDeleteReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteReview404JSONResponse ErrorResponse
+
+func (response DeleteReview404JSONResponse) VisitDeleteReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteReview500JSONResponse ErrorResponse
+
+func (response DeleteReview500JSONResponse) VisitDeleteReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchReviewRequestObject struct {
+	Id   openapi_types.UUID `json:"id"`
+	Body *PatchReviewJSONRequestBody
+}
+
+type PatchReviewResponseObject interface {
+	VisitPatchReviewResponse(w http.ResponseWriter) error
+}
+
+type PatchReview200JSONResponse Review
+
+func (response PatchReview200JSONResponse) VisitPatchReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchReview401JSONResponse ErrorResponse
+
+func (response PatchReview401JSONResponse) VisitPatchReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchReview404JSONResponse ErrorResponse
+
+func (response PatchReview404JSONResponse) VisitPatchReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchReview422JSONResponse ErrorResponse
+
+func (response PatchReview422JSONResponse) VisitPatchReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PatchReview500JSONResponse ErrorResponse
+
+func (response PatchReview500JSONResponse) VisitPatchReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaAvailabilityRequestObject struct {
+	Slug   string `json:"slug"`
+	Params GetVillaAvailabilityParams
+}
+
+type GetVillaAvailabilityResponseObject interface {
+	VisitGetVillaAvailabilityResponse(w http.ResponseWriter) error
+}
+
+type GetVillaAvailability200JSONResponse AvailabilityResponse
+
+func (response GetVillaAvailability200JSONResponse) VisitGetVillaAvailabilityResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaAvailability404JSONResponse ErrorResponse
+
+func (response GetVillaAvailability404JSONResponse) VisitGetVillaAvailabilityResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaAvailability422JSONResponse ErrorResponse
+
+func (response GetVillaAvailability422JSONResponse) VisitGetVillaAvailabilityResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaAvailability500JSONResponse ErrorResponse
+
+func (response GetVillaAvailability500JSONResponse) VisitGetVillaAvailabilityResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricingRequestObject struct {
+	Slug   string `json:"slug"`
+	Params GetVillaPricingParams
+}
+
+type GetVillaPricingResponseObject interface {
+	VisitGetVillaPricingResponse(w http.ResponseWriter) error
+}
+
+type GetVillaPricing200JSONResponse PricingResponse
+
+func (response GetVillaPricing200JSONResponse) VisitGetVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricing404JSONResponse ErrorResponse
+
+func (response GetVillaPricing404JSONResponse) VisitGetVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricing422JSONResponse ErrorResponse
+
+func (response GetVillaPricing422JSONResponse) VisitGetVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricing500JSONResponse ErrorResponse
+
+func (response GetVillaPricing500JSONResponse) VisitGetVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpsertVillaPricingRequestObject struct {
+	Slug string `json:"slug"`
+	Body *UpsertVillaPricingJSONRequestBody
+}
+
+type UpsertVillaPricingResponseObject interface {
+	VisitUpsertVillaPricingResponse(w http.ResponseWriter) error
+}
+
+type UpsertVillaPricing201JSONResponse UpsertPricingResponse
+
+func (response UpsertVillaPricing201JSONResponse) VisitUpsertVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpsertVillaPricing404JSONResponse ErrorResponse
+
+func (response UpsertVillaPricing404JSONResponse) VisitUpsertVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpsertVillaPricing422JSONResponse ErrorResponse
+
+func (response UpsertVillaPricing422JSONResponse) VisitUpsertVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpsertVillaPricing500JSONResponse ErrorResponse
+
+func (response UpsertVillaPricing500JSONResponse) VisitUpsertVillaPricingResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListVillaSeasonRulesRequestObject struct {
+	Slug string `json:"slug"`
+}
+
+type ListVillaSeasonRulesResponseObject interface {
+	VisitListVillaSeasonRulesResponse(w http.ResponseWriter) error
+}
+
+type ListVillaSeasonRules200JSONResponse ListSeasonRulesResponse
+
+func (response ListVillaSeasonRules200JSONResponse) VisitListVillaSeasonRulesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListVillaSeasonRules404JSONResponse ErrorResponse
+
+func (response ListVillaSeasonRules404JSONResponse) VisitListVillaSeasonRulesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListVillaSeasonRules500JSONResponse ErrorResponse
+
+func (response ListVillaSeasonRules500JSONResponse) VisitListVillaSeasonRulesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateVillaSeasonRuleRequestObject struct {
+	Slug string `json:"slug"`
+	Body *CreateVillaSeasonRuleJSONRequestBody
+}
+
+type CreateVillaSeasonRuleResponseObject interface {
+	VisitCreateVillaSeasonRuleResponse(w http.ResponseWriter) error
+}
+
+type CreateVillaSeasonRule201JSONResponse SeasonRule
+
+func (response CreateVillaSeasonRule201JSONResponse) VisitCreateVillaSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateVillaSeasonRule401JSONResponse ErrorResponse
+
+func (response CreateVillaSeasonRule401JSONResponse) VisitCreateVillaSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateVillaSeasonRule404JSONResponse ErrorResponse
+
+func (response CreateVillaSeasonRule404JSONResponse) VisitCreateVillaSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateVillaSeasonRule422JSONResponse ErrorResponse
+
+func (response CreateVillaSeasonRule422JSONResponse) VisitCreateVillaSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateVillaSeasonRule500JSONResponse ErrorResponse
+
+func (response CreateVillaSeasonRule500JSONResponse) VisitCreateVillaSeasonRuleResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricingSettingsRequestObject struct {
+	Slug string `json:"slug"`
+}
+
+type GetVillaPricingSettingsResponseObject interface {
+	VisitGetVillaPricingSettingsResponse(w http.ResponseWriter) error
+}
+
+type GetVillaPricingSettings200JSONResponse PricingSettings
+
+func (response GetVillaPricingSettings200JSONResponse) VisitGetVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricingSettings404JSONResponse ErrorResponse
+
+func (response GetVillaPricingSettings404JSONResponse) VisitGetVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaPricingSettings500JSONResponse ErrorResponse
+
+func (response GetVillaPricingSettings500JSONResponse) VisitGetVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PutVillaPricingSettingsRequestObject struct {
+	Slug string `json:"slug"`
+	Body *PutVillaPricingSettingsJSONRequestBody
+}
+
+type PutVillaPricingSettingsResponseObject interface {
+	VisitPutVillaPricingSettingsResponse(w http.ResponseWriter) error
+}
+
+type PutVillaPricingSettings200JSONResponse PricingSettings
+
+func (response PutVillaPricingSettings200JSONResponse) VisitPutVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PutVillaPricingSettings401JSONResponse ErrorResponse
+
+func (response PutVillaPricingSettings401JSONResponse) VisitPutVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PutVillaPricingSettings404JSONResponse ErrorResponse
+
+func (response PutVillaPricingSettings404JSONResponse) VisitPutVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PutVillaPricingSettings422JSONResponse ErrorResponse
+
+func (response PutVillaPricingSettings422JSONResponse) VisitPutVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PutVillaPricingSettings500JSONResponse ErrorResponse
+
+func (response PutVillaPricingSettings500JSONResponse) VisitPutVillaPricingSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListVillaReviewsRequestObject struct {
+	Slug string `json:"slug"`
+}
+
+type ListVillaReviewsResponseObject interface {
+	VisitListVillaReviewsResponse(w http.ResponseWriter) error
+}
+
+type ListVillaReviews200JSONResponse ListReviewsResponse
+
+func (response ListVillaReviews200JSONResponse) VisitListVillaReviewsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListVillaReviews500JSONResponse ErrorResponse
+
+func (response ListVillaReviews500JSONResponse) VisitListVillaReviewsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitVillaReviewRequestObject struct {
+	Slug string `json:"slug"`
+	Body *SubmitVillaReviewJSONRequestBody
+}
+
+type SubmitVillaReviewResponseObject interface {
+	VisitSubmitVillaReviewResponse(w http.ResponseWriter) error
+}
+
+type SubmitVillaReview201JSONResponse Review
+
+func (response SubmitVillaReview201JSONResponse) VisitSubmitVillaReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitVillaReview404JSONResponse ErrorResponse
+
+func (response SubmitVillaReview404JSONResponse) VisitSubmitVillaReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitVillaReview422JSONResponse ErrorResponse
+
+func (response SubmitVillaReview422JSONResponse) VisitSubmitVillaReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitVillaReview429JSONResponse ErrorResponse
+
+func (response SubmitVillaReview429JSONResponse) VisitSubmitVillaReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SubmitVillaReview500JSONResponse ErrorResponse
+
+func (response SubmitVillaReview500JSONResponse) VisitSubmitVillaReviewResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaReviewMetaRequestObject struct {
+	Slug string `json:"slug"`
+}
+
+type GetVillaReviewMetaResponseObject interface {
+	VisitGetVillaReviewMetaResponse(w http.ResponseWriter) error
+}
+
+type GetVillaReviewMeta200JSONResponse ReviewMeta
+
+func (response GetVillaReviewMeta200JSONResponse) VisitGetVillaReviewMetaResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaReviewMeta404JSONResponse ErrorResponse
+
+func (response GetVillaReviewMeta404JSONResponse) VisitGetVillaReviewMetaResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetVillaReviewMeta500JSONResponse ErrorResponse
+
+func (response GetVillaReviewMeta500JSONResponse) VisitGetVillaReviewMetaResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-
+	// ListAdminHistory Paginated activity log for a villa
+	// (GET /api/admin/history)
+	ListAdminHistory(ctx context.Context, request ListAdminHistoryRequestObject) (ListAdminHistoryResponseObject, error)
+	// AdminLogin Admin login
 	// (POST /api/admin/login)
 	AdminLogin(ctx context.Context, request AdminLoginRequestObject) (AdminLoginResponseObject, error)
-
+	// AdminLogout Admin logout
+	// (POST /api/admin/logout)
+	AdminLogout(ctx context.Context, request AdminLogoutRequestObject) (AdminLogoutResponseObject, error)
+	// AdminMe Get the current admin user
 	// (GET /api/admin/me)
 	AdminMe(ctx context.Context, request AdminMeRequestObject) (AdminMeResponseObject, error)
-
+	// ListAdminReviews List reviews for moderation
+	// (GET /api/admin/reviews)
+	ListAdminReviews(ctx context.Context, request ListAdminReviewsRequestObject) (ListAdminReviewsResponseObject, error)
+	// CreateAdminReview Create a review without a booking
+	// (POST /api/admin/reviews)
+	CreateAdminReview(ctx context.Context, request CreateAdminReviewRequestObject) (CreateAdminReviewResponseObject, error)
+	// ListAdminUsers List all admin users
+	// (GET /api/admin/users)
+	ListAdminUsers(ctx context.Context, request ListAdminUsersRequestObject) (ListAdminUsersResponseObject, error)
+	// CreateAdminUser Create a new admin user
+	// (POST /api/admin/users)
+	CreateAdminUser(ctx context.Context, request CreateAdminUserRequestObject) (CreateAdminUserResponseObject, error)
+	// DeleteAdminUser Delete an admin user
+	// (DELETE /api/admin/users/{id})
+	DeleteAdminUser(ctx context.Context, request DeleteAdminUserRequestObject) (DeleteAdminUserResponseObject, error)
+	// ListBookings List bookings (paginated, optional status filter)
 	// (GET /api/bookings)
 	ListBookings(ctx context.Context, request ListBookingsRequestObject) (ListBookingsResponseObject, error)
-
+	// CreateBooking Submit a booking request
 	// (POST /api/bookings)
 	CreateBooking(ctx context.Context, request CreateBookingRequestObject) (CreateBookingResponseObject, error)
-
+	// DeleteBooking Hard delete a booking (cascades to its review)
+	// (DELETE /api/bookings/{id})
+	DeleteBooking(ctx context.Context, request DeleteBookingRequestObject) (DeleteBookingResponseObject, error)
+	// PatchBooking Transition a booking's status
+	// (PATCH /api/bookings/{id})
+	PatchBooking(ctx context.Context, request PatchBookingRequestObject) (PatchBookingResponseObject, error)
+	// GetHealth Liveness probe
 	// (GET /api/health)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
+	// DeleteSeasonRule Remove a season rule
+	// (DELETE /api/pricing/season-rules/{id})
+	DeleteSeasonRule(ctx context.Context, request DeleteSeasonRuleRequestObject) (DeleteSeasonRuleResponseObject, error)
+	// PatchSeasonRule Update a season rule
+	// (PATCH /api/pricing/season-rules/{id})
+	PatchSeasonRule(ctx context.Context, request PatchSeasonRuleRequestObject) (PatchSeasonRuleResponseObject, error)
+	// SubmitReview Submit a review for a booking
+	// (POST /api/reviews)
+	SubmitReview(ctx context.Context, request SubmitReviewRequestObject) (SubmitReviewResponseObject, error)
+	// DeleteReview Hard delete a review
+	// (DELETE /api/reviews/{id})
+	DeleteReview(ctx context.Context, request DeleteReviewRequestObject) (DeleteReviewResponseObject, error)
+	// PatchReview Moderate a review
+	// (PATCH /api/reviews/{id})
+	PatchReview(ctx context.Context, request PatchReviewRequestObject) (PatchReviewResponseObject, error)
+	// GetVillaAvailability Get booked date ranges for a villa
+	// (GET /api/villas/{slug}/availability)
+	GetVillaAvailability(ctx context.Context, request GetVillaAvailabilityRequestObject) (GetVillaAvailabilityResponseObject, error)
+	// GetVillaPricing Get the resolved nightly prices for a villa within a date window
+	// (GET /api/villas/{slug}/pricing)
+	GetVillaPricing(ctx context.Context, request GetVillaPricingRequestObject) (GetVillaPricingResponseObject, error)
+	// UpsertVillaPricing Bulk upsert price overrides for a villa
+	// (POST /api/villas/{slug}/pricing)
+	UpsertVillaPricing(ctx context.Context, request UpsertVillaPricingRequestObject) (UpsertVillaPricingResponseObject, error)
+	// ListVillaSeasonRules List season rules for a villa, earliest start first
+	// (GET /api/villas/{slug}/pricing/season-rules)
+	ListVillaSeasonRules(ctx context.Context, request ListVillaSeasonRulesRequestObject) (ListVillaSeasonRulesResponseObject, error)
+	// CreateVillaSeasonRule Add a season rule
+	// (POST /api/villas/{slug}/pricing/season-rules)
+	CreateVillaSeasonRule(ctx context.Context, request CreateVillaSeasonRuleRequestObject) (CreateVillaSeasonRuleResponseObject, error)
+	// GetVillaPricingSettings Base rate and fees for a villa
+	// (GET /api/villas/{slug}/pricing/settings)
+	GetVillaPricingSettings(ctx context.Context, request GetVillaPricingSettingsRequestObject) (GetVillaPricingSettingsResponseObject, error)
+	// PutVillaPricingSettings Replace base rate and fees
+	// (PUT /api/villas/{slug}/pricing/settings)
+	PutVillaPricingSettings(ctx context.Context, request PutVillaPricingSettingsRequestObject) (PutVillaPricingSettingsResponseObject, error)
+	// ListVillaReviews List published reviews for a villa
+	// (GET /api/villas/{slug}/reviews)
+	ListVillaReviews(ctx context.Context, request ListVillaReviewsRequestObject) (ListVillaReviewsResponseObject, error)
+	// SubmitVillaReview Leave a review on a villa from its public page
+	// (POST /api/villas/{slug}/reviews)
+	SubmitVillaReview(ctx context.Context, request SubmitVillaReviewRequestObject) (SubmitVillaReviewResponseObject, error)
+	// GetVillaReviewMeta Published rating figures for a villa
+	// (GET /api/villas/{slug}/reviews/meta)
+	GetVillaReviewMeta(ctx context.Context, request GetVillaReviewMetaRequestObject) (GetVillaReviewMetaResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -682,6 +3793,32 @@ type strictHandler struct {
 	options     StrictHTTPServerOptions
 }
 
+// ListAdminHistory operation middleware
+func (sh *strictHandler) ListAdminHistory(w http.ResponseWriter, r *http.Request, params ListAdminHistoryParams) {
+	var request ListAdminHistoryRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAdminHistory(ctx, request.(ListAdminHistoryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAdminHistory")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAdminHistoryResponseObject); ok {
+		if err := validResponse.VisitListAdminHistoryResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // AdminLogin operation middleware
 func (sh *strictHandler) AdminLogin(w http.ResponseWriter, r *http.Request) {
 	var request AdminLoginRequestObject
@@ -713,6 +3850,30 @@ func (sh *strictHandler) AdminLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AdminLogout operation middleware
+func (sh *strictHandler) AdminLogout(w http.ResponseWriter, r *http.Request) {
+	var request AdminLogoutRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminLogout(ctx, request.(AdminLogoutRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminLogout")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(AdminLogoutResponseObject); ok {
+		if err := validResponse.VisitAdminLogoutResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // AdminMe operation middleware
 func (sh *strictHandler) AdminMe(w http.ResponseWriter, r *http.Request) {
 	var request AdminMeRequestObject
@@ -730,6 +3891,144 @@ func (sh *strictHandler) AdminMe(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(AdminMeResponseObject); ok {
 		if err := validResponse.VisitAdminMeResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAdminReviews operation middleware
+func (sh *strictHandler) ListAdminReviews(w http.ResponseWriter, r *http.Request, params ListAdminReviewsParams) {
+	var request ListAdminReviewsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAdminReviews(ctx, request.(ListAdminReviewsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAdminReviews")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAdminReviewsResponseObject); ok {
+		if err := validResponse.VisitListAdminReviewsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateAdminReview operation middleware
+func (sh *strictHandler) CreateAdminReview(w http.ResponseWriter, r *http.Request) {
+	var request CreateAdminReviewRequestObject
+
+	var body CreateAdminReviewJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateAdminReview(ctx, request.(CreateAdminReviewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateAdminReview")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateAdminReviewResponseObject); ok {
+		if err := validResponse.VisitCreateAdminReviewResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAdminUsers operation middleware
+func (sh *strictHandler) ListAdminUsers(w http.ResponseWriter, r *http.Request) {
+	var request ListAdminUsersRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAdminUsers(ctx, request.(ListAdminUsersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAdminUsers")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAdminUsersResponseObject); ok {
+		if err := validResponse.VisitListAdminUsersResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateAdminUser operation middleware
+func (sh *strictHandler) CreateAdminUser(w http.ResponseWriter, r *http.Request) {
+	var request CreateAdminUserRequestObject
+
+	var body CreateAdminUserJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateAdminUser(ctx, request.(CreateAdminUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateAdminUser")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateAdminUserResponseObject); ok {
+		if err := validResponse.VisitCreateAdminUserResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteAdminUser operation middleware
+func (sh *strictHandler) DeleteAdminUser(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request DeleteAdminUserRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteAdminUser(ctx, request.(DeleteAdminUserRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteAdminUser")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteAdminUserResponseObject); ok {
+		if err := validResponse.VisitDeleteAdminUserResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -794,6 +4093,65 @@ func (sh *strictHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteBooking operation middleware
+func (sh *strictHandler) DeleteBooking(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request DeleteBookingRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteBooking(ctx, request.(DeleteBookingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteBooking")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteBookingResponseObject); ok {
+		if err := validResponse.VisitDeleteBookingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PatchBooking operation middleware
+func (sh *strictHandler) PatchBooking(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PatchBookingRequestObject
+
+	request.Id = id
+
+	var body PatchBookingJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PatchBooking(ctx, request.(PatchBookingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PatchBooking")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PatchBookingResponseObject); ok {
+		if err := validResponse.VisitPatchBookingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetHealth operation middleware
 func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	var request GetHealthRequestObject
@@ -811,6 +4169,451 @@ func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetHealthResponseObject); ok {
 		if err := validResponse.VisitGetHealthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteSeasonRule operation middleware
+func (sh *strictHandler) DeleteSeasonRule(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request DeleteSeasonRuleRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteSeasonRule(ctx, request.(DeleteSeasonRuleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteSeasonRule")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteSeasonRuleResponseObject); ok {
+		if err := validResponse.VisitDeleteSeasonRuleResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PatchSeasonRule operation middleware
+func (sh *strictHandler) PatchSeasonRule(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PatchSeasonRuleRequestObject
+
+	request.Id = id
+
+	var body PatchSeasonRuleJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if !errors.Is(err, io.EOF) {
+			sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+			return
+		}
+	} else {
+		request.Body = &body
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PatchSeasonRule(ctx, request.(PatchSeasonRuleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PatchSeasonRule")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PatchSeasonRuleResponseObject); ok {
+		if err := validResponse.VisitPatchSeasonRuleResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SubmitReview operation middleware
+func (sh *strictHandler) SubmitReview(w http.ResponseWriter, r *http.Request) {
+	var request SubmitReviewRequestObject
+
+	var body SubmitReviewJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SubmitReview(ctx, request.(SubmitReviewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SubmitReview")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SubmitReviewResponseObject); ok {
+		if err := validResponse.VisitSubmitReviewResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteReview operation middleware
+func (sh *strictHandler) DeleteReview(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request DeleteReviewRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteReview(ctx, request.(DeleteReviewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteReview")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteReviewResponseObject); ok {
+		if err := validResponse.VisitDeleteReviewResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PatchReview operation middleware
+func (sh *strictHandler) PatchReview(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	var request PatchReviewRequestObject
+
+	request.Id = id
+
+	var body PatchReviewJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if !errors.Is(err, io.EOF) {
+			sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+			return
+		}
+	} else {
+		request.Body = &body
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PatchReview(ctx, request.(PatchReviewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PatchReview")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PatchReviewResponseObject); ok {
+		if err := validResponse.VisitPatchReviewResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetVillaAvailability operation middleware
+func (sh *strictHandler) GetVillaAvailability(w http.ResponseWriter, r *http.Request, slug string, params GetVillaAvailabilityParams) {
+	var request GetVillaAvailabilityRequestObject
+
+	request.Slug = slug
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetVillaAvailability(ctx, request.(GetVillaAvailabilityRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetVillaAvailability")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetVillaAvailabilityResponseObject); ok {
+		if err := validResponse.VisitGetVillaAvailabilityResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetVillaPricing operation middleware
+func (sh *strictHandler) GetVillaPricing(w http.ResponseWriter, r *http.Request, slug string, params GetVillaPricingParams) {
+	var request GetVillaPricingRequestObject
+
+	request.Slug = slug
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetVillaPricing(ctx, request.(GetVillaPricingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetVillaPricing")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetVillaPricingResponseObject); ok {
+		if err := validResponse.VisitGetVillaPricingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpsertVillaPricing operation middleware
+func (sh *strictHandler) UpsertVillaPricing(w http.ResponseWriter, r *http.Request, slug string) {
+	var request UpsertVillaPricingRequestObject
+
+	request.Slug = slug
+
+	var body UpsertVillaPricingJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpsertVillaPricing(ctx, request.(UpsertVillaPricingRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpsertVillaPricing")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpsertVillaPricingResponseObject); ok {
+		if err := validResponse.VisitUpsertVillaPricingResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListVillaSeasonRules operation middleware
+func (sh *strictHandler) ListVillaSeasonRules(w http.ResponseWriter, r *http.Request, slug string) {
+	var request ListVillaSeasonRulesRequestObject
+
+	request.Slug = slug
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListVillaSeasonRules(ctx, request.(ListVillaSeasonRulesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListVillaSeasonRules")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListVillaSeasonRulesResponseObject); ok {
+		if err := validResponse.VisitListVillaSeasonRulesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateVillaSeasonRule operation middleware
+func (sh *strictHandler) CreateVillaSeasonRule(w http.ResponseWriter, r *http.Request, slug string) {
+	var request CreateVillaSeasonRuleRequestObject
+
+	request.Slug = slug
+
+	var body CreateVillaSeasonRuleJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateVillaSeasonRule(ctx, request.(CreateVillaSeasonRuleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateVillaSeasonRule")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateVillaSeasonRuleResponseObject); ok {
+		if err := validResponse.VisitCreateVillaSeasonRuleResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetVillaPricingSettings operation middleware
+func (sh *strictHandler) GetVillaPricingSettings(w http.ResponseWriter, r *http.Request, slug string) {
+	var request GetVillaPricingSettingsRequestObject
+
+	request.Slug = slug
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetVillaPricingSettings(ctx, request.(GetVillaPricingSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetVillaPricingSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetVillaPricingSettingsResponseObject); ok {
+		if err := validResponse.VisitGetVillaPricingSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PutVillaPricingSettings operation middleware
+func (sh *strictHandler) PutVillaPricingSettings(w http.ResponseWriter, r *http.Request, slug string) {
+	var request PutVillaPricingSettingsRequestObject
+
+	request.Slug = slug
+
+	var body PutVillaPricingSettingsJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PutVillaPricingSettings(ctx, request.(PutVillaPricingSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PutVillaPricingSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PutVillaPricingSettingsResponseObject); ok {
+		if err := validResponse.VisitPutVillaPricingSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListVillaReviews operation middleware
+func (sh *strictHandler) ListVillaReviews(w http.ResponseWriter, r *http.Request, slug string) {
+	var request ListVillaReviewsRequestObject
+
+	request.Slug = slug
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListVillaReviews(ctx, request.(ListVillaReviewsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListVillaReviews")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListVillaReviewsResponseObject); ok {
+		if err := validResponse.VisitListVillaReviewsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SubmitVillaReview operation middleware
+func (sh *strictHandler) SubmitVillaReview(w http.ResponseWriter, r *http.Request, slug string) {
+	var request SubmitVillaReviewRequestObject
+
+	request.Slug = slug
+
+	var body SubmitVillaReviewJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SubmitVillaReview(ctx, request.(SubmitVillaReviewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SubmitVillaReview")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SubmitVillaReviewResponseObject); ok {
+		if err := validResponse.VisitSubmitVillaReviewResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetVillaReviewMeta operation middleware
+func (sh *strictHandler) GetVillaReviewMeta(w http.ResponseWriter, r *http.Request, slug string) {
+	var request GetVillaReviewMetaRequestObject
+
+	request.Slug = slug
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetVillaReviewMeta(ctx, request.(GetVillaReviewMetaRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetVillaReviewMeta")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetVillaReviewMetaResponseObject); ok {
+		if err := validResponse.VisitGetVillaReviewMetaResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

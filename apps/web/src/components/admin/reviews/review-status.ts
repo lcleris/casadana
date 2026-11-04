@@ -1,4 +1,4 @@
-import type { ReviewStatus } from "@casa-dana/api"
+import type { ReviewStatus } from "@casa-dana/contract/reviews"
 
 // The design calls these Publié / En attente / Masqué; the API enum is
 // approved / pending / rejected. The enum stays on the wire — this map is

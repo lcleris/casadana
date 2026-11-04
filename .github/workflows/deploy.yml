@@ -36,7 +36,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      # oxfmt --check, oxlint, then tsc (TS 7) on apps/web and packages/api.
+      # oxfmt --check, oxlint, then tsc (TS 7) on apps/web and packages/contract.
       # Compiles paraglide first: src/paraglide is generated and gitignored, so
       # without it every m.* import fails to resolve.
       - name: Format, lint and types
@@ -107,10 +107,9 @@ jobs:
           IMG="${REGISTRY}/${{ github.repository_owner }}/casadana-web@${{ steps.build.outputs.digest }}"
           docker pull -q "$IMG"
           # A PORT is required in the pattern. The bundle legitimately contains a bare
-          # `http://localhost` twice -- TanStack Router falls back to it when window.origin
-          # is unavailable, and axios does the same for window.location.href. Matching bare
-          # localhost would fail every single build. A leaked VITE_API_BASE_URL always
-          # carries a port (http://localhost:8080), which is what this catches.
+          # `http://localhost` -- TanStack Router falls back to it when window.origin is
+          # unavailable. Matching bare localhost would fail every single build. A leaked
+          # VITE_API_BASE_URL always carries a port (http://localhost:8080), which is what this catches.
           FOUND=$(docker run --rm --entrypoint sh "$IMG" -c \
             'cat /usr/share/nginx/html/assets/*.js | grep -oE "https?://(localhost|127\.0\.0\.1):[0-9]+" | sort -u' || true)
           if [ -n "$FOUND" ]; then

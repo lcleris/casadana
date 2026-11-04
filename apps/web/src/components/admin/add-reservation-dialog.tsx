@@ -1,5 +1,4 @@
-import { ApiError, getListBookingsQueryKey, useCreateBooking } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
@@ -14,6 +13,7 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/toast"
+import { apiErrorCode, orpc } from "@/lib/orpc"
 
 interface AddReservationFormValues {
   guestName: string
@@ -53,10 +53,10 @@ export default function AddReservationDialog({ property }: AddReservationDialogP
 
   // Invalidate at the endpoint prefix (not the exact page/limit key) so this
   // also refreshes the stat row's separate limit:1 queries, not just this page.
-  const bookingsQueryKey = getListBookingsQueryKey()
+  const bookingsQueryKey = orpc.bookings.list.key()
 
-  const { mutate: createBooking, isPending } = useCreateBooking({
-    mutation: {
+  const { mutate: createBooking, isPending } = useMutation(
+    orpc.bookings.create.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Réservation ajoutée")
@@ -64,7 +64,7 @@ export default function AddReservationDialog({ property }: AddReservationDialogP
         reset()
       },
       onError: (err) => {
-        if (err instanceof ApiError && err.code === "DATES_CONFLICT") {
+        if (apiErrorCode(err) === "DATES_CONFLICT") {
           setError("checkOut", {
             type: "conflict",
             message: "Ces dates chevauchent une réservation existante.",
@@ -73,22 +73,20 @@ export default function AddReservationDialog({ property }: AddReservationDialogP
           toast("Impossible d'ajouter la réservation")
         }
       },
-    },
-  })
+    }),
+  )
 
   const onSubmit = (values: AddReservationFormValues) => {
     createBooking({
-      data: {
-        villa_slug: property,
-        guest_name: values.guestName,
-        guest_email: values.guestEmail,
-        guest_phone: values.guestPhone,
-        check_in: values.checkIn,
-        check_out: values.checkOut,
-        adults: values.adults,
-        children: 0,
-        source: values.source,
-      },
+      villa_slug: property,
+      guest_name: values.guestName,
+      guest_email: values.guestEmail,
+      guest_phone: values.guestPhone,
+      check_in: values.checkIn,
+      check_out: values.checkOut,
+      adults: values.adults,
+      children: 0,
+      source: values.source,
     })
   }
 

@@ -6,7 +6,6 @@
     "docs/**",
     "**/*.md",
     "apps/api/**",
-    "packages/api/src/generated/**",
     "apps/web/src/routeTree.gen.ts",
     ".fallowrc.json",
     "oxlint-suppressions.json"

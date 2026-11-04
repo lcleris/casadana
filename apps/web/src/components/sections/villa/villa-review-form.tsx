@@ -1,5 +1,5 @@
-import { ApiError, useSubmitVillaReview } from "@casa-dana/api"
-import type { ReviewCategoryRatings } from "@casa-dana/api"
+import type { ReviewCategoryRatings } from "@casa-dana/contract/reviews"
+import { useMutation } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 import { useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/toast"
+import { apiErrorMessage, orpc } from "@/lib/orpc"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
 
@@ -59,13 +60,12 @@ function toCategoryRatings(scores: Record<CategoryKey, number>): ReviewCategoryR
   return Object.keys(scored).length > 0 ? scored : undefined
 }
 
-const ERROR_MESSAGES: Record<string, () => string> = {
-  UNKNOWN_VILLA: m.villa_reviews_form_error_unknown_villa,
+// Its own wording rather than the shared one: the visitor should know which
+// fields to fix, and that a rate limit is not about what they wrote.
+const ERROR_OVERRIDES = {
   INVALID_PAYLOAD: m.villa_reviews_form_error_invalid,
-  VALIDATION: m.villa_reviews_form_error_invalid,
-  // Its own wording rather than the generic failure: nothing is wrong with what
-  // the visitor wrote, so telling them to fix it would send them in circles.
   RATE_LIMITED: m.villa_reviews_form_error_rate_limited,
+  VALIDATION: m.villa_reviews_form_error_invalid,
 }
 
 interface StarPickerProps {
@@ -124,8 +124,8 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
   const rating = useWatch({ control, name: "rating" })
   const categories = useWatch({ control, name: "categories" })
 
-  const { mutate: submitReview, isPending } = useSubmitVillaReview({
-    mutation: {
+  const { mutate: submitReview, isPending } = useMutation(
+    orpc.reviews.submitVilla.mutationOptions({
       onSuccess: () => {
         // Nothing to invalidate: the review lands `pending`, so neither the
         // public listing nor the computed figures have moved.
@@ -134,12 +134,10 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
         toast(m.villa_reviews_form_success_toast())
       },
       onError: (err) => {
-        const code = err instanceof ApiError ? err.code : "NETWORK"
-        const message = ERROR_MESSAGES[code] ?? m.villa_reviews_form_error_generic
-        setTopLevelError(message())
+        setTopLevelError(apiErrorMessage(err, ERROR_OVERRIDES))
       },
-    },
-  })
+    }),
+  )
 
   const handleRating = (next: number) => {
     setValue("rating", next, { shouldDirty: true })
@@ -156,12 +154,10 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
     setTopLevelError(null)
     submitReview({
       slug: villaSlug,
-      data: {
-        author_name: values.authorName.trim(),
-        rating: values.rating,
-        body: values.body.trim(),
-        categories: toCategoryRatings(values.categories),
-      },
+      author_name: values.authorName.trim(),
+      rating: values.rating,
+      body: values.body.trim(),
+      categories: toCategoryRatings(values.categories),
     })
   }
 

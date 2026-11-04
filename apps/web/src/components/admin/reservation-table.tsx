@@ -1,11 +1,9 @@
-import {
-  getListBookingsQueryKey,
-  useDeleteBooking,
-  useListBookings,
-  usePatchBooking,
-} from "@casa-dana/api"
-import type { BookingResponse, BookingStatus, PatchBookingRequestStatus } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import type {
+  BookingResponse,
+  BookingStatus,
+  PatchBookingRequest,
+} from "@casa-dana/contract/bookings"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 
@@ -13,6 +11,7 @@ import { BOOKING_SOURCE_LABELS, BOOKING_STATUS_LABELS } from "@/components/admin
 import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 
 // Half-open interval overlap, matching the backend's own conflict check
 // (check_in < other.check_out AND check_out > other.check_in). ISO
@@ -23,7 +22,7 @@ function datesOverlap(aIn: string, aOut: string, bIn: string, bOut: string): boo
 
 const NEXT_STATUSES: Record<
   BookingStatus,
-  Array<{ status: PatchBookingRequestStatus; label: string }>
+  Array<{ status: PatchBookingRequest["status"]; label: string }>
 > = {
   pending: [
     { status: "approved", label: "Approuver" },
@@ -58,19 +57,27 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   // Invalidate at the endpoint prefix (not the exact page/limit key) so this
   // also refreshes the stat row's separate limit:1 queries, not just this page.
-  const bookingsQueryKey = getListBookingsQueryKey()
+  const bookingsQueryKey = orpc.bookings.list.key()
 
   // Fetched independently of pagination so "Approve" is disabled for a
   // conflict even when the confirmed booking it collides with sits on a
   // different page. Mirrors the backend's own approve-time conflict check
   // (booking/service.go's TransitionStatus) as a proactive UI hint — the
   // backend's check is the authoritative guard either way.
-  const { data: approvedData } = useListBookings({
-    villa_slug: property,
-    status: "approved",
-    limit: 100,
-  })
-  const { data: paidData } = useListBookings({ villa_slug: property, status: "paid", limit: 100 })
+  const { data: approvedData } = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: {
+        villa_slug: property,
+        status: "approved",
+        limit: 100,
+      },
+    }),
+  )
+  const { data: paidData } = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: { villa_slug: property, status: "paid", limit: 100 },
+    }),
+  )
   const confirmedBookings = [...(approvedData?.bookings ?? []), ...(paidData?.bookings ?? [])]
 
   const conflictingApproval = (b: BookingResponse): boolean =>
@@ -79,8 +86,8 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
         other.id !== b.id && datesOverlap(b.check_in, b.check_out, other.check_in, other.check_out),
     )
 
-  const { mutate: patchStatus } = usePatchBooking({
-    mutation: {
+  const { mutate: patchStatus } = useMutation(
+    orpc.bookings.patch.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Statut mis à jour")
@@ -88,11 +95,11 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
       onError: () => {
         toast("Impossible de mettre à jour le statut")
       },
-    },
-  })
+    }),
+  )
 
-  const { mutate: deleteBooking } = useDeleteBooking({
-    mutation: {
+  const { mutate: deleteBooking } = useMutation(
+    orpc.bookings.delete.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: bookingsQueryKey })
         toast("Réservation supprimée")
@@ -100,8 +107,8 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
       onError: () => {
         toast("Impossible de supprimer la réservation")
       },
-    },
-  })
+    }),
+  )
 
   const handleDelete = (id: string) => {
     setPendingDelete(id)
@@ -175,7 +182,7 @@ export default function ReservationTable({ bookings, property }: ReservationTabl
                             : undefined
                         }
                         onClick={() => {
-                          patchStatus({ id: b.id, data: { status: next } })
+                          patchStatus({ id: b.id, status: next })
                         }}
                       >
                         {label}

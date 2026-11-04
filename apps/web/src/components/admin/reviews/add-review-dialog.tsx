@@ -1,11 +1,5 @@
-import {
-  getGetVillaReviewMetaQueryKey,
-  getListAdminReviewsQueryKey,
-  getListVillaReviewsQueryKey,
-  useCreateAdminReview,
-} from "@casa-dana/api"
-import type { ReviewCategoryRatings } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import type { ReviewCategoryRatings } from "@casa-dana/contract/reviews"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
@@ -22,6 +16,7 @@ import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 import { cn } from "@/lib/utils"
 
 const RATINGS = [1, 2, 3, 4, 5] as const
@@ -81,14 +76,18 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
   })
   const rating = useWatch({ control, name: "rating" })
 
-  const { mutate: createReview, isPending } = useCreateAdminReview({
-    mutation: {
+  const { mutate: createReview, isPending } = useMutation(
+    orpc.reviews.createAdmin.mutationOptions({
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: getListAdminReviewsQueryKey() })
-        void queryClient.invalidateQueries({ queryKey: getListVillaReviewsQueryKey(property) })
+        void queryClient.invalidateQueries({ queryKey: orpc.reviews.listAdmin.key() })
+        void queryClient.invalidateQueries({
+          queryKey: orpc.reviews.listVilla.key({ input: { slug: property } }),
+        })
         // An approved review shifts the computed figures, so the breakdown card
         // has to refetch alongside the lists.
-        void queryClient.invalidateQueries({ queryKey: getGetVillaReviewMetaQueryKey(property) })
+        void queryClient.invalidateQueries({
+          queryKey: orpc.reviews.meta.key({ input: { slug: property } }),
+        })
         toast("Avis ajouté")
         setOpen(false)
         reset(DEFAULT_VALUES)
@@ -96,8 +95,8 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
       onError: () => {
         toast("Impossible d'ajouter l'avis")
       },
-    },
-  })
+    }),
+  )
 
   const onSubmit = (values: AddReviewFormValues) => {
     const authorName = values.authorName.trim()
@@ -107,17 +106,15 @@ export default function AddReviewDialog({ property }: AddReviewDialogProps) {
       return
     }
     createReview({
-      data: {
-        villa_slug: property,
-        author_name: authorName,
-        rating: values.rating,
-        body,
-        meta: values.meta.trim(),
-        source: values.source.trim() || "Réservation directe",
-        status: "approved",
-        featured: false,
-        categories: toCategoryRatings(values.categories),
-      },
+      villa_slug: property,
+      author_name: authorName,
+      rating: values.rating,
+      body,
+      meta: values.meta.trim(),
+      source: values.source.trim() || "Réservation directe",
+      status: "approved",
+      featured: false,
+      categories: toCategoryRatings(values.categories),
     })
   }
 

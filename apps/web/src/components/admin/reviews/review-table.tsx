@@ -1,12 +1,5 @@
-import {
-  getGetVillaReviewMetaQueryKey,
-  getListAdminReviewsQueryKey,
-  getListVillaReviewsQueryKey,
-  useDeleteReview,
-  usePatchReview,
-} from "@casa-dana/api"
-import type { Review, ReviewStatus } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import type { Review, ReviewStatus } from "@casa-dana/contract/reviews"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 
@@ -15,6 +8,7 @@ import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog"
 import { EmptyState } from "@/components/admin/ui/empty-state"
 import { Toggle } from "@/components/admin/ui/toggle"
 import { useToast } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 
 function Stars({ rating }: { rating: number }) {
   const filled = Math.max(0, Math.min(5, Math.round(rating)))
@@ -41,24 +35,28 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
   // this villa's site page reads from. Moderating a review also recomputes the
   // published rating, so the meta has to go with them.
   const invalidateReviews = () => {
-    void queryClient.invalidateQueries({ queryKey: getListAdminReviewsQueryKey() })
-    void queryClient.invalidateQueries({ queryKey: getListVillaReviewsQueryKey(property) })
-    void queryClient.invalidateQueries({ queryKey: getGetVillaReviewMetaQueryKey(property) })
+    void queryClient.invalidateQueries({ queryKey: orpc.reviews.listAdmin.key() })
+    void queryClient.invalidateQueries({
+      queryKey: orpc.reviews.listVilla.key({ input: { slug: property } }),
+    })
+    void queryClient.invalidateQueries({
+      queryKey: orpc.reviews.meta.key({ input: { slug: property } }),
+    })
   }
 
-  const { mutate: patchReview } = usePatchReview({
-    mutation: {
+  const { mutate: patchReview } = useMutation(
+    orpc.reviews.patch.mutationOptions({
       onSuccess: () => {
         invalidateReviews()
       },
       onError: () => {
         toast("Impossible de mettre à jour l'avis")
       },
-    },
-  })
+    }),
+  )
 
-  const { mutate: deleteReview } = useDeleteReview({
-    mutation: {
+  const { mutate: deleteReview } = useMutation(
+    orpc.reviews.delete.mutationOptions({
       onSuccess: () => {
         invalidateReviews()
         toast("Avis supprimé")
@@ -66,14 +64,14 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
       onError: () => {
         toast("Impossible de supprimer l'avis")
       },
-    },
-  })
+    }),
+  )
 
   // The per-call onSuccess runs on top of the hook's own, which does the
   // invalidating — only the wording differs between the two patches.
   const handleFeatured = (r: Review, featured: boolean) => {
     patchReview(
-      { id: r.id, data: { featured } },
+      { id: r.id, featured },
       {
         onSuccess: () => {
           toast(featured ? "Avis mis en avant" : "Avis retiré de la mise en avant")
@@ -84,7 +82,7 @@ export default function ReviewTable({ reviews, property }: ReviewTableProps) {
 
   const handleStatus = (r: Review, status: ReviewStatus) => {
     patchReview(
-      { id: r.id, data: { status } },
+      { id: r.id, status },
       {
         onSuccess: () => {
           toast("Statut de l'avis mis à jour")

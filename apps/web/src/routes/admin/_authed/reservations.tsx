@@ -1,6 +1,5 @@
-import { useListBookings } from "@casa-dana/api"
-import type { BookingStatus } from "@casa-dana/api"
-import { keepPreviousData } from "@tanstack/react-query"
+import type { BookingStatus } from "@casa-dana/contract/bookings"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 
 import AddReservationDialog from "@/components/admin/add-reservation-dialog"
@@ -8,6 +7,7 @@ import { BOOKING_STATUS_LABELS } from "@/components/admin/booking-status"
 import ReservationTable from "@/components/admin/reservation-table"
 import { StatTile } from "@/components/admin/ui/stat-tile"
 import { Button } from "@/components/ui/button"
+import { orpc } from "@/lib/orpc"
 
 const PROPERTIES = ["casadana", "casacasay"] as const
 type Property = (typeof PROPERTIES)[number]
@@ -49,11 +49,15 @@ function ReservationsPage() {
   const { property, status, page } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
 
-  const { data } = useListBookings(
-    { villa_slug: property, status, page, limit: PAGE_SIZE },
-    { query: { placeholderData: keepPreviousData } },
+  const { data } = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: { villa_slug: property, status, page, limit: PAGE_SIZE },
+      placeholderData: keepPreviousData,
+    }),
   )
-  const { data: totalsAll } = useListBookings({ villa_slug: property, limit: 1 })
+  const { data: totalsAll } = useQuery(
+    orpc.bookings.list.queryOptions({ input: { villa_slug: property, limit: 1 } }),
+  )
   const statusTotals = useStatusTotals(property)
   const maxPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
 
@@ -144,11 +148,29 @@ function ReservationsPage() {
 }
 
 function useStatusTotals(property: Property): Partial<Record<BookingStatus, number>> {
-  const pendingQuery = useListBookings({ villa_slug: property, status: "pending", limit: 1 })
-  const approvedQuery = useListBookings({ villa_slug: property, status: "approved", limit: 1 })
-  const rejectedQuery = useListBookings({ villa_slug: property, status: "rejected", limit: 1 })
-  const cancelledQuery = useListBookings({ villa_slug: property, status: "cancelled", limit: 1 })
-  const paidQuery = useListBookings({ villa_slug: property, status: "paid", limit: 1 })
+  const pendingQuery = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: { villa_slug: property, status: "pending", limit: 1 },
+    }),
+  )
+  const approvedQuery = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: { villa_slug: property, status: "approved", limit: 1 },
+    }),
+  )
+  const rejectedQuery = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: { villa_slug: property, status: "rejected", limit: 1 },
+    }),
+  )
+  const cancelledQuery = useQuery(
+    orpc.bookings.list.queryOptions({
+      input: { villa_slug: property, status: "cancelled", limit: 1 },
+    }),
+  )
+  const paidQuery = useQuery(
+    orpc.bookings.list.queryOptions({ input: { villa_slug: property, status: "paid", limit: 1 } }),
+  )
   return {
     pending: pendingQuery.data?.total,
     approved: approvedQuery.data?.total,

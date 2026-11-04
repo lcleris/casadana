@@ -31,6 +31,12 @@ jobs:
       - name: Unit tests
         run: bun run test
 
+      # The Go API serves contract.json at /api/docs: it must match the contract.
+      - name: OpenAPI spec is up to date
+        run: |
+          bun run --cwd packages/contract generate
+          git diff --exit-code apps/api/internal/openapi/contract.json
+
       - name: Dead code
         run: bun run dead-code:ci
 

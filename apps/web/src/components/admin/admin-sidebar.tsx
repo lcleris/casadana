@@ -1,7 +1,8 @@
-import { useAdminLogout } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { CalendarDays, History, LogOut, Star, Tag, UserCog } from "lucide-react"
+
+import { orpc } from "@/lib/orpc"
 
 const NAV_ITEMS = [
   { to: "/admin/reservations", label: "Réservations", icon: CalendarDays },
@@ -15,14 +16,14 @@ export default function AdminSidebar() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const { mutate: logout } = useAdminLogout({
-    mutation: {
+  const { mutate: logout } = useMutation(
+    orpc.admin.logout.mutationOptions({
       onSuccess: () => {
         queryClient.clear()
         void navigate({ to: "/admin/login" })
       },
-    },
-  })
+    }),
+  )
 
   const handleLogout = () => {
     logout()
