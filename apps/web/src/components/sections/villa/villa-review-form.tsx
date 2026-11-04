@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/toast"
-import { apiErrorCode, orpc } from "@/lib/orpc"
+import { apiErrorMessage, orpc } from "@/lib/orpc"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
 
@@ -60,13 +60,12 @@ function toCategoryRatings(scores: Record<CategoryKey, number>): ReviewCategoryR
   return Object.keys(scored).length > 0 ? scored : undefined
 }
 
-const ERROR_MESSAGES: Record<string, () => string> = {
-  UNKNOWN_VILLA: m.villa_reviews_form_error_unknown_villa,
+// Its own wording rather than the shared one: the visitor should know which
+// fields to fix, and that a rate limit is not about what they wrote.
+const ERROR_OVERRIDES = {
   INVALID_PAYLOAD: m.villa_reviews_form_error_invalid,
-  VALIDATION: m.villa_reviews_form_error_invalid,
-  // Its own wording rather than the generic failure: nothing is wrong with what
-  // the visitor wrote, so telling them to fix it would send them in circles.
   RATE_LIMITED: m.villa_reviews_form_error_rate_limited,
+  VALIDATION: m.villa_reviews_form_error_invalid,
 }
 
 interface StarPickerProps {
@@ -135,9 +134,7 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
         toast(m.villa_reviews_form_success_toast())
       },
       onError: (err) => {
-        const code = apiErrorCode(err) ?? "NETWORK"
-        const message = ERROR_MESSAGES[code] ?? m.villa_reviews_form_error_generic
-        setTopLevelError(message())
+        setTopLevelError(apiErrorMessage(err, ERROR_OVERRIDES))
       },
     }),
   )

@@ -1,16 +1,35 @@
 import type { Route } from "@orpc/contract"
 import * as z from "zod"
 
+export const ApiErrorCodeSchema = z
+  .enum([
+    "ADMIN_NOT_FOUND",
+    "ALREADY_REVIEWED",
+    "BOOKING_NOT_FOUND",
+    "CANNOT_DELETE_SELF",
+    "DATES_CONFLICT",
+    "EMAIL_TAKEN",
+    "INTERNAL",
+    "INVALID_CREDENTIALS",
+    "INVALID_PAYLOAD",
+    "INVALID_RANGE",
+    "INVALID_STATUS",
+    "RANGE_TOO_LARGE",
+    "RATE_LIMITED",
+    "REVIEW_NOT_FOUND",
+    "SEASON_RULE_NOT_FOUND",
+    "UNAUTHORIZED",
+    "UNKNOWN_VILLA",
+    "VALIDATION",
+  ])
+  .describe(
+    "Every code the Go API sends: the httpserver.Register calls, plus VALIDATION and INTERNAL from httpserver.WriteError.",
+  )
+export type ApiErrorCode = z.infer<typeof ApiErrorCodeSchema>
+
 /** Every non-2xx response from the Go API carries this body. */
 export const ErrorResponseSchema = z.object({
-  error: z.object({
-    code: z
-      .string()
-      .describe(
-        "Machine-readable error code, such as DATES_CONFLICT, UNKNOWN_VILLA, VALIDATION, INVALID_STATUS, EMAIL_TAKEN or INTERNAL.",
-      ),
-    message: z.string(),
-  }),
+  error: z.object({ code: ApiErrorCodeSchema, message: z.string() }),
 })
 
 type Operation = Exclude<NonNullable<Route["spec"]>, (...args: never) => unknown>

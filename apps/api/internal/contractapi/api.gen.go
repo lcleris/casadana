@@ -18,6 +18,72 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for ApiErrorCode.
+const (
+	ADMINNOTFOUND      ApiErrorCode = "ADMIN_NOT_FOUND"
+	ALREADYREVIEWED    ApiErrorCode = "ALREADY_REVIEWED"
+	BOOKINGNOTFOUND    ApiErrorCode = "BOOKING_NOT_FOUND"
+	CANNOTDELETESELF   ApiErrorCode = "CANNOT_DELETE_SELF"
+	DATESCONFLICT      ApiErrorCode = "DATES_CONFLICT"
+	EMAILTAKEN         ApiErrorCode = "EMAIL_TAKEN"
+	INTERNAL           ApiErrorCode = "INTERNAL"
+	INVALIDCREDENTIALS ApiErrorCode = "INVALID_CREDENTIALS"
+	INVALIDPAYLOAD     ApiErrorCode = "INVALID_PAYLOAD"
+	INVALIDRANGE       ApiErrorCode = "INVALID_RANGE"
+	INVALIDSTATUS      ApiErrorCode = "INVALID_STATUS"
+	RANGETOOLARGE      ApiErrorCode = "RANGE_TOO_LARGE"
+	RATELIMITED        ApiErrorCode = "RATE_LIMITED"
+	REVIEWNOTFOUND     ApiErrorCode = "REVIEW_NOT_FOUND"
+	SEASONRULENOTFOUND ApiErrorCode = "SEASON_RULE_NOT_FOUND"
+	UNAUTHORIZED       ApiErrorCode = "UNAUTHORIZED"
+	UNKNOWNVILLA       ApiErrorCode = "UNKNOWN_VILLA"
+	VALIDATION         ApiErrorCode = "VALIDATION"
+)
+
+// Valid indicates whether the value is a known member of the ApiErrorCode enum.
+func (e ApiErrorCode) Valid() bool {
+	switch e {
+	case ADMINNOTFOUND:
+		return true
+	case ALREADYREVIEWED:
+		return true
+	case BOOKINGNOTFOUND:
+		return true
+	case CANNOTDELETESELF:
+		return true
+	case DATESCONFLICT:
+		return true
+	case EMAILTAKEN:
+		return true
+	case INTERNAL:
+		return true
+	case INVALIDCREDENTIALS:
+		return true
+	case INVALIDPAYLOAD:
+		return true
+	case INVALIDRANGE:
+		return true
+	case INVALIDSTATUS:
+		return true
+	case RANGETOOLARGE:
+		return true
+	case RATELIMITED:
+		return true
+	case REVIEWNOTFOUND:
+		return true
+	case SEASONRULENOTFOUND:
+		return true
+	case UNAUTHORIZED:
+		return true
+	case UNKNOWNVILLA:
+		return true
+	case VALIDATION:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for BookingSource.
 const (
 	Airbnb     BookingSource = "airbnb"
@@ -220,6 +286,9 @@ type AdminUser struct {
 	Id        *openapi_types.UUID  `json:"id,omitempty"`
 }
 
+// ApiErrorCode Every code the Go API sends: the httpserver.Register calls, plus VALIDATION and INTERNAL from httpserver.WriteError.
+type ApiErrorCode string
+
 // AvailabilityResponse defines model for AvailabilityResponse.
 type AvailabilityResponse struct {
 	BookedRanges  []BookedRange `json:"booked_ranges"`
@@ -299,9 +368,9 @@ type CreateBookingRequestLocale string
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
 	Error struct {
-		// Code Machine-readable error code, such as DATES_CONFLICT, UNKNOWN_VILLA, VALIDATION, INVALID_STATUS, EMAIL_TAKEN or INTERNAL.
-		Code    string `json:"code"`
-		Message string `json:"message"`
+		// Code Every code the Go API sends: the httpserver.Register calls, plus VALIDATION and INTERNAL from httpserver.WriteError.
+		Code    ApiErrorCode `json:"code"`
+		Message string       `json:"message"`
 	} `json:"error"`
 }
 

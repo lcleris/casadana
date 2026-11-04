@@ -304,16 +304,6 @@ export function parseValidationMessage(message: string): Array<ValidationError> 
     .filter((e) => e !== undefined)
 }
 
-const TOP_LEVEL_ERRORS: Record<string, () => string> = {
-  DATES_CONFLICT: m.villa_booking_error_dates_conflict,
-  UNKNOWN_VILLA: m.villa_booking_error_unknown_villa,
-}
-
-export function topLevelErrorMessage(code: string): string {
-  const message = TOP_LEVEL_ERRORS[code] ?? m.villa_booking_error_generic
-  return message()
-}
-
 interface PriceSummaryInput {
   checkIn: Date
   stayEnd: Date

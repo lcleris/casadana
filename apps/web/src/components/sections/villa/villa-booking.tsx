@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import type { VillaData } from "@/constants/villas.const"
-import { apiErrorCode, orpc } from "@/lib/orpc"
+import { apiErrorCode, apiErrorMessage, orpc } from "@/lib/orpc"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -24,7 +24,6 @@ import {
   isUnavailable,
   parseValidationMessage,
   startOfToday,
-  topLevelErrorMessage,
 } from "./villa-booking-utils"
 import type { BookingFormValues } from "./villa-booking-utils"
 
@@ -148,15 +147,14 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
         })
       },
       onError: (err) => {
-        const code = apiErrorCode(err)
-        if (code === "VALIDATION") {
+        if (apiErrorCode(err) === "VALIDATION") {
           for (const { field, type, message } of parseValidationMessage(err.message)) {
             setError(field, { type, message })
           }
           setTopLevelError(null)
           return
         }
-        setTopLevelError(topLevelErrorMessage(code ?? ""))
+        setTopLevelError(apiErrorMessage(err))
       },
     }),
   )
