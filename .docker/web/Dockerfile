@@ -15,7 +15,7 @@ RUN bun install --frozen-lockfile
 # It is set explicitly here rather than left unset, which is not the same thing. bun
 # auto-loads apps/web/.env.development into process.env whenever NODE_ENV is unset --
 # and it is unset in this stage -- and Vite deliberately gives process.env priority
-# over .env files. So the "unset -> empty string fallback" in packages/api/src/client.ts
+# over .env files. So the "unset -> empty string fallback" in apps/web/src/lib/orpc.ts
 # never ran: every production bundle was built with
 #   baseURL: "http://localhost:8080"
 # which made the browser call localhost instead of the same origin, producing a CORS

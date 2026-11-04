@@ -19,8 +19,8 @@ agent (Codex, Cursor, Copilot, Gemini, …) opens it directly.
 |---|---|
 | `apps/web` | React 19 + Vite + TanStack Router/Query, paraglide i18n (fr, en, es) |
 | `apps/api` | Go API: chi, pgx, sqlc, golang-migrate |
-| `apps/api/internal/openapi/openapi.yaml` | The hand-written API spec, served at `/api/docs` |
-| `packages/api` | orval client generated from that spec |
+| `packages/contract` | The zod + oRPC API contract: the one source of the API's shape |
+| `apps/api/internal/openapi/contract.json` | OpenAPI spec generated from the contract, served at `/api/docs` |
 
 ## Commands
 
@@ -30,12 +30,15 @@ agent (Codex, Cursor, Copilot, Gemini, …) opens it directly.
 - API gates, from `apps/api`: `go vet -tags integration ./...` and
   `go test -tags integration ./...` (the integration suites start Postgres
   with testcontainers).
-- Regenerate the orval client: `bun run --cwd packages/api generate`.
+- After editing the contract: `bun run --cwd packages/contract generate`, then
+  `go generate ./internal/contractapi` from `apps/api`. The web calls the API
+  through `orpc` in `apps/web/src/lib/orpc.ts` (TanStack Query utils).
 
 ## Generated files: never edit by hand
 
 `apps/web/src/routeTree.gen.ts`, `apps/web/src/paraglide/`,
-`packages/api/src/generated/` and `apps/api/internal/db/*.sql.go` (sqlc).
+`apps/api/internal/openapi/contract.json`, `apps/api/internal/contractapi/api.gen.go`
+and `apps/api/internal/db/*.sql.go` (sqlc).
 
 ## Lint and format: Ultracite (oxlint + oxfmt)
 

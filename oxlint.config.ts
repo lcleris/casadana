@@ -16,7 +16,6 @@ export default defineConfig({
     "apps/api/**",
     "apps/web/src/routeTree.gen.ts",
     "apps/web/src/paraglide/**",
-    "packages/api/src/generated/**",
     // shadcn primitives, owned by its CLI (components.json -> aliases.ui).
     "apps/web/src/components/ui/**",
   ],
@@ -25,13 +24,6 @@ export default defineConfig({
     reportUnusedDisableDirectives: "error",
     typeAware: true,
   },
-  overrides: [
-    {
-      // The orval client's package entry. It goes away with the oRPC migration.
-      files: ["packages/api/src/index.ts"],
-      rules: { "oxc/no-barrel-file": "off" },
-    },
-  ],
   rules: {
     // CONTRIBUTING.md: `Array<T>`, never `T[]`.
     "typescript/array-type": ["error", { default: "generic" }],
