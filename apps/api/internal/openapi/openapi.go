@@ -1,8 +1,8 @@
-// Package openapi serves the API's OpenAPI 3.0.3 specification and a
+// Package openapi serves the API's OpenAPI 3.1 specification and a
 // Swagger UI page that browses it.
 //
-//   - GET /api/openapi.yaml  → raw spec
-//   - GET /api/docs           → Swagger UI HTML (loads /api/openapi.yaml)
+//   - GET /api/openapi.json  → raw spec
+//   - GET /api/docs           → Swagger UI HTML (loads /api/openapi.json)
 package openapi
 
 import (
@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-//go:embed openapi.yaml
+//go:embed contract.json
 var Spec []byte
 
 const swaggerHTML = `<!DOCTYPE html>
@@ -30,7 +30,7 @@ const swaggerHTML = `<!DOCTYPE html>
   <script>
     window.addEventListener("load", () => {
       window.ui = SwaggerUIBundle({
-        url: "/api/openapi.yaml",
+        url: "/api/openapi.json",
         dom_id: "#swagger-ui",
         deepLinking: true,
         layout: "BaseLayout",
@@ -41,8 +41,8 @@ const swaggerHTML = `<!DOCTYPE html>
 </html>`
 
 func Mount(r chi.Router) {
-	r.Get("/api/openapi.yaml", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "application/yaml; charset=utf-8")
+	r.Get("/api/openapi.json", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write(Spec)
 	})
 	r.Get("/api/docs", func(w http.ResponseWriter, _ *http.Request) {
