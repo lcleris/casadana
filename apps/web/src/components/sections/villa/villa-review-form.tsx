@@ -1,5 +1,5 @@
-import { ApiError, useSubmitVillaReview } from "@casa-dana/api"
-import type { ReviewCategoryRatings } from "@casa-dana/api"
+import type { ReviewCategoryRatings } from "@casa-dana/contract"
+import { useMutation } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 import { useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/toast"
+import { apiErrorCode, orpc } from "@/lib/orpc"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
 
@@ -124,8 +125,8 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
   const rating = useWatch({ control, name: "rating" })
   const categories = useWatch({ control, name: "categories" })
 
-  const { mutate: submitReview, isPending } = useSubmitVillaReview({
-    mutation: {
+  const { mutate: submitReview, isPending } = useMutation(
+    orpc.reviews.submitVilla.mutationOptions({
       onSuccess: () => {
         // Nothing to invalidate: the review lands `pending`, so neither the
         // public listing nor the computed figures have moved.
@@ -134,12 +135,12 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
         toast(m.villa_reviews_form_success_toast())
       },
       onError: (err) => {
-        const code = err instanceof ApiError ? err.code : "NETWORK"
+        const code = apiErrorCode(err) ?? "NETWORK"
         const message = ERROR_MESSAGES[code] ?? m.villa_reviews_form_error_generic
         setTopLevelError(message())
       },
-    },
-  })
+    }),
+  )
 
   const handleRating = (next: number) => {
     setValue("rating", next, { shouldDirty: true })
@@ -156,12 +157,10 @@ export default function VillaReviewForm({ villaSlug, barLabels }: VillaReviewFor
     setTopLevelError(null)
     submitReview({
       slug: villaSlug,
-      data: {
-        author_name: values.authorName.trim(),
-        rating: values.rating,
-        body: values.body.trim(),
-        categories: toCategoryRatings(values.categories),
-      },
+      author_name: values.authorName.trim(),
+      rating: values.rating,
+      body: values.body.trim(),
+      categories: toCategoryRatings(values.categories),
     })
   }
 

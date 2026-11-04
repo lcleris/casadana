@@ -1,5 +1,4 @@
-import { useListAdminHistory } from "@casa-dana/api"
-import { keepPreviousData } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import type { ComponentProps } from "react"
 
@@ -8,6 +7,7 @@ import { AdminCard } from "@/components/admin/ui/admin-card"
 import { EmptyState } from "@/components/admin/ui/empty-state"
 import { Pager } from "@/components/admin/ui/pager"
 import { StatRow, StatTile } from "@/components/admin/ui/stat-tile"
+import { orpc } from "@/lib/orpc"
 
 const PROPERTIES = ["casadana", "casacasay"] as const
 type Property = (typeof PROPERTIES)[number]
@@ -63,9 +63,11 @@ function HistoryPage() {
   const { property, page } = Route.useSearch()
   const navigate = useNavigate({ from: Route.fullPath })
 
-  const { data, isPending, isError } = useListAdminHistory(
-    { villa_slug: property, page, limit: PAGE_SIZE },
-    { query: { placeholderData: keepPreviousData } },
+  const { data, isPending, isError } = useQuery(
+    orpc.history.list.queryOptions({
+      input: { villa_slug: property, page, limit: PAGE_SIZE },
+      placeholderData: keepPreviousData,
+    }),
   )
   const events = data?.events ?? []
   const maxPage = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1

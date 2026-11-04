@@ -29,3 +29,10 @@ const link = new OpenAPILink(contract, {
 const client: JsonifiedClient<ContractRouterClient<typeof contract>> = createORPCClient(link)
 
 export const orpc = createTanstackQueryUtils(client)
+
+export function apiErrorCode(error: unknown): string | undefined {
+  if (error instanceof ORPCError && typeof error.code === "string") {
+    return error.code
+  }
+  return undefined
+}

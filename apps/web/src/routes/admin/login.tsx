@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/client"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
@@ -6,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { orpc } from "@/lib/orpc"
+import { apiErrorCode, orpc } from "@/lib/orpc"
 
 export const Route = createFileRoute("/admin/login")({
   beforeLoad: async ({ context }) => {
@@ -47,7 +46,7 @@ function AdminLoginPage() {
       },
       onError: (err) => {
         const message =
-          err instanceof ORPCError && err.code === "INVALID_CREDENTIALS"
+          apiErrorCode(err) === "INVALID_CREDENTIALS"
             ? "E-mail ou mot de passe incorrect."
             : "Une erreur est survenue. Réessayez."
         setError("password", { type: "invalid", message })

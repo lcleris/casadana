@@ -1,13 +1,5 @@
-import {
-  getListVillaSeasonRulesQueryKey,
-  useCreateVillaSeasonRule,
-  useDeleteSeasonRule,
-  useGetVillaPricingSettings,
-  useListVillaSeasonRules,
-  usePatchSeasonRule,
-} from "@casa-dana/api"
-import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/contract"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { Plus } from "lucide-react"
 
@@ -15,6 +7,7 @@ import { AdminCard } from "@/components/admin/ui/admin-card"
 import { EmptyState } from "@/components/admin/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/toast"
+import { orpc } from "@/lib/orpc"
 
 import { defaultBasePriceCents } from "./defaults"
 import type { Property } from "./defaults"
@@ -74,17 +67,21 @@ interface SeasonRulesCardProps {
 export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
   const queryClient = useQueryClient()
   const { toast } = useToast()
-  const { data, isPending } = useListVillaSeasonRules(property)
+  const { data, isPending } = useQuery(
+    orpc.pricing.listSeasonRules.queryOptions({ input: { slug: property } }),
+  )
   // Deduped with the base-pricing card's own query; a new rule starts at the
   // villa's current base price.
-  const { data: settings } = useGetVillaPricingSettings(property)
+  const { data: settings } = useQuery(
+    orpc.pricing.getSettings.queryOptions({ input: { slug: property } }),
+  )
 
   // The slug is baked into the URL-shaped query key, so it has to be passed
   // here — a no-arg call would build a key matching nothing.
-  const rulesQueryKey = getListVillaSeasonRulesQueryKey(property)
+  const rulesQueryKey = orpc.pricing.listSeasonRules.key({ input: { slug: property } })
 
-  const { mutate: createRule } = useCreateVillaSeasonRule({
-    mutation: {
+  const { mutate: createRule } = useMutation(
+    orpc.pricing.createSeasonRule.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle ajoutée")
@@ -92,11 +89,11 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
       onError: () => {
         toast("Impossible d'ajouter la règle")
       },
-    },
-  })
+    }),
+  )
 
-  const { mutate: patchRule } = usePatchSeasonRule({
-    mutation: {
+  const { mutate: patchRule } = useMutation(
+    orpc.pricing.patchSeasonRule.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle mise à jour")
@@ -104,11 +101,11 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
       onError: () => {
         toast("Impossible de mettre à jour la règle")
       },
-    },
-  })
+    }),
+  )
 
-  const { mutate: deleteRule } = useDeleteSeasonRule({
-    mutation: {
+  const { mutate: deleteRule } = useMutation(
+    orpc.pricing.deleteSeasonRule.mutationOptions({
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: rulesQueryKey })
         toast("Règle supprimée")
@@ -116,24 +113,22 @@ export default function SeasonRulesCard({ property }: SeasonRulesCardProps) {
       onError: () => {
         toast("Impossible de supprimer la règle")
       },
-    },
-  })
+    }),
+  )
 
   const handleAdd = () => {
     const today = format(new Date(), "yyyy-MM-dd")
     createRule({
       slug: property,
-      data: {
-        label: "Nouvelle règle",
-        start_date: today,
-        end_date: today,
-        price_cents: newRulePriceCents(settings?.base_price_cents, property),
-      },
+      label: "Nouvelle règle",
+      start_date: today,
+      end_date: today,
+      price_cents: newRulePriceCents(settings?.base_price_cents, property),
     })
   }
 
   const handleSave = (id: string, patch: PatchSeasonRuleRequest) => {
-    patchRule({ id, data: patch })
+    patchRule({ id, ...patch })
   }
 
   return (

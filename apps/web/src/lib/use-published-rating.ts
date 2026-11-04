@@ -1,4 +1,6 @@
-import { useGetVillaReviewMeta } from "@casa-dana/api"
+import { useQuery } from "@tanstack/react-query"
+
+import { orpc } from "@/lib/orpc"
 
 export interface PublishedRating {
   score: number
@@ -17,7 +19,7 @@ export interface PublishedRating {
  * row entirely rather than quote a score no guest ever gave.
  */
 export function usePublishedRating(villaSlug: string): PublishedRating | null {
-  const { data: meta } = useGetVillaReviewMeta(villaSlug)
+  const { data: meta } = useQuery(orpc.reviews.meta.queryOptions({ input: { slug: villaSlug } }))
   if (!meta || meta.display_count === 0) {
     return null
   }

@@ -1,8 +1,9 @@
-import { useGetVillaReviewMeta, useListVillaReviews } from "@casa-dana/api"
-import type { Review, ReviewBreakdown, ReviewMeta } from "@casa-dana/api"
+import type { Review, ReviewBreakdown, ReviewMeta } from "@casa-dana/contract"
+import { useQuery } from "@tanstack/react-query"
 
 import VillaReviewForm from "@/components/sections/villa/villa-review-form"
 import type { VillaData } from "@/constants/villas.const"
+import { orpc } from "@/lib/orpc"
 import { m } from "@/paraglide/messages"
 
 interface VillaReviewsProps {
@@ -149,8 +150,12 @@ export default function VillaReviews({ villaSlug, data }: VillaReviewsProps) {
     data: meta,
     isPending: metaPending,
     isError: metaError,
-  } = useGetVillaReviewMeta(villaSlug)
-  const { data: list, isPending: listPending, isError: listError } = useListVillaReviews(villaSlug)
+  } = useQuery(orpc.reviews.meta.queryOptions({ input: { slug: villaSlug } }))
+  const {
+    data: list,
+    isPending: listPending,
+    isError: listError,
+  } = useQuery(orpc.reviews.listVilla.queryOptions({ input: { slug: villaSlug } }))
 
   // Only real, admin-approved guest reviews are ever shown. There is no sample
   // copy standing in: an invented review reads as a real guest's words.

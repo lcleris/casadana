@@ -1,7 +1,8 @@
-import { useGetVillaReviewMeta } from "@casa-dana/api"
+import { useQuery } from "@tanstack/react-query"
 
 import { AdminCard } from "@/components/admin/ui/admin-card"
 import { EmptyState } from "@/components/admin/ui/empty-state"
+import { orpc } from "@/lib/orpc"
 
 const BREAKDOWN_FIELDS = [
   { key: "cleanliness", label: "Propreté" },
@@ -37,7 +38,9 @@ interface RatingBreakdownCardProps {
 }
 
 export default function RatingBreakdownCard({ property }: RatingBreakdownCardProps) {
-  const { data: meta, isPending } = useGetVillaReviewMeta(property)
+  const { data: meta, isPending } = useQuery(
+    orpc.reviews.meta.queryOptions({ input: { slug: property } }),
+  )
 
   return (
     <AdminCard

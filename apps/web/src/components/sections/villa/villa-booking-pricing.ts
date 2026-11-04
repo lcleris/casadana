@@ -1,10 +1,7 @@
-import {
-  useGetVillaAvailability,
-  useGetVillaPricing,
-  useGetVillaPricingSettings,
-} from "@casa-dana/api"
-import { keepPreviousData } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
+
+import { orpc } from "@/lib/orpc"
 
 import {
   buildNightPrices,
@@ -39,32 +36,28 @@ export function useVillaBookingPricing({
     [viewMonth, checkIn, stayEnd],
   )
 
-  const { data: availability } = useGetVillaAvailability(
-    villaSlug,
-    { from: queryWindow.from, to: queryWindow.to },
-    {
-      query: {
-        enabled: calendarOpen,
-        placeholderData: keepPreviousData,
-      },
-    },
+  const { data: availability } = useQuery(
+    orpc.villas.availability.queryOptions({
+      enabled: calendarOpen,
+      input: { from: queryWindow.from, slug: villaSlug, to: queryWindow.to },
+      placeholderData: keepPreviousData,
+    }),
   )
 
   // Pricing is always enabled (not gated on calendar visibility) so the sidebar
   // total reflects the real back-office rates on first paint, before the user
   // opens the calendar.
-  const { data: pricing } = useGetVillaPricing(
-    villaSlug,
-    { from: queryWindow.from, to: queryWindow.to },
-    {
-      query: {
-        placeholderData: keepPreviousData,
-      },
-    },
+  const { data: pricing } = useQuery(
+    orpc.pricing.get.queryOptions({
+      input: { from: queryWindow.from, slug: villaSlug, to: queryWindow.to },
+      placeholderData: keepPreviousData,
+    }),
   )
 
   // Base rate and both fees live in the back-office, per villa.
-  const { data: settings } = useGetVillaPricingSettings(villaSlug)
+  const { data: settings } = useQuery(
+    orpc.pricing.getSettings.queryOptions({ input: { slug: villaSlug } }),
+  )
   const { baseNightlyCents, cleaningFeeCents, conciergeFeeCents } = resolveSettingsCents(
     settings,
     fallbackNightlyEuros,

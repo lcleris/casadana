@@ -1,5 +1,4 @@
-import { ApiError, getListAdminUsersQueryKey, useCreateAdminUser } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 
@@ -14,6 +13,7 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/toast"
+import { apiErrorCode, orpc } from "@/lib/orpc"
 
 interface CreateAdminUserFormValues {
   email: string
@@ -34,16 +34,16 @@ export default function CreateAdminUserDialog() {
     defaultValues: { email: "", password: "" },
   })
 
-  const { mutate: createUser, isPending } = useCreateAdminUser({
-    mutation: {
+  const { mutate: createUser, isPending } = useMutation(
+    orpc.admin.createUser.mutationOptions({
       onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: getListAdminUsersQueryKey() })
+        void queryClient.invalidateQueries({ queryKey: orpc.admin.listUsers.key() })
         toast("Administrateur ajouté")
         setOpen(false)
         reset()
       },
       onError: (err) => {
-        if (err instanceof ApiError && err.code === "EMAIL_TAKEN") {
+        if (apiErrorCode(err) === "EMAIL_TAKEN") {
           setError("email", {
             type: "taken",
             message: "Un administrateur avec cet e-mail existe déjà.",
@@ -52,11 +52,11 @@ export default function CreateAdminUserDialog() {
           toast("Impossible d'ajouter l'administrateur")
         }
       },
-    },
-  })
+    }),
+  )
 
   const onSubmit = (values: CreateAdminUserFormValues) => {
-    createUser({ data: values })
+    createUser(values)
   }
 
   return (

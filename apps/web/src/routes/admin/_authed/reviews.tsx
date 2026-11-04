@@ -1,4 +1,4 @@
-import { useGetVillaReviewMeta, useListAdminReviews } from "@casa-dana/api"
+import { useQuery } from "@tanstack/react-query"
 import { Navigate, createFileRoute, useNavigate } from "@tanstack/react-router"
 
 import AddReviewDialog from "@/components/admin/reviews/add-review-dialog"
@@ -7,6 +7,7 @@ import ReviewTable from "@/components/admin/reviews/review-table"
 import { AdminCard } from "@/components/admin/ui/admin-card"
 import { Pager } from "@/components/admin/ui/pager"
 import { StatRow, StatTile } from "@/components/admin/ui/stat-tile"
+import { orpc } from "@/lib/orpc"
 
 const PROPERTIES = ["casadana", "casacasay"] as const
 type Property = (typeof PROPERTIES)[number]
@@ -62,13 +63,15 @@ function ReviewsPage() {
 
   // The admin endpoint returns every review for the villa in one go, so the
   // counts and the pagination below are both derived client-side.
-  const { data } = useListAdminReviews({ villa_slug: property })
+  const { data } = useQuery(
+    orpc.reviews.listAdmin.queryOptions({ input: { villa_slug: property } }),
+  )
   const reviews = data?.reviews ?? []
 
   // Read from the meta rather than averaging the rows: the published figure
   // counts approved reviews only, and a tile disagreeing with it would read as
   // a bug.
-  const { data: meta } = useGetVillaReviewMeta(property)
+  const { data: meta } = useQuery(orpc.reviews.meta.queryOptions({ input: { slug: property } }))
   const average = meta && meta.display_count > 0 ? meta.display_avg.toFixed(2) : "—"
 
   const total = reviews.length

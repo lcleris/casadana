@@ -1,4 +1,4 @@
-import type { HistoryEvent, HistoryEventType } from "@casa-dana/api"
+import type { HistoryEvent, HistoryEventType } from "@casa-dana/contract"
 import { CalendarDays, Circle, Star, Tag, UserCog } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 

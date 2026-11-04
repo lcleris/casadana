@@ -1,4 +1,4 @@
-import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/api"
+import type { PatchSeasonRuleRequest, SeasonRule } from "@casa-dana/contract"
 import { Trash2 } from "lucide-react"
 import { useEffect, useEffectEvent, useRef, useState } from "react"
 

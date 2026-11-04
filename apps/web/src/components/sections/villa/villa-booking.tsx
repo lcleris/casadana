@@ -1,11 +1,11 @@
-import { ApiError, useCreateBooking } from "@casa-dana/api"
-import { useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ArrowRight } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import type { VillaData } from "@/constants/villas.const"
+import { apiErrorCode, orpc } from "@/lib/orpc"
 import { usePublishedRating } from "@/lib/use-published-rating"
 import { cn } from "@/lib/utils"
 import { m } from "@/paraglide/messages"
@@ -138,18 +138,18 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
   const [topLevelError, setTopLevelError] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
-  const { mutate: createBooking, isPending } = useCreateBooking({
-    mutation: {
+  const { mutate: createBooking, isPending } = useMutation(
+    orpc.bookings.create.mutationOptions({
       onSuccess: () => {
         setSubmitted(true)
         setTopLevelError(null)
         void queryClient.invalidateQueries({
-          queryKey: ["/api/villas", villaSlug, "availability"],
+          queryKey: orpc.villas.availability.key({ input: { slug: villaSlug } }),
         })
       },
       onError: (err) => {
-        const code = err instanceof ApiError ? err.code : undefined
-        if (err instanceof ApiError && code === "VALIDATION") {
+        const code = apiErrorCode(err)
+        if (code === "VALIDATION") {
           for (const { field, type, message } of parseValidationMessage(err.message)) {
             setError(field, { type, message })
           }
@@ -158,8 +158,8 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
         }
         setTopLevelError(topLevelErrorMessage(code ?? ""))
       },
-    },
-  })
+    }),
+  )
 
   const {
     nightSets,
@@ -238,21 +238,19 @@ export default function VillaBooking({ villaSlug, booking }: VillaBookingProps) 
       return
     }
     createBooking({
-      data: {
-        villa_slug: villaSlug,
-        guest_name: values.name,
-        guest_email: values.email,
-        guest_phone: values.tel,
-        check_in: dayKey(values.checkIn),
-        check_out: dayKey(values.checkOut),
-        adults: values.guests,
-        children: 0,
-        message: values.description,
-        // The language this guest is reading the site in. It's persisted with
-        // the booking so every email about it — including the approval sent
-        // weeks later — is written in that language rather than in French.
-        locale: getLocale(),
-      },
+      villa_slug: villaSlug,
+      guest_name: values.name,
+      guest_email: values.email,
+      guest_phone: values.tel,
+      check_in: dayKey(values.checkIn),
+      check_out: dayKey(values.checkOut),
+      adults: values.guests,
+      children: 0,
+      message: values.description,
+      // The language this guest is reading the site in. It's persisted with
+      // the booking so every email about it — including the approval sent
+      // weeks later — is written in that language rather than in French.
+      locale: getLocale(),
     })
   }
 
