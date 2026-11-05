@@ -22,12 +22,12 @@
     "fallow:audit": "fallow audit"
   },
   "devDependencies": {
-    "fallow": "^3.34.1",
+    "fallow": "^3.39.0",
     "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0",
-    "oxlint-plugin-react-doctor": "^0.9.18",
-    "oxlint-tsgolint": "^7.0.2004",
+    "oxlint": "^1.91.0",
+    "oxlint-plugin-react-doctor": "^0.9.22",
+    "oxlint-tsgolint": "^7.0.2005",
     "typescript": "^7.0.2",
-    "ultracite": "^8.0.1"
+    "ultracite": "^8.1.1"
   }
 }
