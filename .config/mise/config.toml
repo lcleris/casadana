@@ -1,6 +1,6 @@
 [tools]
 bun = "1"
-go = "1.26"
+go = "1.27"
 node = "latest"
 
 [tasks.dev-api]
